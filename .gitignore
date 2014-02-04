@@ -1,0 +1,12 @@
+# Ignore binary directory:
+build/
+
+# Ignore C++ object files and executables:
+*.o
+SoFiA
+
+# Ignore Python bytecode:
+*.pyc
+
+# Ignore backup files:
+*~

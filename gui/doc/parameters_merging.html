@@ -1,0 +1,79 @@
+<html>
+  <head>
+    <title>SoFiA Handbook - Parameters: Merging</title>
+  </head>
+  
+  <body style="margin:5px;">
+    <h1 style="color:#4060A0;">Parameters</h1>
+    
+    <h2 style="color:#4060A0;">Merging</h2>
+    
+    <p align="center">
+      <img src="images/interface_merging.png" width="360" heigh="126" alt="SoFiA User Interface: Merging Parameters" />
+    </p>
+    
+    <p>
+      The settings below control how detections get merged into sources.
+    </p>
+    
+    <table style="margin:10px; background-color:#E0F0FF;" cellspacing="0" cellpadding="3" border="1">
+      <tr>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Module / Parameter</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Type</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Values</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Description</th>
+      </tr>
+      <tr style="background-color:#F0F8FF;">
+        <td>steps.doMerge</td>
+        <td>bool</td>
+        <td><b>true</b>, false</td>
+        <td>Merge detected sources?</td>
+      </tr>
+      <tr>
+        <td>merge.mergeX</td>
+        <td>int</td>
+        <td>&ge; 0; default: <b>3</b></td>
+        <td>Merging radius in first dimension in pixels.</td>
+      </tr>
+      <tr style="background-color:#F0F8FF;">
+        <td>merge.mergeY</td>
+        <td>int</td>
+        <td>&ge; 0; default: <b>3</b></td>
+        <td>Merging radius in second dimension in pixels.</td>
+      </tr>
+      <tr>
+        <td>merge.mergeZ</td>
+        <td>int</td>
+        <td>&ge; 0; default: <b>3</b></td>
+        <td>Merging radius in third dimension in pixels.</td>
+      </tr>
+      <tr style="background-color:#F0F8FF;">
+        <td>merge.minSizeX</td>
+        <td>int</td>
+        <td>&ge; 1; default: <b>3</b></td>
+        <td>Minimum extent of genuine sources in first dimension.</td>
+      </tr>
+      <tr>
+        <td>merge.minSizeY</td>
+        <td>int</td>
+        <td>&ge; 1; default: <b>3</b></td>
+        <td>Minimum extent of genuine sources in second dimension.</td>
+      </tr>
+      <tr style="background-color:#F0F8FF;">
+        <td>merge.minSizeZ</td>
+        <td>int</td>
+        <td>&ge; 1; default: <b>2</b></td>
+        <td>Minimum extent of genuine sources in third dimension.</td>
+      </tr>
+      <tr>
+        <td colspan="4" style="background-color:#FFFFFF;">Default values are set in <b>bold-face</b> font.</td>
+      </tr>
+    </table>
+    
+    <p align="center">
+      <a href="parameters_sourcefinding.html">&larr;&nbsp;Previous</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="parameters.html">&uarr;&nbsp;Up</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="parameters_parametrisation.html">Next&nbsp;&rarr;</a>
+    </p>
+    
+    <p>&nbsp;</p>
+  </body>
+</html>

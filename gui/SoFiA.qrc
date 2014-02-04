@@ -1,0 +1,25 @@
+<!DOCTYPE RCC>
+
+<RCC version="1.0">
+    <qresource>
+        <file>icons/22/document-new.png</file>
+        <file>icons/22/document-open.png</file>
+        <file>icons/22/document-preview.png</file>
+        <file>icons/22/document-save.png</file>
+        <file>icons/22/document-save-as.png</file>
+        <file>icons/22/application-exit.png</file>
+        <file>icons/22/dialog-ok-apply.png</file>
+        <file>icons/22/dialog-cancel.png</file>
+        <file>icons/22/dialog-close.png</file>
+        <file>icons/22/help-about.png</file>
+        <file>icons/22/go-home.png</file>
+        <file>icons/22/go-previous.png</file>
+        <file>icons/22/go-previous-view.png</file>
+        <file>icons/22/go-next-view.png</file>
+        <file>icons/22/edit-clear-list.png</file>
+        <file>icons/22/help-contents.png</file>
+        <file>icons/22/view-refresh.png</file>
+        <file>icons/32/SoFiA.png</file>
+        <file>SoFiA.def</file>
+    </qresource>
+</RCC>

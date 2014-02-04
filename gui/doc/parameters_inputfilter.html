@@ -1,0 +1,115 @@
+<html>
+  <head>
+    <title>SoFiA Handbook - Parameters: Input Filter</title>
+  </head>
+  
+  <body style="margin:5px;">
+    <h1 style="color:#4060A0;">Parameters</h1>
+    
+    <h2 style="color:#4060A0;">Input Filter</h2>
+    
+    <p align="center">
+      <img src="images/interface_inputfilter.png" width="360" heigh="202" alt="SoFiA User Interface: Input Filter Parameters" />
+    </p>
+    
+    <h3 style="color:#4060A0;">Spatial and spectral smoothing</h3>
+    
+    <table style="margin:10px; background-color:#E0F0FF;" cellspacing="0" cellpadding="3" border="1">
+      <tr>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Module / Parameter</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Type</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Values</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Description</th>
+      </tr>
+      <tr style="background-color:#F0F8FF;">
+        <td>steps.doSmooth</td>
+        <td>bool</td>
+        <td>true, <b>false</b></td>
+        <td>Spatially and spectrally smooth cube prior to source finding?</td>
+      </tr>
+      <tr>
+        <td>smooth.kernel</td>
+        <td>string</td>
+        <td><b>gaussian</b>, boxcar, median</td>
+        <td>Type of smoothing kernel used in both spatial and spectral smoothing.</td>
+      </tr>
+      <tr style="background-color:#F0F8FF;">
+        <td>smooth.edgeMode</td>
+        <td>string</td>
+        <td><b>constant</b>, reflect, mirror, nearest, wrap</td>
+        <td>Behaviour near the edge of the cube.</td>
+      </tr>
+      <tr>
+        <td>smooth.kernelX</td>
+        <td>float</td>
+        <td>&ge; 0.0; default: <b>3.0</b></td>
+        <td>Kernel size in pixels for first coordinate. For Gaussian kernels the value refers to the FWHM.</td>
+      </tr>
+      <tr style="background-color:#F0F8FF;">
+        <td>smooth.kernelY</td>
+        <td>float</td>
+        <td>&ge; 0.0; default: <b>3.0</b></td>
+        <td>Kernel size in pixels for second coordinate. For Gaussian kernels the value refers to the FWHM.</td>
+      </tr>
+      <tr>
+        <td>smooth.kernelZ</td>
+        <td>float</td>
+        <td>&ge; 0.0; default: <b>3.0</b></td>
+        <td>Kernel size in pixels for third coordinate. For Gaussian kernels the value refers to the FWHM.</td>
+      </tr>
+      <tr>
+        <td colspan="4" style="background-color:#FFFFFF;">Default values are set in <b>bold-face</b> font.</td>
+      </tr>
+    </table>
+    
+    <h3 style="color:#4060A0;">Noise scaling</h3>
+    
+    <table style="margin:10px; background-color:#E0F0FF;" cellspacing="0" cellpadding="3" border="1">
+      <tr>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Module / Parameter</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Type</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Value</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Description</th>
+      </tr>
+      <tr style="background-color:#F0F8FF;">
+        <td>steps.doScaleNoise</td>
+        <td>bool</td>
+        <td>true, <b>false</b></td>
+        <td>Normalise noise levels prior to source finding?</td>
+      </tr>
+      <tr>
+        <td>scaleNoise.statistic</td>
+        <td>string</td>
+        <td><b>mad</b>, std</td>
+        <td>Statistic used to measure the noise (median absolute deviation or standard deviation).</td>
+      </tr>
+      <tr style="background-color:#F0F8FF;">
+        <td>scaleNoise.edgeX</td>
+        <td>int</td>
+        <td>&ge; <b>0</b></td>
+        <td>Size of edge (in pixels) to be excluded in first coordinate.</td>
+      </tr>
+      <tr>
+        <td>scaleNoise.edgeY</td>
+        <td>int</td>
+        <td>&ge; <b>0</b></td>
+        <td>Size of edge (in pixels) to be excluded in second coordinate.</td>
+      </tr>
+      <tr style="background-color:#F0F8FF;">
+        <td>scaleNoise.edgeZ</td>
+        <td>int</td>
+        <td>&ge; <b>0</b></td>
+        <td>Size of edge (in pixels) to be excluded in third coordinate.</td>
+      </tr>
+      <tr>
+        <td colspan="4" style="background-color:#FFFFFF;">Default values are set in <b>bold-face</b> font.</td>
+      </tr>
+    </table>
+    
+    <p align="center">
+      <a href="parameters_input.html">&larr;&nbsp;Previous</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="parameters.html">&uarr;&nbsp;Up</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="parameters_sourcefinding.html">Next&nbsp;&rarr;</a>
+    </p>
+    
+    <p>&nbsp;</p>
+  </body>
+</html>

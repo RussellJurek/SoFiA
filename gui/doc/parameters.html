@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <title>SoFiA Handbook - Parameters</title>
+  </head>
+  
+  <body style="margin:5px;">
+    <h1 style="color:#4060A0;">Parameters</h1>
+    
+    <h2 style="color:#4060A0;">Introduction</h2>
+    
+    <p>
+      The main purpose of SoFiA is to allow pipeline users to comfortably create and edit parameter settings for pipeline. While parameter files can in principle be created and edited by hand, SoFiA is designed to make this task much easier by guiding the user through the set of available parameters and providing additional information and help on individual settings if required.
+    </p>
+    
+    <h2 style="color:#4060A0;">Format of Parameter Files</h2>
+    
+    <p>
+      SoFiA parameter files are regular ASCII files with arbitrary file names that define a set of parameters controlling the source finding and parametrisation tasks carried out by the pipeline. Parameters are defined in the following human- and machine-readable form:
+    </p>
+    
+    <pre style="background-color:#E0F0FF; margin:10px;"> module.parameter = value</pre>
+    
+    <p>
+      Each parameter setting must be on a separate line. An arbitrary number (including zero) of space and tabulator characters are allowed around the assignment operator (=) and at the beginning or end of each line; these will be ignored by the parser. Any empty lines and lines starting with a hash character (#) will be ignored as well and treated as a comment.
+    </p>
+    
+    <h2 style="color:#4060A0;">Available Parameters</h2>
+    
+    <p>
+      The parameters of SoFiA are grouped into the following six categories:
+    </p>
+    
+    <table style="margin:10px; background-color:#E0F0FF;" cellspacing="0" cellpadding="3">
+      <tr>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Category</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Description</th>
+      </tr>
+      <tr>
+        <td><a href="parameters_input.html">Input</a></td>
+        <td>Specification of the input data files.</td>
+      </tr>
+      <tr>
+        <td style="background-color:#F0F8FF;"><a href="parameters_inputfilter.html">Input Filter</a></td>
+        <td style="background-color:#F0F8FF;">A range of data filtering and preconditioning algorithms prior to running the source finding and parametrisation, including spatial and spectral smoothing and noise scaling.</td>
+      </tr>
+      <tr>
+        <td><a href="parameters_sourcefinding.html">Source Finding</a></td>
+        <td>Settings for the actual source finding algorithms.</td>
+      </tr>
+      <tr>
+        <td style="background-color:#F0F8FF;"><a href="parameters_merging.html">Merging</a></td>
+        <td style="background-color:#F0F8FF;">Settings related to the merging of detections into sources.</td>
+      </tr>
+      <tr>
+        <td><a href="parameters_parametrisation.html">Parametrisation</a></td>
+        <td>The settings for the source parametrisation algorithm used to measure the sources&rsquo; observational and physical parameters.</td>
+      </tr>
+      <tr>
+        <td style="background-color:#F0F8FF;"><a href="parameters_outputfilter.html">Output Filter</a></td>
+        <td style="background-color:#F0F8FF;">A range of options for filtering the output catalogue based on the measured source parameters.</td>
+      </tr>
+      <tr>
+        <td><a href="parameters_output.html">Output</a></td>
+        <td>The output data products and formats as well as the range of source parameters to be included in the output catalogue.</td>
+      </tr>
+    </table>
+    
+    <p>
+      Please click on the individual categories for a detailed description of the available parameters and their possible values.
+    </p>
+    
+    <p align="center">
+      <a href="interface_statusbar.html">&larr;&nbsp;Previous</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="index.html">&uarr;&nbsp;Up</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="parameters_input.html">Next&nbsp;&rarr;</a>
+    </p>
+    
+    <p>&nbsp;</p>
+  </body>
+</html>

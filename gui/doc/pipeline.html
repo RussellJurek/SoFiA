@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <title>SoFiA Handbook - Running the Pipeline</title>
+  </head>
+  
+  <body style="margin:5px;">
+    <h1 style="color:#4060A0;">Running the Pipeline</h1>
+    
+    <h2 style="color:#4060A0;">From the Use Interface</h2>
+    
+    <p>
+      Once an input data cube has been selected and the desired parameter settings have been selected, the pipeline can be launched from within the user interface, either by selecting <span style="background-color:#E0E0E0;">&nbsp;Pipeline &rarr; Run Pipeline&nbsp;</span> or by clicking on the corresponding tool bar button. The pipeline run can be aborted at any time by selecting <span style="background-color:#E0E0E0;">&nbsp;Pipeline &rarr; Abort Pipeline&nbsp;</span> or by clicking on the respective tool bar button.
+    </p>
+    
+    <p>
+      SoFiA will automatically save the current parameter settings to the current parameter file before starting the pipeline. If no file is specified, SoFiA will create a temporary file instead.
+    </p>
+    
+    <h2 style="color:#4060A0;">From the Terminal</h2>
+    
+    <p>
+      Alternatively, the pipeline can be launched from the terminal after the parameter settings have been saved to an output file. To achieve this, open a terminal window and navigate to the directory where the output parameter file was saved. Then run the pipeline by typing
+    </p>
+    
+    <pre style="background-color:#E0F0FF; margin:10px;"> sofia_pipeline.py &lt;parameter file&gt;</pre>
+    
+    where &lt;parameter file&gt; is the name of the SoFiA parameter file. There is no difference between running the pipeline from the user interface or from the terminal, but the latter is more useful in situations where the pipeline needs to be launched by another application or shell script, e.g. to automatically process a larger number of data cubes.
+    
+    <p align="center">
+      <a href="parameters_output.html">&larr;&nbsp;Previous</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="index.html">&uarr;&nbsp;Up</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="references.html">Next&nbsp;&rarr;</a>
+    </p>
+    
+    <p>&nbsp;</p>
+  </body>
+</html>

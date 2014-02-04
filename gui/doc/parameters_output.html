@@ -1,0 +1,113 @@
+<html>
+  <head>
+    <title>SoFiA Handbook - Parameters: Output</title>
+  </head>
+  
+  <body style="margin:5px;">
+    <h1 style="color:#4060A0;">Parameters</h1>
+    
+    <h2 style="color:#4060A0;">Output</h2>
+    
+    <p align="center">
+      <img src="images/interface_output.png" width="360" heigh="189" alt="SoFiA User Interface: Output Parameters" />
+    </p>
+    
+    <p>
+      The parameters below control the storage of source catalogues and other data products.
+    </p>
+    
+    <h3 style="color:#4060A0;">Source catalogue</h3>
+    
+    <table style="margin:10px; background-color:#E0F0FF;" cellspacing="0" cellpadding="3" border="1">
+      <tr>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Module / Parameter</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Type</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Values</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Description</th>
+      </tr>
+      <tr style="background-color:#F0E0E0;">
+        <td>steps.doWriteCat</td>
+        <td>bool</td>
+        <td><b>true</b>, false</td>
+        <td>Write source catalogue(s) to disk?</td>
+      </tr>
+      <tr style="background-color:#FFF8F0;">
+        <td>writeCat.parameters</td>
+        <td>string</td>
+        <td>list of parameters; default: <b>['*']</b></td>
+        <td>List of parameters to appear in source catalogue. Format: ['par1', 'par2', ...]. An asterisk ['*'] means all parameters.</td>
+      </tr>
+      <tr>
+        <td>writeCat.baseName</td>
+        <td>string</td>
+        <td>file name</td>
+        <td>Base name of output files (not yet implemented). No default.</td>
+      </tr>
+      <tr style="background-color:#F0F8FF;">
+        <td>writeCat.writeASCII</td>
+        <td>bool</td>
+        <td><b>true</b>, false</td>
+        <td>Write catalogue in ASCII format.</td>
+      </tr>
+      <tr>
+        <td>writeCat.writeXML</td>
+        <td>bool</td>
+        <td>true, <b>false</b></td>
+        <td>Write catalogue in VO table (XML) format.</td>
+      </tr>
+      <tr style="background-color:#F0F8FF;">
+        <td>writeCat.writeSQL</td>
+        <td>bool</td>
+        <td>true, <b>false</b></td>
+        <td>Write catalogue in SQL format (not yet implemented).</td>
+      </tr>
+      <tr>
+        <td colspan="4" style="background-color:#FFFFFF;">Default values are set in <b>bold-face</b> font. Parameters on a red background are not accessible through the user interface.</td>
+      </tr>
+    </table>
+    
+    <h3 style="color:#4060A0;">Additional data products</h3>
+    
+    <table style="margin:10px; background-color:#E0F0FF;" cellspacing="0" cellpadding="3" border="1">
+      <tr>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Module / Parameter</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Type</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Values</th>
+        <th align="left" style="background-color:#4060A0; color:#FFFFFF;">Description</th>
+      </tr>
+      <tr>
+        <td>steps.doWriteMask</td>
+        <td>bool</td>
+        <td><b>false</b>, true</td>
+        <td>Save mask cube?</td>
+      </tr>
+      <tr style="background-color:#F0F8FF;">
+        <td>steps.doMom0</td>
+        <td>bool</td>
+        <td><b>false</b>, true</td>
+        <td>Create and save moment-0 map?</td>
+      </tr>
+      <tr>
+        <td>steps.doMom1</td>
+        <td>bool</td>
+        <td><b>false</b>, true</td>
+        <td>Create and save moment-1 map?</td>
+      </tr>
+      <tr style="background-color:#F0F8FF;">
+        <td>steps.doCubelets</td>
+        <td>bool</td>
+        <td><b>false</b>, true</td>
+        <td>Create and save sub-cube of each source?</td>
+      </tr>
+      <tr>
+        <td colspan="4" style="background-color:#FFFFFF;">Default values are set in <b>bold-face</b> font.</td>
+      </tr>
+    </table>
+    
+    <p align="center">
+      <a href="parameters_outputfilter.html">&larr;&nbsp;Previous</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="parameters.html">&uarr;&nbsp;Up</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="pipeline.html">Next&nbsp;&rarr;</a>
+    </p>
+    
+    <p>&nbsp;</p>
+  </body>
+</html>
