@@ -44,7 +44,7 @@ def SizeFilter(mskt,sfx,sfy,sfz,sbx,sby,sbz,zt,sizeFilter,edgeMode='constant',ve
 	return mskt
 
 def MaskedCube(incube,msk,replace_value):
-	maskedcube=incube*1 # *1 makes sure that incube is not modified!
+	maskedcube=np.copy(incube)
 	maskedcube[msk]=np.sign(incube[msk])*np.minimum(abs(incube[msk]),replace_value)
 	# this only decreases the absolute value of voxels already in the mask, or leaves it unchanged
 	# if already lower than replace_value; the sign is unchanged
@@ -97,7 +97,9 @@ def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskS
 			# smooth starting from the latest xy cube (clipped to the detection threshold times maskScaleXY)
 			cubexy=nd.filters.gaussian_filter(np.clip(cubexy,-maskScaleXY*threshold*rmsxy,maskScaleXY*threshold*rmsxy),[0,mt.sqrt(ky**2-kyold**2)/2.355,mt.sqrt(kx**2-kxold**2)/2.355],mode=edgeMode)
 			rmsxy=GetRMS(cubexy,rmsMode=rmsMode,zoomx=1,zoomy=1,zoomz=1,verbose=verbose)
-		else: cubexy,rmsxy=cube,rms
+		else:
+			cubexy,rmsxy=np.copy(cube),rms
+			cubexy[np.isnan(cubexy)]=0
 
 		# Loop over all z kernels
 		for ii in range(len(velsmooth[jj])):
@@ -134,6 +136,7 @@ def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskS
 		if verbose: print '    Adding xy mask to final mask ...'
 		msk=msk+mskxy
 
+	msk[np.isnan(cube)]=False
 	return msk
 
 import pyfits as pf
