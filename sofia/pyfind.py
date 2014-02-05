@@ -13,7 +13,7 @@ def GetRMS(cube,rmsMode='negative',zoomx=1,zoomy=1,zoomz=10000,nrbins=10000,verb
 
 	if rmsMode=='negative':
 		cubemin=np.nanmin(cube)
-		bins=np.arange(cubemin,abs(cubemin))/nrbins-1e-12,abs(cubemin)/nrbins)
+		bins=np.arange(cubemin,abs(cubemin)/nrbins-1e-12,abs(cubemin)/nrbins)
 		fluxval=(bins[:-1]+bins[1:])/2
 		rmshisto=np.histogram(cube[z0:z1,y0:y1,x0:x1],bins=bins)[0]
 
