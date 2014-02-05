@@ -23,7 +23,9 @@ def recursion(dictionary,optionsList,optionsDepth,counter=0):
 
 def writeMoment0(datacube,maskcube,filename,debug,header):
   print 'Writing moment-0' # in units of header['bunit']*km/s
-  m0=np.array((datacube*maskcube.astype(bool)).sum(axis=0))
+  m0=datacube*maskcube.astype(bool)
+  m0[np.isnan(m0)]=0
+  m0=np.array(m0.sum(axis=0))
   op=0
   if 'vopt' in header['ctype3'].lower() or 'vrad' in header['ctype3'].lower() or 'velo' in header['ctype3'].lower() or 'felo' in header['ctype3'].lower():
     if not 'cunit3' in header: dkms=abs(header['cdelt3'])/1e+3 # assuming m/s
