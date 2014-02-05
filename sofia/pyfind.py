@@ -68,10 +68,6 @@ def SortKernels(kernels):
 	return uniquesky,velsmooth,velfshape
 
 def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskScaleXY=2.,maskScaleZ=2.,kernelUnit='pixel',edgeMode='constant',rmsMode='negative',verbose=0):
-	# Get beam FWHM in pixels
-	bmin=header['bmin']/abs(header['cdelt1']) # assumed to be along x axis
-	bmaj=header['bmaj']/abs(header['cdelt2']) # assumed to be along y axis
-
 	# Create binary mask array
 	msk=np.zeros(cube.shape,'bool')
 
@@ -124,6 +120,11 @@ def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskS
 			# Add detected voxels to mask
 			if sizeFilter:
 				if verbose: print '      Adding detected voxels to xy mask with size filtering'
+				# Get beam FWHM in pixels
+				if 'BMAJ' in header.keys(): bmaj=header['bmaj']/abs(header['cdelt2']) # assumed to be along y axis
+				else: bmaj=0
+				if 'BMIN' in header.keys(): bmin=header['bmin']/abs(header['cdelt1']) # assumed to be along x axis
+				else: bmin=bmaj
 				mskxy=mskxy+SizeFilter(((cubexyz>=threshold*rmsxyz)+(cubexyz<=-threshold*rmsxyz)).astype('float32'),kx,ky,kz,bmin,bmaj,3,kt,sizeFilter,edgeMode=edgeMode,verbose=0).astype('bool')
 			else:
 				if verbose: print '      Adding detected voxels directly to xy mask ...'
