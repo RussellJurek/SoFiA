@@ -12,7 +12,8 @@ def GetRMS(cube,rmsMode='negative',zoomx=1,zoomy=1,zoomz=10000,nrbins=10000,verb
 	if verbose: print '    ... Subcube shape is',cube[z0:z1,y0:y1,x0:x1].shape,'...'
 
 	if rmsMode=='negative':
-		bins=np.arange(cube.min(),abs(cube.min())/nrbins-1e-12,abs(cube.min())/nrbins)
+		cubemin=np.nanmin(cube)
+		bins=np.arange(cubemin,abs(cubemin))/nrbins-1e-12,abs(cubemin)/nrbins)
 		fluxval=(bins[:-1]+bins[1:])/2
 		rmshisto=np.histogram(cube[z0:z1,y0:y1,x0:x1],bins=bins)[0]
 
@@ -22,7 +23,7 @@ def GetRMS(cube,rmsMode='negative',zoomx=1,zoomy=1,zoomz=10000,nrbins=10000,verb
 		if nrsummedbins:
 			if verbose: print '    ... adjusting bin size to get a fraction of voxels in central bin >=',min_hist_peak
 			nrbins/=nrsummedbins
-			bins=np.arange(cube.min(),abs(cube.min())/nrbins-1e-12,abs(cube.min())/nrbins)
+			bins=np.arange(cubemin,abs(cubemin)/nrbins-1e-12,abs(cubemin)/nrbins)
 			fluxval=(bins[:-1]+bins[1:])/2
 			rmshisto=np.histogram(cube[z0:z1,y0:y1,x0:x1],bins=bins)[0]
 
@@ -72,7 +73,7 @@ def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskS
 	msk=np.zeros(cube.shape,'bool')
 
 	# Measure noise in original cube
-	rms=GetRMS(cube,rmsMode=rmsMode,zoomx=2,zoomy=2,zoomz=20,verbose=verbose)
+	rms=GetRMS(cube,rmsMode=rmsMode,zoomx=1,zoomy=1,zoomz=1,verbose=verbose)
 
 	# Sort kernels
 	uniquesky,velsmooth,velfshape=SortKernels(kernels)
@@ -95,7 +96,7 @@ def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskS
 		if kx+ky:
 			# smooth starting from the latest xy cube (clipped to the detection threshold times maskScaleXY)
 			cubexy=nd.filters.gaussian_filter(np.clip(cubexy,-maskScaleXY*threshold*rmsxy,maskScaleXY*threshold*rmsxy),[0,mt.sqrt(ky**2-kyold**2)/2.355,mt.sqrt(kx**2-kxold**2)/2.355],mode=edgeMode)
-			rmsxy=GetRMS(cubexy,rmsMode=rmsMode,zoomx=2,zoomy=2,zoomz=20,verbose=verbose)
+			rmsxy=GetRMS(cubexy,rmsMode=rmsMode,zoomx=1,zoomy=1,zoomz=1,verbose=verbose)
 		else: cubexy,rmsxy=cube,rms
 
 		# Loop over all z kernels
@@ -114,7 +115,7 @@ def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskS
 				# before smoothing voxels already detected at the current angular resolution are brought down to +/-maskScaleZ*rmsxyz*threshold
 				if kt=='b': cubexyz=nd.filters.uniform_filter1d(MaskedCube(cubexy,mskxy,maskScaleZ*rmsxyz*threshold),kz,axis=0,mode=edgeMode)
 				elif kt=='g': cubexyz=nd.filters.gaussian_filter1d(MaskedCube(cubexy,mskxy,maskScaleZ*rmsxyz*threshold),kz/2.355,axis=0,mode=edgeMode)
-				rmsxyz=GetRMS(cubexyz,rmsMode=rmsMode,zoomx=2,zoomy=2,zoomz=20,verbose=verbose)
+				rmsxyz=GetRMS(cubexyz,rmsMode=rmsMode,zoomx=1,zoomy=1,zoomz=1,verbose=verbose)
 			else: cubexyz,rmsxyz=cubexy,rmsxy
 
 			# Add detected voxels to mask
