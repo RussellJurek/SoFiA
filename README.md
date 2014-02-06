@@ -44,7 +44,7 @@ folder where the downloaded file was saved. Then follow the steps below.
 
 1. Unpack all files
 
-   Unpack the sofia_0.1-beta.tar.gz file into a directory of your choice:
+   Download and unpack the zipped archive into a directory of your choice:
 
     gunzip sofia_0.1-beta.tar.gz
     tar -xvf sofia_0.1-beta.tar
