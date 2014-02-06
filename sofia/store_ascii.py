@@ -55,7 +55,7 @@ def make_ascii_from_array(objects,cathead,catfmt,store_pars,outname):
 	#print catfmt
 	for j in catfmt:
 	  lenCathead.append(int( (((((j.split('%')[1]).split('e')[0]).split('f')[0]).split('i')[0]).split('d')[0]).split('.')[0] )+1)
-	lenCathead[0] -= 2
+	#lenCathead[0] -= 2
 	catNum=tuple(['(%i)'%jj for jj in range(len(cathead))])
 	
 	# creating the header
@@ -65,13 +65,13 @@ def make_ascii_from_array(objects,cathead,catfmt,store_pars,outname):
 		for i in range(0,len(cathead)):
 			header1 += cathead[i].rjust(lenCathead[i])
 			header2 += catNum[i].rjust(lenCathead[i])
-		header += header1[1:]+'\n'+header2[1:]
+		header += header1[3:]+'\n'+header2[3:]
 	else:	
 		for i in range (0,len(store_pars)):
 			index = list(cathead).index(store_pars[i])
 			header1 += store_pars[i].rjust(lenCathead[index])
 			header2 += catNum[i].rjust(lenCathead[index])
-		header += header1[1:]+'\n'+header2[1:]+'\n'
+		header += header1[3:]+'\n'+header2[3:]
 
 
 	if store_pars == ['*']:
