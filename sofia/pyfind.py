@@ -71,6 +71,7 @@ def SortKernels(kernels):
 def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskScaleXY=2.,maskScaleZ=2.,kernelUnit='pixel',edgeMode='constant',rmsMode='negative',verbose=0):
 	# Create binary mask array
 	msk=np.zeros(cube.shape,'bool')
+	found_nan=np.isnan(cube).sum()
 
 	# Measure noise in original cube
 	rms=GetRMS(cube,rmsMode=rmsMode,zoomx=1,zoomy=1,zoomz=1,verbose=verbose)
@@ -96,8 +97,11 @@ def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskS
 		if kx+ky:
 			# smooth starting from the latest xy cube (clipped to the detection threshold times maskScaleXY)
 			cubexy=nd.filters.gaussian_filter(np.clip(cubexy,-maskScaleXY*threshold*rmsxy,maskScaleXY*threshold*rmsxy),[0,mt.sqrt(ky**2-kyold**2)/2.355,mt.sqrt(kx**2-kxold**2)/2.355],mode=edgeMode)
+			if found_nan: cubexy[np.isnan(cube)]=np.nan
 			rmsxy=GetRMS(cubexy,rmsMode=rmsMode,zoomx=1,zoomy=1,zoomz=1,verbose=verbose)
-		else: cubexy,rmsxy=np.nan_to_num(cube),rms
+			if found_nan: cubexy=np.nan_to_num(cubexy)
+		elif found_nan: cubexy,rmsxy=np.nan_to_num(cube),rms
+		else: cubexy,rmsxy=np.copy(cube),rms
 
 		# Loop over all z kernels
 		for ii in range(len(velsmooth[jj])):
@@ -115,7 +119,9 @@ def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskS
 				# before smoothing voxels already detected at the current angular resolution are brought down to +/-maskScaleZ*rmsxyz*threshold
 				if kt=='b': cubexyz=nd.filters.uniform_filter1d(MaskedCube(cubexy,mskxy,maskScaleZ*rmsxyz*threshold),kz,axis=0,mode=edgeMode)
 				elif kt=='g': cubexyz=nd.filters.gaussian_filter1d(MaskedCube(cubexy,mskxy,maskScaleZ*rmsxyz*threshold),kz/2.355,axis=0,mode=edgeMode)
+				if found_nan: cubexyz[np.isnan(cube)]=np.nan
 				rmsxyz=GetRMS(cubexyz,rmsMode=rmsMode,zoomx=1,zoomy=1,zoomz=1,verbose=verbose)
+				if found_nan: cubexyz=np.nan_to_num(cubexyz)
 			else: cubexyz,rmsxyz=cubexy,rmsxy
 
 			# Add detected voxels to mask
