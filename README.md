@@ -46,14 +46,13 @@ folder where the downloaded file was saved. Then follow the steps below.
 
    Download and unpack the zipped archive into a directory of your choice:
 
-    gunzip sofia_0.1-beta.tar.gz
-    tar -xvf sofia_0.1-beta.tar
+    unzip SoFiA-master.zip
 
-   This will unpack all files into a directory called sofia_0.1-beta.
+   This will unpack all files into a directory called SoFiA-master.
 
 2. Enter the installation directory
 
-    cd sofia_0.1-beta
+    cd SoFiA-master
 
 3. Compile and install the SoFiA pipeline and user interface
 
@@ -67,7 +66,7 @@ folder where the downloaded file was saved. Then follow the steps below.
 
 5. Launch SoFiA
 
-    Open a new terminal window and type ‘SoFiA &’.
+    Open a new terminal window and type ‘SoFiA’.
 
 
 Problems
@@ -92,6 +91,10 @@ and only basic help is available at this stage.
 
 Version history
 ---------------
+
+SoFiA 0.2
+  Released 05/02/2014
+  Fixes several bugs that were still present in the initial beta version.
 
 SoFiA 0.1 beta
   Released 14/11/2013
