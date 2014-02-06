@@ -23,9 +23,7 @@ def recursion(dictionary,optionsList,optionsDepth,counter=0):
 
 def writeMoment0(datacube,maskcube,filename,debug,header):
   print 'Writing moment-0' # in units of header['bunit']*km/s
-  m0=datacube*maskcube.astype(bool)
-  m0[np.isnan(m0)]=0
-  m0=np.array(m0.sum(axis=0))
+  m0=np.nan_to_num(datacube*maskcube.astype(bool)).sum(axis=0)
   op=0
   if 'vopt' in header['ctype3'].lower() or 'vrad' in header['ctype3'].lower() or 'velo' in header['ctype3'].lower() or 'felo' in header['ctype3'].lower():
     if not 'cunit3' in header: dkms=abs(header['cdelt3'])/1e+3 # assuming m/s
@@ -59,7 +57,7 @@ def writeMoment1(datacube,maskcube,filename,debug,header,m0):
     elif header['cunit3'].lower()=='khz': m1*=2.99792458e+5/1.42040575177e+6
   # calculate moment 1
   m0[m0==0]=np.nan
-  m1=np.divide(np.array((m1*datacube*maskcube.astype('bool')).sum(axis=0)),m0)
+  m1=np.divide(np.array(np.nan_to_num(m1*datacube*maskcube.astype('bool')).sum(axis=0)),m0)
   hdu = pyfits.PrimaryHDU(data=m1,header=header)
   hdu.header['bunit']='km/s'
   hdu.header['datamin']=np.nanmin(m1)
