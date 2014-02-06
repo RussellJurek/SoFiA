@@ -21,7 +21,7 @@ from sofia import linker
 from sofia import store_xml
 from sofia import store_ascii
 from sofia import cubelets
-#from sofia import parametrisation
+from sofia import parametrisation
 
 
 
@@ -266,55 +266,55 @@ if Parameters['steps']['doDebug'] and NRdet:
 #results=PyCatalog.PySourceCatalog()
 #results.readDuchampFile("duchamp-results.txt")
 
-#if Parameters['steps']['doParameterise'] and Parameters['steps']['doMerge'] and NRdet:
-	#print "\n--- SoFiA: Parametrising sources ---"
-	#sys.stdout.flush()
-	#objects, catParNames, catParFormt = parametrisation.parametrise(np_Cube, dict_Header, mask, objects, catParNames, catParFormt, Parameters)
+if Parameters['steps']['doParameterise'] and Parameters['steps']['doMerge'] and NRdet:
+	print "\n--- SoFiA: Parametrising sources ---"
+	sys.stdout.flush()
+	objects, catParNames, catParFormt = parametrisation.parametrise(np_Cube, dict_Header, mask, objects, catParNames, catParFormt, Parameters)
 	##print catParFormt
 	
 
-objects = np.array(objects)
-if Parameters['steps']['doParameterise'] and Parameters['steps']['doMerge']:
-	print "\n--- SoFiA: Parametrising sources ---"
-	sys.stdout.flush()
+#objects = np.array(objects)
+#if Parameters['steps']['doParameterise'] and Parameters['steps']['doMerge']:
+	#print "\n--- SoFiA: Parametrising sources ---"
+	#sys.stdout.flush()
         
-	from sofia import parametrizer2
-	cathead = np.array(catParNames)
-	initcatalog = parametrizer2.PySourceCatalog()
+	#from sofia import parametrizer2
+	#cathead = np.array(catParNames)
+	#initcatalog = parametrizer2.PySourceCatalog()
         
-	for rr in reliable:
-		obj = np.array(objects[rr - 1])
-		newSource = parametrizer2.PySource()
-		newSource.setSourceID(obj[cathead == 'ID'])
-		newMeasurement = parametrizer2.PyMeasurement()
-		newMeasurement.set('X', obj[cathead == 'Xg'], 0.0, '')
-		newSource.setParameter(newMeasurement)
-		newMeasurement.set('Y', obj[cathead == 'Yg'], 0.0, '')
-		newSource.setParameter(newMeasurement)
-		newMeasurement.set('Z', obj[cathead == 'Zg'], 0.0, '')
-		newSource.setParameter(newMeasurement)
-		newMeasurement.set('BBOX_X_MIN', obj[cathead == 'Xmin'], 0.0, '')
-		newSource.setParameter(newMeasurement)
-		newMeasurement.set('BBOX_X_MAX', obj[cathead == 'Xmax'], 0.0, '')
-		newSource.setParameter(newMeasurement)
-		newMeasurement.set('BBOX_Y_MIN', obj[cathead == 'Ymin'], 0.0, '')
-		newSource.setParameter(newMeasurement)
-		newMeasurement.set('BBOX_Y_MAX', obj[cathead == 'Ymax'], 0.0, '')
-		newSource.setParameter(newMeasurement)
-		newMeasurement.set('BBOX_Z_MIN', obj[cathead == 'Zmin'], 0.0, '')
-		newSource.setParameter(newMeasurement)
-		newMeasurement.set('BBOX_Z_MAX', obj[cathead == 'Zmax'], 0.0, '')
-		newSource.setParameter(newMeasurement)
-		initcatalog.insert(newSource)
+	#for rr in reliable:
+		#obj = np.array(objects[rr - 1])
+		#newSource = parametrizer2.PySource()
+		#newSource.setSourceID(obj[cathead == 'ID'])
+		#newMeasurement = parametrizer2.PyMeasurement()
+		#newMeasurement.set('X', obj[cathead == 'Xg'], 0.0, '')
+		#newSource.setParameter(newMeasurement)
+		#newMeasurement.set('Y', obj[cathead == 'Yg'], 0.0, '')
+		#newSource.setParameter(newMeasurement)
+		#newMeasurement.set('Z', obj[cathead == 'Zg'], 0.0, '')
+		#newSource.setParameter(newMeasurement)
+		#newMeasurement.set('BBOX_X_MIN', obj[cathead == 'Xmin'], 0.0, '')
+		#newSource.setParameter(newMeasurement)
+		#newMeasurement.set('BBOX_X_MAX', obj[cathead == 'Xmax'], 0.0, '')
+		#newSource.setParameter(newMeasurement)
+		#newMeasurement.set('BBOX_Y_MIN', obj[cathead == 'Ymin'], 0.0, '')
+		#newSource.setParameter(newMeasurement)
+		#newMeasurement.set('BBOX_Y_MAX', obj[cathead == 'Ymax'], 0.0, '')
+		#newSource.setParameter(newMeasurement)
+		#newMeasurement.set('BBOX_Z_MIN', obj[cathead == 'Zmin'], 0.0, '')
+		#newSource.setParameter(newMeasurement)
+		#newMeasurement.set('BBOX_Z_MAX', obj[cathead == 'Zmax'], 0.0, '')
+		#newSource.setParameter(newMeasurement)
+		#initcatalog.insert(newSource)
 
-	moduleParametrizer = parametrizer2.PyModuleParametrisation()
-	moduleParametrizer.setFlags(Parameters['parameters']['optimiseMask'], Parameters['parameters']['fitBusyFunction'])
+	#moduleParametrizer = parametrizer2.PyModuleParametrisation()
+	#moduleParametrizer.setFlags(Parameters['parameters']['optimiseMask'], Parameters['parameters']['fitBusyFunction'])
         
-	np_Cube = np_Cube.astype('<f4')
-	mask = mask.astype('<i2')
+	#np_Cube = np_Cube.astype('<f4')
+	#mask = mask.astype('<i2')
         
-	moduleParametrizer.run(np_Cube, mask, initcatalog, dict_Header)
-	results = moduleParametrizer.getCatalog()
+	#moduleParametrizer.run(np_Cube, mask, initcatalog, dict_Header)
+	#results = moduleParametrizer.getCatalog()
         
 	print 'Parameterisation complete'
 	print
@@ -379,8 +379,8 @@ if Parameters['steps']['doWriteCat'] and Parameters['steps']['doMerge'] and NRde
 	if Parameters['writeCat']['writeXML'] and Parameters['steps']['doMerge'] and NRdet:
 		store_xml.make_xml(results, outroot + '_cat.xml')
 	if Parameters['writeCat']['writeASCII'] and Parameters['steps']['doMerge'] and NRdet:
-		#store_ascii.make_ascii_from_array(objects, catParNames, catParFormt, Parameters['writeCat']['parameters'], outroot+'_cat.ascii')
-		store_ascii.make_ascii(results, Parameters['writeCat']['parameters'], outroot + '_cat.ascii')
+		store_ascii.make_ascii_from_array(objects, catParNames, catParFormt, Parameters['writeCat']['parameters'], outroot+'_cat.ascii')
+		#store_ascii.make_ascii(results, Parameters['writeCat']['parameters'], outroot + '_cat.ascii')
 
 
 
