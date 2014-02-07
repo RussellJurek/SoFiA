@@ -269,7 +269,7 @@ if Parameters['steps']['doDebug'] and NRdet:
 if Parameters['steps']['doParameterise'] and Parameters['steps']['doMerge'] and NRdet:
 	print "\n--- SoFiA: Parametrising sources ---"
 	sys.stdout.flush()
-	objects, catParNames, catParFormt = parametrisation.parametrise(np_Cube, dict_Header, mask, objects, catParNames, catParFormt, Parameters)
+	np_Cube, dict_Header, mask, objects, catParNames, catParFormt = parametrisation.parametrise(np_Cube, dict_Header, mask, objects, catParNames, catParFormt, Parameters)
 	##print catParFormt
 	
 
