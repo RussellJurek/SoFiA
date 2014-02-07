@@ -68,11 +68,11 @@ def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
         objects[index-1][cathead.index(origParam[replParam.index(j)])] = source_dict[j].getValue()
       else:
         objects[index-1].append(source_dict[j].getValue())
-    if len(source_dict) != 30:   # temp
-      delIndex.append(index-1)   # temp
-  delIndex.sort(reverse = True)  # temp
-  for i in delIndex:             # temp
-    objects.pop(i)               # temp
+    if len(source_dict) != len(pars):   # temp
+      delIndex.append(index-1)          # temp
+  delIndex.sort(reverse = True)         # temp
+  for i in delIndex:                    # temp
+    objects.pop(i)                      # temp
 
   objects = np.array(objects)
   cathead = np.array(cathead)
