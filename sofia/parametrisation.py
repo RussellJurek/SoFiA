@@ -7,6 +7,7 @@ import numpy as np
 def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
   
   cathead=np.array(cathead)
+  objects=np.array(objects)
   initcatalog=parametrizer2.PySourceCatalog()
   for obj in objects:
     newSource=parametrizer2.PySource()
@@ -52,6 +53,9 @@ def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
       cathead.append(i)
       catformt.append('%12.3f')
   objects = objects.tolist()
+  # here starts the workaround for the cases where the parametrization returns a smaller number
+  # of parameters, temporary solution: delete these sources from the objects arrays
+  delIndex = [] # temp
   for i in d:
     source_dict = d[i].getParametersDict()
     # check the source index
@@ -62,6 +66,11 @@ def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
         objects[index-1][cathead.index(origParam[replParam.index(j)])] = source_dict[j].getValue()
       else:
         objects[index-1].append(source_dict[j].getValue())
+    if len(source_dict) != 30:   # temp
+      delIndex.append(index-1)   # temp
+  delIndex.sort(reverse = True)  # temp
+  for i in delIndex:             # temp
+    objects.pop(i)               # temp
 
   objects = np.array(objects)
   cathead = np.array(cathead)
