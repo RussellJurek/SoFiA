@@ -34,9 +34,11 @@ def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
     initcatalog.insert(newSource)
 
   moduleParametrizer = parametrizer2.PyModuleParametrisation()
-  cube = cube.astype("<f4")
-  mask = mask.astype("<i2")
   moduleParametrizer.setFlags(Parameters['parameters']['optimiseMask'], Parameters['parameters']['fitBusyFunction'])
+  
+  cube = cube.astype('<f4')
+  mask = mask.astype('<i2')
+  
   moduleParametrizer.run(cube, mask, initcatalog, header)
   results = moduleParametrizer.getCatalog()
 
@@ -79,4 +81,4 @@ def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
   print
   
   #print objects.shape,cathead.shape
-  return objects,cathead,catformt
+  return cube,header,mask,objects,cathead,catformt
