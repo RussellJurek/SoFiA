@@ -46,13 +46,18 @@ folder where the downloaded file was saved. Then follow the steps below.
 
    Download and unpack the zipped archive into a directory of your choice:
 
-   > unzip SoFiA-master.zip
+   > unzip SoFiA-[version].zip
+   
+   or
+   
+   > tar -xzvf SoFiA-[version].tar.gz
 
-   This will unpack all files into a directory called SoFiA-master.
+   where [version] is the downloaded version of SoFiA, e.g. 0.2. This will 
+   unpack all files into a directory called SoFiA-[version].
 
 2. Enter the installation directory
 
-   > cd SoFiA-master
+   > cd SoFiA-[version]
 
 3. Compile and install the SoFiA pipeline and user interface
 
@@ -93,7 +98,7 @@ Version history
 ---------------
 
 * SoFiA 0.2
-  * Released 05/02/2014
+  * Released 10/02/2014
   * Fixes several bugs that were still present in the initial beta version.
 
 * SoFiA 0.1 beta
