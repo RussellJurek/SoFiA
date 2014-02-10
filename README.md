@@ -92,14 +92,14 @@ and only basic help is available at this stage.
 Version history
 ---------------
 
-SoFiA 0.2
-  Released 05/02/2014
-  Fixes several bugs that were still present in the initial beta version.
+* SoFiA 0.2
+  * Released 05/02/2014
+  * Fixes several bugs that were still present in the initial beta version.
 
-SoFiA 0.1 beta
-  Released 14/11/2013
-  Initial beta release of the package with basic functionality and built-in 
-  help system; may still contain bugs and errors.
+* SoFiA 0.1 beta
+  * Released 14/11/2013
+  * Initial beta release of the package with basic functionality and built-in 
+    help system; may still contain bugs and errors.
 
 
 Copyright and licence
