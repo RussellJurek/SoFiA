@@ -31,7 +31,7 @@ def GetRMS(cube,rmsMode='negative',zoomx=1,zoomy=1,zoomz=10000,nrbins=10000,verb
 	elif rmsMode=='mad':
 		rms=np.median(abs(cube[z0:z1,y0:y1,x0:x1]-np.median(cube[z0:z1,y0:y1,x0:x1])))/0.6745
 	elif rmsMode=='std':
-		rms=nd.standard_deviation(cube[z0:z1,y0:y1,x0:x1])
+		rms=np.nanstd(cube[z0:z1,y0:y1,x0:x1])
 	if verbose: print '    ... %s rms = %.2e (data units)'%(rmsMode,rms)
 	return rms
 
