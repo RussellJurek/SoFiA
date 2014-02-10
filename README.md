@@ -109,7 +109,7 @@ SoFiA was created by the following people: Lars Flöer, Nadine Giese, Russell
 Jurek, Martin Meyer, Attila Popping, Paolo Serra, Tobias Westmeier, and 
 Benjamin Winkel.
 
-© 2013 The SoFiA Authors
+© 2014 The SoFiA Authors
 
 This programme is free software: you can redistribute it and/or modify it 
 under the terms of the GNU General Public License as published by the Free 
