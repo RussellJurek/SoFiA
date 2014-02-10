@@ -46,17 +46,17 @@ folder where the downloaded file was saved. Then follow the steps below.
 
    Download and unpack the zipped archive into a directory of your choice:
 
-    unzip SoFiA-master.zip
+   > unzip SoFiA-master.zip
 
    This will unpack all files into a directory called SoFiA-master.
 
 2. Enter the installation directory
 
-    cd SoFiA-master
+   > cd SoFiA-master
 
 3. Compile and install the SoFiA pipeline and user interface
 
-    python setup.py build --force
+   > python setup.py build --force
 
 4. Set up environment variables
 
