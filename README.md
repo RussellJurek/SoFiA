@@ -100,6 +100,8 @@ Version history
 * SoFiA 0.2
   * Released 10/02/2014
   * Fixes several bugs that were still present in the initial beta version.
+  * See release notes for details:
+    https://github.com/SoFiA-Admin/SoFiA/releases/tag/v0.2
 
 * SoFiA 0.1 beta
   * Released 14/11/2013
