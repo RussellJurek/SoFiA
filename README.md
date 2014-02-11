@@ -46,13 +46,18 @@ folder where the downloaded file was saved. Then follow the steps below.
 
    Download and unpack the zipped archive into a directory of your choice:
 
-   > unzip SoFiA-master.zip
+   > unzip SoFiA-[version].zip
+   
+   or
+   
+   > tar -xzvf SoFiA-[version].tar.gz
 
-   This will unpack all files into a directory called SoFiA-master.
+   where [version] is the downloaded version of SoFiA, e.g. 0.2. This will 
+   unpack all files into a directory called SoFiA-[version].
 
 2. Enter the installation directory
 
-   > cd SoFiA-master
+   > cd SoFiA-[version]
 
 3. Compile and install the SoFiA pipeline and user interface
 
@@ -66,7 +71,9 @@ folder where the downloaded file was saved. Then follow the steps below.
 
 5. Launch SoFiA
 
-    Open a new terminal window and type ‘SoFiA’.
+    Open a new terminal window and type:
+    
+    > SoFiA &
 
 
 Problems
@@ -76,7 +83,10 @@ If you encounter problems when running the setup script, it is likely
 that you are either missing one of the required packages and libraries or 
 that some of the packages are outdated. Please check that the required 
 versions of all packages are installed and properly set up such that they 
-can be found by Python and the GCC.
+can be found by Python and the GCC. On some systems it may be necessary to 
+explicitly install the GNU C++ compiler (g++, should normally be part of 
+the GCC) as well as the development packages (dev) of Qt 4 and the GNU 
+Scientific Library. 
 
 
 Documentation
@@ -93,8 +103,10 @@ Version history
 ---------------
 
 * SoFiA 0.2
-  * Released 05/02/2014
+  * Released 10/02/2014
   * Fixes several bugs that were still present in the initial beta version.
+  * See release notes for details:
+    https://github.com/SoFiA-Admin/SoFiA/releases/tag/v0.2
 
 * SoFiA 0.1 beta
   * Released 14/11/2013
