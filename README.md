@@ -71,7 +71,9 @@ folder where the downloaded file was saved. Then follow the steps below.
 
 5. Launch SoFiA
 
-    Open a new terminal window and type ‘SoFiA’.
+    Open a new terminal window and type:
+    
+    > SoFiA &
 
 
 Problems
