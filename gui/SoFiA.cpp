@@ -1,7 +1,7 @@
 /// ____________________________________________________________________ ///
 ///                                                                      ///
 /// SoFiA 0.2 (SoFiA.cpp) - Source Finding Application                   ///
-/// Copyright (C) 2013 Tobias Westmeier                                  ///
+/// Copyright (C) 2013-2014 Tobias Westmeier                             ///
 /// ____________________________________________________________________ ///
 ///                                                                      ///
 /// Address:  Tobias Westmeier                                           ///
@@ -759,7 +759,7 @@ void SoFiA::showHandbook(const QString &page)
 
 void SoFiA::aboutSoFiA()
 {
-    QString messageText = tr("<h3>About SoFiA</h3><p>Version 0.2</p><p>SoFiA, the <b>Source Finding Application</b>, is an HI source finding pipeline designed to find and parametrise galaxies in HI data cubes. The name SoFiA is based on the Greek word %1, which means wisdom.</p><p>SoFiA is free software: you can redistribute it and/or modify it under the terms of the <b>GNU General Public License</b> as published by the Free Software Foundation, either version 3 of the licence, or (at your option) any later version.</p><p>SoFiA is distributed in the hope that it will be useful, but <b>without any warranty</b>; without even the implied warranty of merchantability or fitness for a particular purpose. See the GNU General Public License for more details.</p><p>You should have received a copy of the GNU General Public License along with SoFiA. If not, see <a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>.</p><p>SoFiA uses the Oxygen icon set which is licensed under version&nbsp;3 of the <a href=\"http://www.gnu.org/licenses/lgpl-3.0.txt\">GNU Lesser General Public License</a>. For more details please visit the website of the <a href=\"http://www.oxygen-icons.org/\">Oxygen project</a>.</p><p>&copy; 2013 The SoFiA Authors</p>").arg(QString::fromUtf8("σοφία"));
+    QString messageText = tr("<h3>About SoFiA</h3><p>Version 0.2</p><p>SoFiA, the <b>Source Finding Application</b>, is an HI source finding pipeline designed to find and parametrise galaxies in HI data cubes. The name SoFiA is based on the Greek word %1, which means wisdom.</p><p>SoFiA is free software: you can redistribute it and/or modify it under the terms of the <b>GNU General Public License</b> as published by the Free Software Foundation, either version 3 of the licence, or (at your option) any later version.</p><p>SoFiA is distributed in the hope that it will be useful, but <b>without any warranty</b>; without even the implied warranty of merchantability or fitness for a particular purpose. See the GNU General Public License for more details.</p><p>You should have received a copy of the GNU General Public License along with SoFiA. If not, see <a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>.</p><p>SoFiA uses the Oxygen icon set which is licensed under version&nbsp;3 of the <a href=\"http://www.gnu.org/licenses/lgpl-3.0.txt\">GNU Lesser General Public License</a>. For more details please visit the website of the <a href=\"http://www.oxygen-icons.org/\">Oxygen project</a>.</p><p>&copy; 2014 The SoFiA Authors</p>").arg(QString::fromUtf8("σοφία"));
     QString statusText = QString("");
     showMessage(0, messageText, statusText);
     

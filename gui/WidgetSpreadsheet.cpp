@@ -1,7 +1,7 @@
 /// ____________________________________________________________________ ///
 ///                                                                      ///
 /// SoFiA 0.2 (WidgetSpreadsheet.cpp) - Source Finding Application       ///
-/// Copyright (C) 2013 Tobias Westmeier                                  ///
+/// Copyright (C) 2013-2014 Tobias Westmeier                             ///
 /// ____________________________________________________________________ ///
 ///                                                                      ///
 /// Address:  Tobias Westmeier                                           ///
