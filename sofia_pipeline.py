@@ -376,7 +376,8 @@ if Parameters['steps']['doCubelets'] and Parameters['steps']['doMerge'] and NRde
 if Parameters['steps']['doWriteCat'] and Parameters['steps']['doMerge'] and NRdet:
 	print "\n--- SoFiA: Writing output catalogue ---"
 	sys.stdout.flush()
-	#if Parameters['writeCat']['writeXML'] and Parameters['steps']['doMerge'] and NRdet:
+	if Parameters['writeCat']['writeXML'] and Parameters['steps']['doMerge'] and NRdet:
+		store_xml.make_xml_from_array(objects, catParNames, catParFormt, Parameters['writeCat']['parameters'],outroot + '_cat.xml')
 		#store_xml.make_xml(results, outroot + '_cat.xml')
 	if Parameters['writeCat']['writeASCII'] and Parameters['steps']['doMerge'] and NRdet:
 		store_ascii.make_ascii_from_array(objects, catParNames, catParFormt, Parameters['writeCat']['parameters'], outroot+'_cat.ascii')
