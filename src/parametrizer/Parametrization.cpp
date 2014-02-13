@@ -571,6 +571,9 @@ int Parametrization::writeParameters()
     source->setParameter("Y",          centroidY);
     source->setParameter("Z",          centroidZ);
     
+    source->setParameter("W50",        lineWidthW50);
+    source->setParameter("W20",        lineWidthW20);
+    
     source->setParameter("F_PEAK",     peakFlux);
     source->setParameter("F_INT",      integratedFlux);
     source->setParameter("F_TOT",      totalFlux);
