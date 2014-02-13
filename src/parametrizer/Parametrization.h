@@ -21,6 +21,7 @@ private:
     int loadData(DataCube<float> *d, DataCube<short> *m, Source *s);
     //int createMomentZeroMap();
     int measureCentroid();
+    int measureLineWidth();
     int measureFlux();
     int createIntegratedSpectrum();
     int fitBusyFunction();
