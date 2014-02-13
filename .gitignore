@@ -4,6 +4,7 @@ build/
 # Ignore C++ object files and executables:
 *.o
 moc_*
+Makefile
 SoFiA
 
 # Ignore Python bytecode:
