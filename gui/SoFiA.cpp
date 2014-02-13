@@ -1879,7 +1879,7 @@ void SoFiA::createInterface()
     
     QFont font = QFont("Courier");
     font.setStyleHint(QFont::TypeWriter, QFont::PreferAntialias);
-    font.setPointSize(9);
+    font.setPointSize(10);
     font.setFixedPitch(true);
     font.setKerning(false);
     outputText->setFont(font);
