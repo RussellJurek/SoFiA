@@ -45,7 +45,7 @@ int Parametrization::parametrize(DataCube<float> *d, DataCube<short> *m, Source 
     
     if(loadData(d, m, s) != 0)
     {
-        std::cerr << "Error (Parametrization): Source parametrisation failed." << std::endl;
+        std::cerr << "Error (Parametrization): No data found; source parametrisation failed." << std::endl;
         return 1;
     }
     
@@ -63,22 +63,24 @@ int Parametrization::parametrize(DataCube<float> *d, DataCube<short> *m, Source 
     
     if(measureCentroid() != 0)
     {
-        std::cerr << "Error (Parametrization): Failed to measure source centroid." << std::endl;
-        return 1;
+        std::cerr << "Warning (Parametrization): Failed to measure source centroid." << std::endl;
+    }
+    
+    if(measureLineWidth() != 0)
+    {
+        std::cerr << "Warning (Parametrization): Failed to measure source line width." << std::endl;
     }
     
     if(measureFlux() != 0)
     {
-        std::cerr << "Error (Parametrization): Source flux measurement failed." << std::endl;
-        return 1;
+        std::cerr << "Warning (Parametrization): Source flux measurement failed." << std::endl;
     }
     
     if(doBusyFunction == true)
     {
         if(fitBusyFunction() != 0)
         {
-            std::cerr << "Error (Parametrization): Failed to fit Busy Function." << std::endl;
-            return 1;
+            std::cerr << "Warning (Parametrization): Failed to fit Busy Function." << std::endl;
         }
     }
     
@@ -418,6 +420,101 @@ int Parametrization::createIntegratedSpectrum()
     //{
     //    std::cout << i << '\t' << spectrum[i] << std::endl;
     //}
+    
+    return 0;
+}
+
+
+
+// Measure line width:
+
+int Parametrization::measureLineWidth()
+{
+    if(data.empty() == true or spectrum.empty() == true)
+    {
+        std::cerr << "Error (Parametrization): No data loaded." << std::endl;
+        return 1;
+    }
+    
+    // Determine maximum:
+    double specMax = 0.0;    // WARNING: This assumes that sources are always positive!
+    
+    for(size_t i = 0; i < spectrum.size(); ++i)
+    {
+        if(spectrum[i] > specMax) specMax = spectrum[i];
+    }
+    
+    //Determine w50:
+    size_t i = 0;
+    
+    while(i < spectrum.size() and spectrum[i] < specMax / 2.0) ++i;
+    
+    if(i >= spectrum.size())
+    {
+        std::cerr << "Error (Parametrization): Calculation of line width failed." << std::endl;
+        lineWidthW50 = 0.0;
+        return 1;
+    }
+    
+    lineWidthW50 = static_cast<double>(i);
+    if(i > 0) lineWidthW50 -= (spectrum[i] - specMax / 2.0) / (spectrum[i] - spectrum[i - 1]);     // Interpolate if not at edge.
+    
+    i = spectrum.size() - 1;
+    
+    while(i >= 0 and spectrum[i] < specMax / 2.0) --i;
+    
+    if(i < 0)
+    {
+        std::cerr << "Error (Parametrization): Calculation of line width failed." << std::endl;
+        lineWidthW50 = 0.0;
+        return 1;
+    }
+    
+    lineWidthW50 = static_cast<double>(i) - lineWidthW50;
+    if(i < spectrum.size() - 1) lineWidthW50 += (spectrum[i] - specMax / 2.0) / (spectrum[i] - spectrum[i + 1]);  // Interpolate if not at edge.
+    
+    if(lineWidthW50 <= 0.0)
+    {
+        std::cerr << "Error (Parametrization): Calculation of line width failed." << std::endl;
+        lineWidthW50 = 0.0;
+        return 1;
+    }
+    
+    //Determine w20:
+    i = 0;
+    
+    while(i < spectrum.size() and spectrum[i] < specMax / 5.0) ++i;
+    
+    if(i >= spectrum.size())
+    {
+        std::cerr << "Error (Parametrization): Calculation of W20 failed." << std::endl;
+        lineWidthW20 = 0.0;
+        return 1;
+    }
+    
+    lineWidthW20 = static_cast<double>(i);
+    if(i > 0) lineWidthW20 -= (spectrum[i] - specMax / 5.0) / (spectrum[i] - spectrum[i - 1]);     // Interpolate if not at edge.
+    
+    i = spectrum.size() - 1;
+    
+    while(i >= 0 and spectrum[i] < specMax / 5.0) --i;
+    
+    if(i < 0)
+    {
+        std::cerr << "Error (Parametrization): Calculation of W20 failed." << std::endl;
+        lineWidthW20 = 0.0;
+        return 1;
+    }
+    
+    lineWidthW20 = static_cast<double>(i) - lineWidthW20;
+    if(i < spectrum.size() - 1) lineWidthW20 += (spectrum[i] - specMax / 5.0) / (spectrum[i] - spectrum[i + 1]);  // Interpolate if not at edge.
+    
+    if(lineWidthW20 <= 0.0)
+    {
+        std::cerr << "Error (Parametrization): Calculation of W20 failed." << std::endl;
+        lineWidthW20 = 0.0;
+        return 1;
+    }
     
     return 0;
 }
