@@ -14,7 +14,7 @@ from numpy import *
 
 def prettify(elem):
     # Return a pretty-printed XML string for the Element.
-    # Indent is set to "" here to save disk space; default would be tabulator.
+    # Indent is set to "" here to save disk space; default would be "\t".
     rough_string = ElementTree.tostring(elem, 'utf-8')
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="")

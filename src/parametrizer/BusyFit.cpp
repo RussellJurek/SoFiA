@@ -123,7 +123,7 @@ int BusyFit::fit()
     if(spectrum.nChannels == 0 or spectrum.values == 0 or spectrum.sigma == 0)
     {
         std::cerr << "Error (BusyFit): No valid data found." << std::endl;
-        return 1;
+        return 2;
     }
     
     // Define initial estimates:
@@ -179,8 +179,8 @@ int BusyFit::fit()
     }
     else
     {
-        std::cerr << "Error (BusyFit): Failed to find line flanks." << std::endl;
-        std::cerr << "                 Calculating moments instead." << std::endl;
+        std::cerr << "Warning (BusyFit): Failed to find line flanks." << std::endl;
+        std::cerr << "                   Calculating moments instead." << std::endl;
         
         // Calculate first moment to use as xe0 and xp0:
         double sum = 0.0;
@@ -240,7 +240,7 @@ int BusyFit::fit(double new_a, double new_b1, double new_b2, double new_c, doubl
     if(spectrum.nChannels == 0 or spectrum.values == 0 or spectrum.sigma == 0)
     {
         std::cerr << "Error (BusyFit): No valid data found." << std::endl;
-        return 1;
+        return 2;
     }
     
     a   = init_a   = new_a;

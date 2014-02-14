@@ -1269,6 +1269,7 @@ void SoFiA::createInterface()
     tabInFilterFieldStatistic->setObjectName("scaleNoise.statistic");
     tabInFilterFieldStatistic->addItem(tr("mad"));
     tabInFilterFieldStatistic->addItem(tr("std"));
+    tabInFilterFieldStatistic->addItem(tr("negative"));
     
     tabInFilterForm2->addRow(tr("Statistic:"), tabInFilterFieldStatistic);
     tabInFilterForm2->addRow(tr("Edge X:"), tabInFilterFieldEdgeX);
