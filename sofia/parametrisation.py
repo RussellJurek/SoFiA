@@ -41,38 +41,37 @@ def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
   
   moduleParametrizer.run(cube, mask, initcatalog, header)
   results = moduleParametrizer.getCatalog()
-
+  
 
   # append the results to the objects array or reset
   replParam = ['BBOX_X_MAX','BBOX_X_MIN','BBOX_Y_MAX','BBOX_Y_MIN','BBOX_Z_MAX','BBOX_Z_MIN','F_PEAK','F_TOT','ID','X','Y','Z']
   origParam = ['Xmax','Xmin','Ymax','Ymin','Zmax','Zmin','Fmax','Ftot','ID','Xm','Ym','Zm']
   d = results.getSourcesDict()
-  pars = d[d.keys()[0]].getParametersDict()
+  # select data set with maximum number of parameters
+  parsListLen = [len(d[d.keys()[i]].getParametersDict()) for i in range(0,len(d))]
+  index = parsListLen.index(max(parsListLen))
+  # add parameter names from parametrization
+  pars = d[d.keys()[index]].getParametersDict()
   cathead = list(cathead)
   catformt = list(catformt)
   for i in sorted(pars):
     if i not in replParam:
       cathead.append(i)
       catformt.append('%12.3f')
-  objects = objects.tolist()
-  # here starts the workaround for the cases where the parametrization returns a smaller number
-  # of parameters, temporary solution: delete these sources from the objects arrays
-  delIndex = [] # temp
+  # extend the parameter array
+  tmpObjects = np.empty((objects.shape[0],len(cathead)))
+  tmpObjects[:,:] = np.NAN
+  tmpObjects[:,0:objects.shape[1]] = objects
+  objects = tmpObjects
   for i in d:
     source_dict = d[i].getParametersDict()
     # check the source index
     index = int(source_dict['ID'].getValue())
-    #print index
     for j in sorted(source_dict):
       if j in replParam:
         objects[index-1][cathead.index(origParam[replParam.index(j)])] = source_dict[j].getValue()
       else:
-        objects[index-1].append(source_dict[j].getValue())
-    if len(source_dict) != len(pars):   # temp
-      delIndex.append(index-1)          # temp
-  delIndex.sort(reverse = True)         # temp
-  for i in delIndex:                    # temp
-    objects.pop(i)                      # temp
+        objects[index-1][cathead.index(j)] = source_dict[j].getValue()
 
   objects = np.array(objects)
   cathead = np.array(cathead)
