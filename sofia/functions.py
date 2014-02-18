@@ -13,6 +13,13 @@ def GaussianNoise(F,N0,s0):
 
 def GetRMS(cube,rmsMode='negative',zoomx=1,zoomy=1,zoomz=10000,nrbins=10000,verbose=0,min_hist_peak=0.05):
 	sh=cube.shape
+
+        if len(sh) == 2:
+            # add an extra dimension to make it a 3d cube
+            cube = np.array([cube])
+    
+        sh=cube.shape
+        
 	x0,x1=int(mt.ceil((1-1./zoomx)*sh[2]/2)),int(mt.floor((1+1./zoomx)*sh[2]/2))+1
 	y0,y1=int(mt.ceil((1-1./zoomy)*sh[1]/2)),int(mt.floor((1+1./zoomy)*sh[1]/2))+1
 	z0,z1=int(mt.ceil((1-1./zoomz)*sh[0]/2)),int(mt.floor((1+1./zoomz)*sh[0]/2))+1
@@ -44,7 +51,5 @@ def GetRMS(cube,rmsMode='negative',zoomx=1,zoomy=1,zoomz=10000,nrbins=10000,verb
                 rms=sp.stats.nanstd(cube[z0:z1,y0:y1,x0:x1],axis=None)
 	if verbose: print '    ... %s rms = %.2e (data units)'%(rmsMode,rms)
 
-        print 'rms'
-        print np.shape(rms)
-        print rms
+
 	return rms
