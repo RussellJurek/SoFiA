@@ -1,15 +1,9 @@
 #! /usr/bin/env python
 
 # import default python libraries
-import numpy
-import scipy
-import matplotlib
-import pyfits
-import os
-from numpy import *
-from pylab import *
-from scipy import *
-import os
+import numpy as np
+import scipy as sp
+from functions import *
 
 # function to read in a cube and generate a cube with sigma levels using 'MAD' statistic
 # or simple standard deviation
@@ -17,8 +11,15 @@ import os
 
 # this script is usefull to correct for variation in noise as function of frequency, noisy edges of cubes and channels with strong rfi
 
-def sigma_scale(np_Cube,edgeX,edgeY,edgeZ,statistic):
-	# np_cube: the input cube
+def sigma_scale(cube,edgeX,edgeY,edgeZ,statistic):
+	verbose = 0
+
+
+	# sigma scaling only works for 3D cubes, as it is mainyl designed to correct for differences in frequency
+	
+	
+	
+	# cube: the input cube
 	# edgeX,Y,Z: the edges of the cube that can be trimmed of (default 0,0,0)
 	# statistic: mad or std (default mad)
 	
@@ -32,14 +33,13 @@ def sigma_scale(np_Cube,edgeX,edgeY,edgeZ,statistic):
 	edge_z2 = edgeZ
 	
 	# check the dimensions of the cube (could be obtained from header information)
-	dimensions = shape(np_Cube)
-	np_Sigma_cube = np_Cube
+	dimensions = np.shape(cube)
 	
 	
 	# calculated rms as function of x,y,z
-	z_rms = zeros(dimensions[0])
-	y_rms = zeros(dimensions[1])
-	x_rms = zeros(dimensions[2])
+	z_rms = np.zeros(dimensions[0])
+	y_rms = np.zeros(dimensions[1])
+	x_rms = np.zeros(dimensions[2])
 
 	# define the range over which stats are calculated
 	z1 = edge_z1
@@ -49,55 +49,40 @@ def sigma_scale(np_Cube,edgeX,edgeY,edgeZ,statistic):
 	x1 = edge_x1
 	x2 = len(x_rms) - edge_x2
 
-
-	
 	if statistic == 'mad':
-		# apply 'MAD' statistic
-		print 'Apply Median Absolute Deviation (MAD) statistic'	
-		for i in range(len(z_rms)):
-			z_rms[i] = 1.4826 * median(abs(np_Sigma_cube[i,y1:y2,x1:x2] - median(np_Sigma_cube[i,y1:y2,x1:x2])))
-		# scale the cube by the rms
-		for i in range(len(z_rms)):
-			if z_rms[i] > 0:
-				np_Sigma_cube[i,:,:] = np_Sigma_cube[i,:,:]/z_rms[i] 
-
-		for i in range(len(y_rms)):
-			y_rms[i] = 1.4826 * median(abs(np_Sigma_cube[z1:z2,i,x1:x2] - median(np_Sigma_cube[z1:z2,i,x1:x2])))
-		for i in range(len(y_rms)):
-			if y_rms[i] > 0:
-				np_Sigma_cube[:,i,:] = np_Sigma_cube[:,i,:]/y_rms[i] 
-    
-		for i in range(len(x_rms)):
-			x_rms[i] = 1.4826 * median(abs(np_Sigma_cube[z1:z2,y1:y2,i] - median(np_Sigma_cube[z1:z2,y1:y2,i])))    
-		for i in range(len(x_rms)):
-			if x_rms[i] > 0:
-				np_Sigma_cube[:,:,i] = np_Sigma_cube[:,:,i]/x_rms[i] 
-
+		print 'Apply Median Absolute Deviation (MAD) statistic'
 	if statistic == 'std':
-		# apply the standard deviation as statistic
 		print 'Apply Standard Deviation (STD) statistic'
-		for i in range(len(z_rms)):
-			z_rms[i] = std(np_Sigma_cube[i,y1:y2,x1:x2])
-		# scale the cube by the rms
-		for i in range(len(z_rms)):
-			if z_rms[i] > 0:
-				np_Sigma_cube[i,:,:] = np_Sigma_cube[i,:,:]/z_rms[i] 
+	if statistic == 'negative':
+		print 'Apply Negatice statistic'
 
-		for i in range(len(y_rms)):
-			y_rms[i] = std(np_Sigma_cube[z1:z2,i,x1:x2])    
-		for i in range(len(y_rms)):
-			if y_rms[i] > 0:
-				np_Sigma_cube[:,i,:] = np_Sigma_cube[:,i,:]/y_rms[i] 
-    
-		for i in range(len(x_rms)):
-			x_rms[i] = std(np_Sigma_cube[z1:z2,y1:y2,i])
-		for i in range(len(x_rms)):
-			if x_rms[i] > 0:
-				np_Sigma_cube[:,:,i] = np_Sigma_cube[:,:,i]/x_rms[i] 
+
 	
-	# the input cube is replaced by the sigma cube
-	np_Cube = np_Sigma_cube
-	del np_Sigma_cube	
+	for i in range(len(z_rms)):
+		#z_rms[i] = GetRMS(cube[i,y1:y2,x1:x2],rmsMode=statistic,zoomx=1,zoomy=1,zoomz=1,verbose=verbose)
+		z_rms[i] = GetRMS(cube[i,y1:y2,x1:x2],rmsMode=statistic,zoomx=1,zoomy=1,zoomz=1,verbose=verbose)
+		#print 'z_rms[i] = ', z_rms[i]
+	# scale the cube by the rms
+	for i in range(len(z_rms)):
+		if z_rms[i] > 0:
+			cube[i,:,:] = cube[i,:,:]/z_rms[i] 
+
+	for i in range(len(y_rms)):
+		y_rms[i] = GetRMS(cube[z1:z2,i,x1:x2],rmsMode=statistic,zoomx=1,zoomy=1,zoomz=1,verbose=verbose)
+	# scale the cube by the rms
+	for i in range(len(y_rms)):
+		if y_rms[i] > 0:
+			cube[:,i,:] = cube[:,i,:]/y_rms[i] 
+    
+	for i in range(len(x_rms)):
+		x_rms[i] = GetRMS(cube[z1:z2,y1:y2,i],rmsMode=statistic,zoomx=1,zoomy=1,zoomz=1,verbose=verbose)
+	# scale the cube by the rms
+	for i in range(len(x_rms)):
+		if x_rms[i] > 0:
+			cube[:,:,i] = cube[:,:,i]/x_rms[i] 
+
+
+	
 	print 'Sigma cube is created'
 	print
-	return np_Cube
+	return cube
