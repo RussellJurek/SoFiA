@@ -2,6 +2,8 @@
 
 import numpy as np
 import math as mt
+import scipy as sp
+from scipy import stats
 from scipy import optimize
 import scipy.ndimage as nd
 
@@ -35,17 +37,14 @@ def GetRMS(cube,rmsMode='negative',zoomx=1,zoomy=1,zoomz=10000,nrbins=10000,verb
 
 		rms=abs(optimize.curve_fit(GaussianNoise,fluxval,rmshisto,p0=[rmshisto.max(),-fluxval[rmshisto<rmshisto.max()/2].max()*2/2.355])[0][1])
 	elif rmsMode=='mad':
-                # normal median does not deal with "NaN"
-		# rms=np.median(abs(cube[z0:z1,y0:y1,x0:x1]-np.median(cube[z0:z1,y0:y1,x0:x1])))/0.6745
-                # a[~np.isnan(a)] gives array "a" without "NaN"
-                rms=np.median(abs(cube[z0:z1,y0:y1,x0:x1][~np.isnan(cube[z0:z1,y0:y1,x0:x1])]-np.median(cube[z0:z1,y0:y1,x0:x1][~np.isnan(cube[z0:z1,y0:y1,x0:x1])])))/0.6745
+                rms=sp.stats.nanmedian(abs(cube[z0:z1,y0:y1,x0:x1]-sp.stats.nanmedian(cube[z0:z1,y0:y1,x0:x1],axis=None)),axis=None)/0.6745
+
             
 	elif rmsMode=='std':
-                #rms=np.nanstd(cube[z0:z1,y0:y1,x0:x1])
-                # nanstd crashes as it is not defined in numpy 1.7.1
-                # normal std does not deal with "NaN"
-                #rms=np.std(cube[z0:z1,y0:y1,x0:x1])
-                # a[~np.isnan(a)] gives array "a" without "NaN"
-                rms = np.std(cube[z0:z1,y0:y1,x0:x1][~np.isnan(cube[z0:z1,y0:y1,x0:x1])])
+                rms=sp.stats.nanstd(cube[z0:z1,y0:y1,x0:x1],axis=None)
 	if verbose: print '    ... %s rms = %.2e (data units)'%(rmsMode,rms)
+
+        print 'rms'
+        print np.shape(rms)
+        print rms
 	return rms
