@@ -306,7 +306,7 @@ int Parametrization::measureFlux()
     }
     
     // Multiply with channel width:
-    double cdelt3 = 1.0;
+    /*double cdelt3 = 1.0;
     
     if(dataCube->getHeader("CDELT3", cdelt3) != 0)
     {
@@ -381,7 +381,7 @@ int Parametrization::measureFlux()
         beamCorr = 1.0;
     }
     
-    integratedFlux /= beamCorr;
+    integratedFlux /= beamCorr;*/
     
     //std::cout << cdelt1 << '\t' << cdelt2 << '\t' << cdelt3 << '\t' << bmaj << '\t' << bmin << std::endl;
     
@@ -575,7 +575,7 @@ int Parametrization::writeParameters()
     source->setParameter("W20",        lineWidthW20);
     
     source->setParameter("F_PEAK",     peakFlux);
-    source->setParameter("F_INT",      integratedFlux);
+    //source->setParameter("F_INT",      integratedFlux);
     source->setParameter("F_TOT",      totalFlux);
     
     if(doBusyFunction == true)
