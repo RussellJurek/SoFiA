@@ -363,6 +363,8 @@ int MaskOptimization::growEllipse()
     else
     {
         // Modify mask cube:
+        unsigned long pixelCount = 0;
+        
         for(long x = subRegionX1; x <= subRegionX2; x++)
         {
             for(long y = subRegionY1; y <= subRegionY2; y++)
@@ -388,6 +390,7 @@ int MaskOptimization::growEllipse()
                         {
                             // Mask pixel:
                             maskCube->setData(source->getSourceID(), x, y, z);
+                            ++pixelCount;
                             
                             // Update bounding box:
                             if(x < source->getParameter("BBOX_X_MIN")) source->setParameter("BBOX_X_MIN", x);
@@ -401,6 +404,8 @@ int MaskOptimization::growEllipse()
                 }
             }
         }
+        
+        source->setParameter("NRvox", pixelCount);
     }
     
     return 0;
