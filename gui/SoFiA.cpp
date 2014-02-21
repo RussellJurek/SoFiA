@@ -1052,6 +1052,7 @@ void SoFiA::showCatalogue()
     else
     {
         spreadsheet->show();
+        spreadsheet->raise();
     }
     
     return;
