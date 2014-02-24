@@ -182,7 +182,7 @@ if Parameters['steps']['doReliability'] and Parameters['steps']['doMerge'] and N
 elif Parameters['steps']['doMerge'] and NRdet:
 	reliable = list(np.array(objects)[np.array(objects)[:,16] > 0,0].astype(int)) # select all positive sources
 	print 'The following sources have been detected:', reliable
-else: reliable=[1,]
+else: reliable=[1,] # if not merging, all detected voxels have ID = 1 and here they are set to be reliable
 
 
 
@@ -203,11 +203,11 @@ if Parameters['steps']['doMerge'] and NRdet:
 
 
 
-# -------------------------------------
-# ---- REMOVE NON RELIABLE SOURCES ----
-# -------------------------------------
+# --------------------------------------------------
+# ---- REMOVE NON RELIABLE AND NEGATIVE SOURCES ----
+# --------------------------------------------------
 
-if Parameters['steps']['doReliability'] and Parameters['steps']['doMerge'] and NRdet:
+if Parameters['steps']['doMerge'] and NRdet:
 	print "\n--- SoFiA: Removing all sources that are not reliable ---"
 
 	# make sure that reliable is sorted
