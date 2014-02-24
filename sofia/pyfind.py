@@ -29,9 +29,9 @@ def GetRMS(cube,rmsMode='negative',zoomx=1,zoomy=1,zoomz=10000,nrbins=10000,verb
 
 		rms=abs(optimize.curve_fit(GaussianNoise,fluxval,rmshisto,p0=[rmshisto.max(),-fluxval[rmshisto<rmshisto.max()/2].max()*2/2.355])[0][1])
 	elif rmsMode=='mad':
-		rms=np.median(abs(cube[z0:z1,y0:y1,x0:x1]-np.median(cube[z0:z1,y0:y1,x0:x1])))/0.6745
+		rms=scipy.stats.nanmedian(abs(cube[z0:z1,y0:y1,x0:x1]-scipy.stats.nanmedian(cube[z0:z1,y0:y1,x0:x1],axis=None)),axis=None)/0.6745
 	elif rmsMode=='std':
-		rms=np.nanstd(cube[z0:z1,y0:y1,x0:x1])
+		rms=scipy.stats.nanstd(cube[z0:z1,y0:y1,x0:x1],axis=None)
 	if verbose: print '    ... %s rms = %.2e (data units)'%(rmsMode,rms)
 	return rms
 
@@ -146,6 +146,7 @@ def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskS
 import pyfits as pf
 import numpy as np
 import math as mt
+import scipy
 from scipy import optimize
 import scipy.ndimage as nd
 from sys import argv
