@@ -44,8 +44,8 @@ def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
   
 
   # append the results to the objects array or reset
-  replParam = ['BBOX_X_MAX','BBOX_X_MIN','BBOX_Y_MAX','BBOX_Y_MIN','BBOX_Z_MAX','BBOX_Z_MIN','F_PEAK','F_TOT','ID','X','Y','Z']
-  origParam = ['Xmax','Xmin','Ymax','Ymin','Zmax','Zmin','Fmax','Ftot','ID','Xm','Ym','Zm']
+  replParam = ['BBOX_X_MAX','BBOX_X_MIN','BBOX_Y_MAX','BBOX_Y_MIN','BBOX_Z_MAX','BBOX_Z_MIN','F_PEAK','F_TOT','ID','X','Y','Z','NRvox']
+  origParam = ['Xmax','Xmin','Ymax','Ymin','Zmax','Zmin','Fmax','Ftot','ID','Xm','Ym','Zm','NRvox']
   d = results.getSourcesDict()
   # select data set with maximum number of parameters
   parsListLen = [len(d[d.keys()[i]].getParametersDict()) for i in range(0,len(d))]
