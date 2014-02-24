@@ -94,9 +94,9 @@ Documentation
 
 SoFiA comes with its own built-in help browser that can be launched from 
 the help menu in the user interface. Alternatively, you can use your web 
-browser to open the index.html file located in the SoFiA_0.1/doc/ 
-sub-folder. Please note that the user manual is still under construction, 
-and only basic help is available at this stage.
+browser to open the index.html file located in the gui/doc/ sub-folder. 
+Please note that the user manual is still work in progress, and only 
+basic help is available at this stage.
 
 
 Version history
