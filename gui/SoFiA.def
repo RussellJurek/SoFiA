@@ -85,8 +85,8 @@ reliability.relThresh           =       0.9
 
 # Parametrisation module
 
-parameters.fitBusyFunction      =       true
-parameters.optimiseMask         =       true
+parameters.fitBusyFunction      =       false
+parameters.optimiseMask         =       false
 
 
 # Output module
