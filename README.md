@@ -105,6 +105,13 @@ basic help is available at this stage.
 Version history
 ---------------
 
+* SoFiA 0.2.1
+  * Released 25/02/2014
+  * Some more bug fixes, including fixing the threshold finder.
+  * Implementation of VO table output.
+  * See release notes for details:
+    https://github.com/SoFiA-Admin/SoFiA/releases/tag/v0.2.1
+
 * SoFiA 0.2
   * Released 10/02/2014
   * Fixes several bugs that were still present in the initial beta version.
