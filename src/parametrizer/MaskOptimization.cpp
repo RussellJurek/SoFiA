@@ -266,9 +266,10 @@ int MaskOptimization::fitEllipse()
     ellA = sqrt(2.0 * (momX + momY + sqrt((momX - momY) * (momX - momY) + 4.0 * momXY * momXY)));
     ellB = sqrt(2.0 * (momX + momY - sqrt((momX - momY) * (momX - momY) + 4.0 * momXY * momXY)));
     
-    source->setParameter("ELL_MAJ", ellA);
-    source->setParameter("ELL_MIN", ellB);
-    source->setParameter("ELL_PA",  180.0 * theta / MATH_CONST_PI);
+    //source->setParameter("ELL_MAJ", ellA);
+    //source->setParameter("ELL_MIN", ellB);
+    //source->setParameter("ELL_PA",  180.0 * theta / MATH_CONST_PI);
+    // This is no longer needed here, because ellipse fit will be repeated in parametrisation module.
     
     // Set initial values for semi-major and semi-minor axes (as defined in header file):
     ellB = MASKOPTIMIZATION_INITIAL_ELLIPSE_SIZE * ellB / ellA;

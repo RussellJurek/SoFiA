@@ -345,16 +345,24 @@ private:
     QCheckBox    *tabOutputButtonParameterX;
     QCheckBox    *tabOutputButtonParameterY;
     QCheckBox    *tabOutputButtonParameterZ;
-    QCheckBox    *tabOutputButtonParameterRA;
-    QCheckBox    *tabOutputButtonParameterDec;
+    QCheckBox    *tabOutputButtonParameterLon;
+    QCheckBox    *tabOutputButtonParameterLat;
     QCheckBox    *tabOutputButtonParameterFreq;
     QCheckBox    *tabOutputButtonParameterVrad;
     QCheckBox    *tabOutputButtonParameterW50;
     QCheckBox    *tabOutputButtonParameterW20;
     QCheckBox    *tabOutputButtonParameterFpeak;
     QCheckBox    *tabOutputButtonParameterFint;
+    QCheckBox    *tabOutputButtonParameterEllMaj;
+    QCheckBox    *tabOutputButtonParameterEllMin;
+    QCheckBox    *tabOutputButtonParameterEllPA;
     QCheckBox    *tabOutputButtonParameterRel;
     QCheckBox    *tabOutputButtonParameterFlags;
+    QCheckBox    *tabOutputButtonParameterRms;
+    QCheckBox    *tabOutputButtonParameterBFInfo;
+    QCheckBox    *tabOutputButtonParameterBFPar;
+    QCheckBox    *tabOutputButtonParameterBFPhys;
+    QCheckBox    *tabOutputButtonParameterAll;
     
     QHBoxLayout  *tabOutputLayoutControls;
     QWidget      *tabOutputWidgetControls;

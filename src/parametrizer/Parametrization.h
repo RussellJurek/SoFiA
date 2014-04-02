@@ -19,10 +19,10 @@ public:
     
 private:
     int loadData(DataCube<float> *d, DataCube<short> *m, Source *s);
-    //int createMomentZeroMap();
     int measureCentroid();
     int measureLineWidth();
     int measureFlux();
+    int fitEllipse();
     int createIntegratedSpectrum();
     int fitBusyFunction();
     int writeParameters();
@@ -53,8 +53,10 @@ private:
     };
     
     std::vector<struct DataPoint> data;
+    double noiseSubCube;
     
     std::vector<double> spectrum;
+    std::vector<double> noiseSpectrum;
     
     double centroidX;
     double centroidY;
@@ -62,8 +64,11 @@ private:
     double lineWidthW20;
     double lineWidthW50;
     double peakFlux;
-    double integratedFlux;
     double totalFlux;
+    double ellMaj;
+    double ellMin;
+    double ellPA;
+    
     int    busyFitSuccess;
     double busyFunctionChi2;
     double busyFitParameters[BUSYFIT_FREE_PARAM];

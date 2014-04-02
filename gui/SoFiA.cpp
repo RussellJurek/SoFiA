@@ -238,6 +238,44 @@ int SoFiA::updateVariables()
         }
     }
     
+    // Treat list of output parameters separately and check respective check boxes:
+    QString listOutputPar;
+    
+    if(tabOutputButtonParameterAll->isChecked())
+    {
+        listOutputPar = QString("\'*\'");
+    }
+    else
+    {
+        if(tabOutputButtonParameterID->isChecked())     listOutputPar.append(QString("\'ID\',"));
+        if(tabOutputButtonParameterX->isChecked())      listOutputPar.append(QString("\'Xm\',"));
+        if(tabOutputButtonParameterY->isChecked())      listOutputPar.append(QString("\'Ym\',"));
+        if(tabOutputButtonParameterZ->isChecked())      listOutputPar.append(QString("\'Zm\',"));
+        if(tabOutputButtonParameterW50->isChecked())    listOutputPar.append(QString("\'W50\',"));
+        if(tabOutputButtonParameterW20->isChecked())    listOutputPar.append(QString("\'W20\',"));
+        if(tabOutputButtonParameterFpeak->isChecked())  listOutputPar.append(QString("\'Fmax\',"));
+        if(tabOutputButtonParameterFint->isChecked())   listOutputPar.append(QString("\'Ftot\',"));
+        if(tabOutputButtonParameterEllMaj->isChecked()) listOutputPar.append(QString("\'ELL_MAJ\',"));
+        if(tabOutputButtonParameterEllMin->isChecked()) listOutputPar.append(QString("\'ELL_MIN\',"));
+        if(tabOutputButtonParameterEllPA->isChecked())  listOutputPar.append(QString("\'ELL_PA\',"));
+        if(tabOutputButtonParameterRel->isChecked())    listOutputPar.append(QString("\'Rel\',"));
+        if(tabOutputButtonParameterRms->isChecked())    listOutputPar.append(QString("\'RMS_CUBE\',"));
+        
+        if(!listOutputPar.isEmpty())
+        {
+            listOutputPar.truncate(listOutputPar.size() - 1);
+        }
+        else
+        {
+            listOutputPar = QString("\'*\'");
+        }
+    }
+    
+    listOutputPar.prepend(QString("["));
+    listOutputPar.append(QString("]"));
+    
+    parameters.insert(QString("writeCat.parameters"), listOutputPar);
+    
     return 0;
 }
 
@@ -319,6 +357,53 @@ int SoFiA::setFields()
             if(value == "True" or value == "true" or value == "TRUE" or value == "T" or value == "t" or value == "1" or value == "Yes" or value == "yes" or value == "YES" or value == "Y" or value == "y") w->setChecked(true);
             else w->setChecked(false);
         }
+    }
+    
+    // Treat list of output parameters separately and set respective check boxes:
+    QString listOutputPar = parameters.value(QString("writeCat.parameters"));
+    
+    if(listOutputPar.contains(QString("\'*\'")))
+    {
+        tabOutputButtonParameterAll->setChecked(true);
+    }
+    else
+    {
+        tabOutputButtonParameterAll->setChecked(false);
+        tabOutputButtonParameterID->setChecked(false);
+        tabOutputButtonParameterX->setChecked(false);
+        tabOutputButtonParameterY->setChecked(false);
+        tabOutputButtonParameterZ->setChecked(false);
+        tabOutputButtonParameterLon->setChecked(false);
+        tabOutputButtonParameterLat->setChecked(false);
+        tabOutputButtonParameterFreq->setChecked(false);
+        tabOutputButtonParameterVrad->setChecked(false);
+        tabOutputButtonParameterW50->setChecked(false);
+        tabOutputButtonParameterW20->setChecked(false);
+        tabOutputButtonParameterFpeak->setChecked(false);
+        tabOutputButtonParameterFint->setChecked(false);
+        tabOutputButtonParameterRel->setChecked(false);
+        tabOutputButtonParameterFlags->setChecked(false);
+        tabOutputButtonParameterEllMaj->setChecked(false);
+        tabOutputButtonParameterEllMin->setChecked(false);
+        tabOutputButtonParameterEllPA->setChecked(false);
+        tabOutputButtonParameterRms->setChecked(false);
+        tabOutputButtonParameterBFPar->setChecked(false);
+        tabOutputButtonParameterBFPhys->setChecked(false);
+        tabOutputButtonParameterBFInfo->setChecked(false);
+        
+        if(listOutputPar.contains(QString("\'ID\'")))       tabOutputButtonParameterID->setChecked(true);
+        if(listOutputPar.contains(QString("\'Xm\'")))       tabOutputButtonParameterX->setChecked(true);
+        if(listOutputPar.contains(QString("\'Ym\'")))       tabOutputButtonParameterY->setChecked(true);
+        if(listOutputPar.contains(QString("\'Zm\'")))       tabOutputButtonParameterZ->setChecked(true);
+        if(listOutputPar.contains(QString("\'W50\'")))      tabOutputButtonParameterW50->setChecked(true);
+        if(listOutputPar.contains(QString("\'W20\'")))      tabOutputButtonParameterW20->setChecked(true);
+        if(listOutputPar.contains(QString("\'Fmax\'")))     tabOutputButtonParameterFpeak->setChecked(true);
+        if(listOutputPar.contains(QString("\'Ftot\'")))     tabOutputButtonParameterFint->setChecked(true);
+        if(listOutputPar.contains(QString("\'ELL_MAJ\'")))  tabOutputButtonParameterEllMaj->setChecked(true);
+        if(listOutputPar.contains(QString("\'ELL_MIN\'")))  tabOutputButtonParameterEllMin->setChecked(true);
+        if(listOutputPar.contains(QString("\'ELL_PA\'")))   tabOutputButtonParameterEllPA->setChecked(true);
+        if(listOutputPar.contains(QString("\'Rel\'")))      tabOutputButtonParameterRel->setChecked(true);
+        if(listOutputPar.contains(QString("\'RMS_CUBE\'"))) tabOutputButtonParameterRms->setChecked(true);
     }
     
     return 0;
@@ -616,6 +701,28 @@ void SoFiA::updateFields()
     n = tabInFilterFieldSmoothingSpectral->text().toDouble();
     if(n < 0.0) tabInFilterFieldSmoothingSpectral->setText("0.0");
     
+    tabOutputButtonParameterID->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterX->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterY->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterZ->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterLon->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterLat->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterFreq->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterVrad->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterW50->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterW20->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterFpeak->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterFint->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterRel->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterFlags->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterEllMaj->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterEllMin->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterEllPA->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterRms->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterBFPar->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterBFPhys->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    tabOutputButtonParameterBFInfo->setEnabled(!tabOutputButtonParameterAll->isChecked());
+    
     updateActions();
     
     return;
@@ -759,7 +866,7 @@ void SoFiA::showHandbook(const QString &page)
 
 void SoFiA::aboutSoFiA()
 {
-    QString messageText = tr("<h3>About SoFiA</h3><p>Version 0.2</p><p>SoFiA, the <b>Source Finding Application</b>, is an HI source finding pipeline designed to find and parametrise galaxies in HI data cubes. The name SoFiA is based on the Greek word %1, which means wisdom.</p><p>SoFiA is free software: you can redistribute it and/or modify it under the terms of the <b>GNU General Public License</b> as published by the Free Software Foundation, either version 3 of the licence, or (at your option) any later version.</p><p>SoFiA is distributed in the hope that it will be useful, but <b>without any warranty</b>; without even the implied warranty of merchantability or fitness for a particular purpose. See the GNU General Public License for more details.</p><p>You should have received a copy of the GNU General Public License along with SoFiA. If not, see <a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>.</p><p>SoFiA uses the Oxygen icon set which is licensed under version&nbsp;3 of the <a href=\"http://www.gnu.org/licenses/lgpl-3.0.txt\">GNU Lesser General Public License</a>. For more details please visit the website of the <a href=\"http://www.oxygen-icons.org/\">Oxygen project</a>.</p><p>&copy; 2014 The SoFiA Authors</p>").arg(QString::fromUtf8("σοφία"));
+    QString messageText = tr("<h3>About SoFiA</h3><p>Version 0.2</p><p>SoFiA, the <b>Source Finding Application</b>, is an HI source finding pipeline designed to find and parametrise galaxies in HI data cubes. The name SoFiA is based on the Greek word %1, which means wisdom.</p><p>SoFiA is free software: you can redistribute it and/or modify it under the terms of the <b>GNU General Public License</b> as published by the Free Software Foundation, either version 3 of the licence, or (at your option) any later version.</p><p>SoFiA is distributed in the hope that it will be useful, but <b>without any warranty</b>; without even the implied warranty of merchantability or fitness for a particular purpose. See the GNU General Public License for more details.</p><p>You should have received a copy of the GNU General Public License along with SoFiA. If not, see <a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>.</p><p>SoFiA uses the Oxygen icon set which is licensed under version&nbsp;3 of the <a href=\"http://www.gnu.org/licenses/lgpl-3.0.txt\">GNU Lesser General Public License</a>. For more details please visit the website of the <a href=\"http://www.oxygen-icons.org/\">Oxygen project</a>.</p><p>&copy; 2013&ndash;2014 The SoFiA Authors</p>").arg(QString::fromUtf8("σοφία"));
     QString statusText = QString("");
     showMessage(0, messageText, statusText);
     
@@ -1781,46 +1888,92 @@ void SoFiA::createInterface()
     tabOutputForm1->addRow(tr("Data products:"), tabOutputWidgetProducts);
     
     tabOutputGroupBox2 = new QGroupBox(tr("Output parameters"), tabOutput);
-    tabOutputGroupBox2->setEnabled(false);
+    tabOutputGroupBox2->setEnabled(true);
     
     tabOutputForm2 = new QFormLayout;
     
     tabOutputButtonParameterID    = new QCheckBox(tr("Source ID "), tabOutputGroupBox2);
     tabOutputButtonParameterID->setObjectName("parameterID");
+    tabOutputButtonParameterID->setChecked(false);
     tabOutputButtonParameterX     = new QCheckBox(tr("Position X "), tabOutputGroupBox2);
     tabOutputButtonParameterX->setObjectName("parameterX");
+    tabOutputButtonParameterX->setChecked(false);
+    tabOutputButtonParameterX->setToolTip(tr("Source position in pixels"));
     tabOutputButtonParameterY     = new QCheckBox(tr("Position Y "), tabOutputGroupBox2);
     tabOutputButtonParameterY->setObjectName("parameterY");
+    tabOutputButtonParameterY->setChecked(false);
+    tabOutputButtonParameterY->setToolTip(tr("Source position in pixels"));
     tabOutputButtonParameterZ     = new QCheckBox(tr("Position Z "), tabOutputGroupBox2);
     tabOutputButtonParameterZ->setObjectName("parameterZ");
-    tabOutputButtonParameterRA    = new QCheckBox(tr("Right Ascension "), tabOutputGroupBox2);
-    tabOutputButtonParameterRA->setObjectName("parameterRA");
-    tabOutputButtonParameterDec   = new QCheckBox(tr("Declination "), tabOutputGroupBox2);
-    tabOutputButtonParameterDec->setObjectName("parameterDec");
+    tabOutputButtonParameterZ->setChecked(false);
+    tabOutputButtonParameterZ->setToolTip(tr("Source position in pixels"));
+    tabOutputButtonParameterLon   = new QCheckBox(tr("Longitude "), tabOutputGroupBox2);
+    tabOutputButtonParameterLon->setObjectName("parameterLon");
+    tabOutputButtonParameterLon->setChecked(false);
+    tabOutputButtonParameterLon->setToolTip(tr("Longitude in world coordinates (e.g. right ascension, Galactic longitude, etc.)"));
+    tabOutputButtonParameterLat   = new QCheckBox(tr("Latitude "), tabOutputGroupBox2);
+    tabOutputButtonParameterLat->setObjectName("parameterLat");
+    tabOutputButtonParameterLat->setChecked(false);
+    tabOutputButtonParameterLat->setToolTip(tr("Latitude in world coordinates (e.g. declination, Galactic latitude, etc.)"));
     tabOutputButtonParameterFreq  = new QCheckBox(tr("Frequency "), tabOutputGroupBox2);
     tabOutputButtonParameterFreq->setObjectName("parameterFreq");
+    tabOutputButtonParameterFreq->setChecked(false);
     tabOutputButtonParameterVrad  = new QCheckBox(tr("Velocity "), tabOutputGroupBox2);
     tabOutputButtonParameterVrad->setObjectName("parameterVelo");
+    tabOutputButtonParameterVrad->setChecked(false);
+    tabOutputButtonParameterVrad->setToolTip(tr("Radial velocity"));
     tabOutputButtonParameterW50   = new QCheckBox(tr("Line width (w50) "), tabOutputGroupBox2);
     tabOutputButtonParameterW50->setObjectName("parameterW50");
+    tabOutputButtonParameterW50->setChecked(false);
     tabOutputButtonParameterW20   = new QCheckBox(tr("Line width (w20) "), tabOutputGroupBox2);
     tabOutputButtonParameterW20->setObjectName("parameterW20");
+    tabOutputButtonParameterW20->setChecked(false);
     tabOutputButtonParameterFpeak = new QCheckBox(tr("Peak flux "), tabOutputGroupBox2);
     tabOutputButtonParameterFpeak->setObjectName("parameterFpeak");
+    tabOutputButtonParameterFpeak->setChecked(false);
     tabOutputButtonParameterFint  = new QCheckBox(tr("Integrated flux "), tabOutputGroupBox2);
     tabOutputButtonParameterFint->setObjectName("parameterFint");
+    tabOutputButtonParameterFint->setChecked(false);
     tabOutputButtonParameterRel   = new QCheckBox(tr("Reliability "), tabOutputGroupBox2);
     tabOutputButtonParameterRel->setObjectName("parameterRel");
+    tabOutputButtonParameterRel->setChecked(false);
+    tabOutputButtonParameterRel->setToolTip(tr("Reliability from negative detections (if enabled)"));
     tabOutputButtonParameterFlags = new QCheckBox(tr("Quality flags "), tabOutputGroupBox2);
     tabOutputButtonParameterFlags->setObjectName("parameterFlags");
-    
-    tabOutputButtonParameterID->setChecked(true);
-    tabOutputButtonParameterRA->setChecked(true);
-    tabOutputButtonParameterDec->setChecked(true);
-    tabOutputButtonParameterVrad->setChecked(true);
-    tabOutputButtonParameterW50->setChecked(true);
-    tabOutputButtonParameterFpeak->setChecked(true);
-    tabOutputButtonParameterFint->setChecked(true);
+    tabOutputButtonParameterFlags->setChecked(false);
+    tabOutputButtonParameterEllMaj = new QCheckBox(tr("Major axis "), tabOutputGroupBox2);
+    tabOutputButtonParameterEllMaj->setObjectName("parameterEllMaj");
+    tabOutputButtonParameterEllMaj->setChecked(false);
+    tabOutputButtonParameterEllMaj->setToolTip(tr("Major axis of ellipse fitted to source"));
+    tabOutputButtonParameterEllMin = new QCheckBox(tr("Minor axis "), tabOutputGroupBox2);
+    tabOutputButtonParameterEllMin->setObjectName("parameterEllMin");
+    tabOutputButtonParameterEllMin->setChecked(false);
+    tabOutputButtonParameterEllMin->setToolTip(tr("Minor axis of ellipse fitted to source"));
+    tabOutputButtonParameterEllPA = new QCheckBox(tr("Position angle "), tabOutputGroupBox2);
+    tabOutputButtonParameterEllPA->setObjectName("parameterEllPA");
+    tabOutputButtonParameterEllPA->setChecked(false);
+    tabOutputButtonParameterEllPA->setToolTip(tr("Position angle of ellipse fitted to source"));
+    tabOutputButtonParameterRms = new QCheckBox(tr("RMS noise "), tabOutputGroupBox2);
+    tabOutputButtonParameterRms->setObjectName("parameterRms");
+    tabOutputButtonParameterRms->setChecked(false);
+    tabOutputButtonParameterRms->setToolTip(tr("Measured RMS noise of the data"));
+    tabOutputButtonParameterBFPar = new QCheckBox(tr("BF fit solution "), tabOutputGroupBox2);
+    tabOutputButtonParameterBFPar->setObjectName("parameterBFPar");
+    tabOutputButtonParameterBFPar->setChecked(false);
+    tabOutputButtonParameterBFPar->setToolTip(tr("Best-fit Busy Function parameters (if enabled)"));
+    tabOutputButtonParameterBFPhys = new QCheckBox(tr("BF parametrisation "), tabOutputGroupBox2);
+    tabOutputButtonParameterBFPhys->setObjectName("parameterBFPhys");
+    tabOutputButtonParameterBFPhys->setChecked(false);
+    tabOutputButtonParameterBFPhys->setToolTip(tr("Physical parameters derived from Busy Function fit (if enabled)"));
+    tabOutputButtonParameterBFInfo = new QCheckBox(tr("BF information "), tabOutputGroupBox2);
+    tabOutputButtonParameterBFInfo->setObjectName("parameterBFInfo");
+    tabOutputButtonParameterBFInfo->setChecked(false);
+    tabOutputButtonParameterBFInfo->setToolTip(tr("Additional information (chi-squared, flags, etc.) about Busy Function fit (if enabled)"));
+    tabOutputButtonParameterAll = new QCheckBox(tr("All "), tabOutputGroupBox2);
+    tabOutputButtonParameterAll->setObjectName("parameterAll");
+    tabOutputButtonParameterAll->setChecked(true);
+    tabOutputButtonParameterAll->setToolTip(tr("Select all available parameters"));
+    connect(tabOutputButtonParameterAll, SIGNAL(toggled(bool)), this, SLOT(updateFields()));
     
     tabOutputWidgetParameters = new QWidget(tabOutputGroupBox2);
     tabOutputLayoutParameters = new QGridLayout();
@@ -1830,16 +1983,24 @@ void SoFiA::createInterface()
     tabOutputLayoutParameters->addWidget(tabOutputButtonParameterX, 1, 0);
     tabOutputLayoutParameters->addWidget(tabOutputButtonParameterY, 2, 0);
     tabOutputLayoutParameters->addWidget(tabOutputButtonParameterZ, 3, 0);
-    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterRA, 4, 0);
-    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterDec, 5, 0);
+    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterLon, 4, 0);
+    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterLat, 5, 0);
     tabOutputLayoutParameters->addWidget(tabOutputButtonParameterFreq, 0, 1);
     tabOutputLayoutParameters->addWidget(tabOutputButtonParameterVrad, 1, 1);
     tabOutputLayoutParameters->addWidget(tabOutputButtonParameterW50, 2, 1);
     tabOutputLayoutParameters->addWidget(tabOutputButtonParameterW20, 3, 1);
     tabOutputLayoutParameters->addWidget(tabOutputButtonParameterFpeak, 4, 1);
     tabOutputLayoutParameters->addWidget(tabOutputButtonParameterFint, 5, 1);
-    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterRel, 0, 2);
-    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterFlags, 1, 2);
+    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterEllMaj, 0, 2);
+    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterEllMin, 1, 2);
+    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterEllPA, 2, 2);
+    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterRel, 3, 2);
+    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterFlags, 4, 2);
+    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterRms, 5, 2);
+    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterBFPar, 0, 3);
+    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterBFPhys, 1, 3);
+    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterBFInfo, 2, 3);
+    tabOutputLayoutParameters->addWidget(tabOutputButtonParameterAll, 5, 3);
     tabOutputWidgetParameters->setLayout(tabOutputLayoutParameters);
     
     tabOutputForm2->addRow(tr(""), tabOutputWidgetParameters);

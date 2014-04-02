@@ -20,7 +20,6 @@ Parametrization::Parametrization()
     lineWidthW20         = 0.0;
     lineWidthW50         = 0.0;
     peakFlux             = 0.0;
-    integratedFlux       = 0.0;
     totalFlux            = 0.0;
     busyFitSuccess       = 0;
     busyFunctionChi2     = 0.0;
@@ -30,7 +29,9 @@ Parametrization::Parametrization()
     busyFunctionFpeak    = 0.0;
     busyFunctionFint     = 0.0;
     
-    for(size_t i = 0; i < BUSYFIT_FREE_PARAM; i++)
+    noiseSubCube         = 0.0;
+    
+    for(size_t i = 0; i < BUSYFIT_FREE_PARAM; ++i)
     {
         busyFitParameters[i]    = 0.0;
         busyFitUncertainties[i] = 0.0;
@@ -48,12 +49,6 @@ int Parametrization::parametrize(DataCube<float> *d, DataCube<short> *m, Source 
         std::cerr << "Error (Parametrization): No data found; source parametrisation failed." << std::endl;
         return 1;
     }
-    
-    /*if(createMomentZeroMap() != 0)
-    {
-        std::cerr << "Error (Parametrization): Failed to create moment-zero map." << std::endl;
-        return 1;
-    }*/
     
     if(createIntegratedSpectrum() != 0)
     {
@@ -74,6 +69,11 @@ int Parametrization::parametrize(DataCube<float> *d, DataCube<short> *m, Source 
     if(measureFlux() != 0)
     {
         std::cerr << "Warning (Parametrization): Source flux measurement failed." << std::endl;
+    }
+    
+    if(fitEllipse() != 0)
+    {
+        std::cerr << "Warning (Parametrization): Ellipse fit failed." << std::endl;
     }
     
     if(doBusyFunction == true)
@@ -182,13 +182,19 @@ int Parametrization::loadData(DataCube<float> *d, DataCube<short> *m, Source *s)
     if(subRegionY2 >= dataCube->getSize(1)) subRegionY2 = dataCube->getSize(1) - 1L;
     if(subRegionZ2 >= dataCube->getSize(2)) subRegionZ2 = dataCube->getSize(2) - 1L;
     
-    for(long x = subRegionX1; x <= subRegionX2; x++)
+    // Extract all pixels belonging to the source and calculate local noise:
+    size_t counter = 0;
+    noiseSubCube   = 0.0;
+    
+    for(long x = subRegionX1; x <= subRegionX2; ++x)
     {
-        for(long y = subRegionY1; y <= subRegionY2; y++)
+        for(long y = subRegionY1; y <= subRegionY2; ++y)
         {
-            for(long z = subRegionZ1; z <= subRegionZ2; z++)
+            for(long z = subRegionZ1; z <= subRegionZ2; ++z)
             {
                 // Add only those pixels that are masked as being part of the source:
+                float tmpFlux = dataCube->getData(x, y, z);
+                
                 if(static_cast<unsigned short>(maskCube->getData(x, y, z)) == source->getSourceID())
                 {
                     struct DataPoint dataPoint;
@@ -196,10 +202,15 @@ int Parametrization::loadData(DataCube<float> *d, DataCube<short> *m, Source *s)
                     dataPoint.x = x;
                     dataPoint.y = y;
                     dataPoint.z = z;
-                    dataPoint.value = dataCube->getData(x, y, z);
+                    dataPoint.value = tmpFlux;
                     // ### WARNING: A std::bad_alloc exception occurs later on when dataPoint.value is set to a constant of 1.0! No idea why...
                     
                     data.push_back(dataPoint);
+                }
+                else if(maskCube->getData(x, y, z) == 0 and !isnan(tmpFlux))
+                {
+                    noiseSubCube += static_cast<double>(tmpFlux * tmpFlux);
+                    ++counter;
                 }
             }
         }
@@ -211,44 +222,17 @@ int Parametrization::loadData(DataCube<float> *d, DataCube<short> *m, Source *s)
         return 1;
     }
     
+    if(counter == 0)
+    {
+        std::cerr << "Warning (Parametrization): Noise calculation failed for source " << source->getSourceID() << "." << std::endl;
+    }
+    else
+    {
+        noiseSubCube = sqrt(noiseSubCube / static_cast<double>(counter));
+    }
+    
     return 0;
 }
-
-
-
-// Create moment-0 map:
-
-/*int Parametrization::createMomentZeroMap()
-{
-    if(data.empty())
-    {
-        std::cerr << "Error (Parametrization): No data loaded." << std::endl;
-        return 1;
-    }
-    
-    DataCube<float> moment0;
-    
-    if(moment0.createNewCube(subRegionX2 - subRegionX1 + 1, subRegionY2 - subRegionY1 + 1, subRegionZ2 - subRegionZ1 + 1) != 0)
-    {
-        std::cerr << "Error (Parametrization): Failed to create moment map." << std::endl;
-        return 1;
-    }
-    
-    moment0.floodFill(0.0);
-    
-    for(long x = 0; x <= subRegionX2 - subRegionX1; x++)
-    {
-        for(long y = 0; y <= subRegionY2 - subRegionY1; y++)
-        {
-            for(long z = 0; z <= subRegionZ2 - subRegionZ1; z++)
-            {
-                moment0.addData(dataCube->getData(x + subRegionX1, y + subRegionY1, z + subRegionZ1), x, y, z);
-            }
-        }
-    }
-    
-    return 0;
-}*/
 
 
 
@@ -267,7 +251,7 @@ int Parametrization::measureCentroid()
     centroidY  = 0.0;
     centroidZ  = 0.0;
     
-    for(size_t i = 0; i < data.size(); i++)
+    for(size_t i = 0; i < data.size(); ++i)
     {
         centroidX += data[i].value * data[i].x;
         centroidY += data[i].value * data[i].y;
@@ -298,96 +282,58 @@ int Parametrization::measureFlux()
     peakFlux  = -std::numeric_limits<double>::max();
     
     // Sum over all pixels:
-    for(unsigned long i = 0L; i < data.size(); i++)
+    for(unsigned long i = 0L; i < data.size(); ++i)
     {
-        totalFlux += static_cast<double>(data[i].value);
-        
+        totalFlux  += static_cast<double>(data[i].value);
         if(peakFlux < static_cast<double>(data[i].value)) peakFlux = static_cast<double>(data[i].value);
     }
     
-    // Multiply with channel width:
-    /*double cdelt3 = 1.0;
-    
-    if(dataCube->getHeader("CDELT3", cdelt3) != 0)
+    return 0;
+}
+
+
+
+// Fit ellipse to source:
+
+int Parametrization::fitEllipse()
+{
+    if(data.empty() == true)
     {
-        std::cerr << "Warning (Parametrization): No spectral channel width information found." << std::endl;
-        std::cerr << "                           Flux measurement will not be adjusted." << std::endl;
+        std::cerr << "Error (Parametrization): No data loaded." << std::endl;
+        return 1;        
     }
     
-    integratedFlux = totalFlux * cdelt3;
-    
-    // Correct for beam size:
-    double bmaj = sqrt(4.0 * log(2.0) / MATH_CONST_PI);
-    double bmin = bmaj;
-    
-    if(dataCube->getHeader("BMAJ", bmaj) != 0)
+    if(totalFlux <= 0.0)
     {
-        std::cerr << "Warning (Parametrization): No beam information found." << std::endl;
-        std::cerr << "                           Flux measurement will not be adjusted." << std::endl;
-    }
-    else if(dataCube->getHeader("BMIN", bmin) != 0)
-    {
-        std::cerr << "Warning (Parametrization): No beam minor axis information found." << std::endl;
-        std::cerr << "                           Assuming circular beam for flux measurement." << std::endl;
-        bmin = bmaj;
+        std::cerr << "Error (Parametrization): Cannot fit ellipse, source flux <= 0." << std::endl;
+        return 1;        
     }
     
-    double cdelt1 = 1.0;
-    double cdelt2 = 1.0;
+    double momX  = 0.0;
+    double momY  = 0.0;
+    double momXY = 0.0;
+    double sum   = 0.0;
     
-    if(dataCube->getHeader("CDELT1", cdelt1) != 0)
+    for(unsigned long i = 0L; i < data.size(); ++i)
     {
-        std::cerr << "Warning (Parametrization): No longitude pixel size information found." << std::endl;
-        std::cerr << "                           Flux measurement will not be adjusted." << std::endl;
-    }
-    else if(dataCube->getHeader("CDELT2", cdelt2) != 0)
-    {
-        std::cerr << "Warning (Parametrization): No latitude pixel size information found." << std::endl;
-        std::cerr << "                           Assuming square pixels." << std::endl;
-        cdelt2 = cdelt1;
-    }
-    
-    cdelt1 = mathAbs(cdelt1);
-    cdelt2 = mathAbs(cdelt2);
-    
-    if(mathAbs(cdelt1 - cdelt2) > cdelt1 * 0.01)
-    {
-        // Make sure that pixels are square-shaped within 1% accuracy:
-        std::cerr << "Warning (Parametrization): Pixels deviate from square shape by more than 1%." << std::endl;
-        std::cerr << "                           Flux measurement will not be adjusted." << std::endl;
+        double fluxValue = static_cast<double>(data[i].value);
         
-        cdelt1 = 1.0;
-        cdelt2 = 1.0;
-    }
-    else
-    {
-        // Average pixel sizes:
-        cdelt1 = 0.5 * (cdelt1 + cdelt2);
-    }
-    
-    double beamCorr = MATH_CONST_PI * (bmaj / cdelt1) * (bmin / cdelt1) / (4.0 * log(2.0));
-    
-    if(beamCorr < 0.5 or beamCorr > 50.0)
-    {
-        std::cerr << "Warning (Parametrization): Unusual beam correction factor of " << beamCorr << " found." << std::endl;
-        std::cerr << "                           Values normally range from about 1 to 20." << std::endl;
+        if(fluxValue > 0.0)
+        {
+            momX  += (static_cast<double>(data[i].x) - source->getParameter("X")) * (static_cast<double>(data[i].x) - source->getParameter("X")) * fluxValue;
+            momY  += (static_cast<double>(data[i].y) - source->getParameter("Y")) * (static_cast<double>(data[i].y) - source->getParameter("Y")) * fluxValue;
+            momXY += (static_cast<double>(data[i].x) - source->getParameter("X")) * (static_cast<double>(data[i].y) - source->getParameter("Y")) * fluxValue;
+            sum += fluxValue;
+        }
     }
     
-    if(beamCorr == 0.0)
-    {
-        // In C++ the above should be true for both +0 and -0.
-        std::cerr << "Warning (Parametrization): Beam correction factor is zero." << std::endl;
-        std::cerr << "                           Flux measurement will not be adjusted." << std::endl;
-        beamCorr = 1.0;
-    }
+    momX  /= sum;
+    momY  /= sum;
+    momXY /= sum;
     
-    integratedFlux /= beamCorr;*/
-    
-    //std::cout << cdelt1 << '\t' << cdelt2 << '\t' << cdelt3 << '\t' << bmaj << '\t' << bmin << std::endl;
-    
-    // WARNING: There is no proper treatment of different units here, and all parameters are implicitly 
-    // WARNING: assumed to have matching default units. This will need to be improved at some point.
-    // WARNING: Also, there is no calculation of uncertainties yet!
+    ellPA  = 0.5 * atan2(2.0 * momXY, momX - momY);
+    ellMaj = sqrt(2.0 * (momX + momY + sqrt((momX - momY) * (momX - momY) + 4.0 * momXY * momXY)));
+    ellMin = sqrt(2.0 * (momX + momY - sqrt((momX - momY) * (momX - momY) + 4.0 * momXY * momXY)));
     
     return 0;
 }
@@ -405,21 +351,34 @@ int Parametrization::createIntegratedSpectrum()
     }
     
     spectrum.clear();
+    noiseSpectrum.clear();
     
-    for(long i = 0; i <= subRegionZ2 - subRegionZ1; i++)
+    for(long i = 0; i <= subRegionZ2 - subRegionZ1; ++i)
     {
         spectrum.push_back(0.0);
+        noiseSpectrum.push_back(0.0);
     }
     
-    for(size_t i = 0; i < data.size(); i++)
+    std::vector<size_t> counter(spectrum.size(), 0);
+    
+    // Extract spectrum...
+    for(size_t i = 0; i < data.size(); ++i)
     {
         spectrum[data[i].z - subRegionZ1] += static_cast<double>(data[i].value);
+        counter[data[i].z - subRegionZ1]  += 1;
     }
     
-    //for(size_t i = 0; i <= subRegionZ2 - subRegionZ1; i++)
-    //{
-    //    std::cout << i << '\t' << spectrum[i] << std::endl;
-    //}
+    // ...and determine noise per channel:
+    // ### WARNING: This still needs some consideration. Is is wise to provide the rms per
+    // ### WARNING: channel as the uncertainty? Or would one rather use the S/N? If the rms
+    // ### WARNING: is zero (because there are no data) the BF fitting will just produce NaNs.
+    // ### WARNING: Even worse: the noise will not scale with sqrt(N), because pixels are
+    // ### WARNING: spatially correlated!!!
+    for(size_t i = 0; i < noiseSpectrum.size(); ++i)
+    {
+        if(counter[i] > 0) noiseSpectrum[i] = sqrt(static_cast<double>(counter[i])) * noiseSubCube;
+        else noiseSpectrum[i] = std::numeric_limits<double>::infinity();
+    }
     
     return 0;
 }
@@ -444,7 +403,7 @@ int Parametrization::measureLineWidth()
         if(spectrum[i] > specMax) specMax = spectrum[i];
     }
     
-    //Determine w50:
+    //Determine w₅₀:
     size_t i = 0;
     
     while(i < spectrum.size() and spectrum[i] < specMax / 2.0) ++i;
@@ -480,7 +439,7 @@ int Parametrization::measureLineWidth()
         return 1;
     }
     
-    //Determine w20:
+    //Determine w₂₀:
     i = 0;
     
     while(i < spectrum.size() and spectrum[i] < specMax / 5.0) ++i;
@@ -516,6 +475,11 @@ int Parametrization::measureLineWidth()
         return 1;
     }
     
+    //Determine Wₘ₅₀:
+    double sum = 0.0;
+    
+    // ### CONTINUE HERE...
+    
     return 0;
 }
 
@@ -531,10 +495,8 @@ int Parametrization::fitBusyFunction()
         return 1;
     }
     
-    std::vector<double> uncertainties(subRegionZ2 - subRegionZ1 + 1, 0.1);
-    
     BusyFit busyFit;
-    busyFit.setup(spectrum.size(), &spectrum[0], &uncertainties[0], 2, true, false);
+    busyFit.setup(spectrum.size(), &spectrum[0], &noiseSpectrum[0], 2, true, false);
     
     busyFitSuccess = busyFit.fit();
     
@@ -550,33 +512,20 @@ int Parametrization::fitBusyFunction()
 
 int Parametrization::writeParameters()
 {
-    /*Measurement<double> measurementFlux = dataCube->getUnitFlux();
-    Measurement<double> measurementSpec = dataCube->getUnitSpec();
+    source->setParameter("ID",       source->getSourceID());
+    source->setParameter("X",        centroidX);
+    source->setParameter("Y",        centroidY);
+    source->setParameter("Z",        centroidZ);
+    source->setParameter("W50",      lineWidthW50);
+    source->setParameter("W20",      lineWidthW20);
+    source->setParameter("F_PEAK",   peakFlux);
+    source->setParameter("F_TOT",    totalFlux);
     
-    // WARNING: This will later need to be set manually in DataCube when reading data from pointer, using header information!
-    measurementFlux.set("Flux", 1.0, 0.0, UNIT_JY);
-    measurementSpec.set("Velocity", 1.0, 0.0, "km/s");
+    source->setParameter("ELL_MAJ",  ellMaj);
+    source->setParameter("ELL_MIN",  ellMin);
+    source->setParameter("ELL_PA",   180.0 * ellPA / MATH_CONST_PI);
     
-    Unit unitFlux    = measurementFlux.getUnit();
-    Unit unitSpec    = measurementSpec.getUnit();
-    Unit unitIntFlux = unitFlux * unitSpec;
-    Unit unitBfB     = unitSpec;
-    unitBfB.invert();
-    Unit unitBfC     = unitSpec * unitSpec;
-    unitBfC.invert();*/
-    
-    source->setParameter("ID",         source->getSourceID());
-    
-    source->setParameter("X",          centroidX);
-    source->setParameter("Y",          centroidY);
-    source->setParameter("Z",          centroidZ);
-    
-    source->setParameter("W50",        lineWidthW50);
-    source->setParameter("W20",        lineWidthW20);
-    
-    source->setParameter("F_PEAK",     peakFlux);
-    //source->setParameter("F_INT",      integratedFlux);
-    source->setParameter("F_TOT",      totalFlux);
+    source->setParameter("RMS_CUBE", noiseSubCube);
     
     if(doBusyFunction == true)
     {
