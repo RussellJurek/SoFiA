@@ -391,8 +391,8 @@ if Parameters['steps']['doMerge'] and NRdet:
 		wcsin = wcs.WCS(hdulist[0].header)
 		hdulist.close()
  		objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
-		catParNames = tuple(list(catParNames) + ['RAg',  'DECg',  'VELg'])
-		catParFormt = tuple(list(catParFormt) + ['%11.5f', '%11.5f', '%10.0f'])
+		catParNames = tuple(list(catParNames) + ['%sg'%(dict_Header['ctype1']),'%sg'%(dict_Header['ctype2']),'%sg'%(dict_Header['ctype3'])])
+		catParFormt = tuple(list(catParFormt) + ['%12.7e', '%12.7e', '%12.7e'])
 
 # 		if 'vopt' in dict_Header['ctype3'].lower() or 'vrad' in dict_Header['ctype3'].lower() or 'velo' in dict_Header['ctype3'].lower() or 'felo' in dict_Header['ctype3'].lower():
 # 			if not 'cunit3' in dict_Header: dkms=abs(dict_Header['cdelt3'])/1e+3 # assuming m/s
