@@ -63,6 +63,7 @@ private:
     double centroidZ;
     double lineWidthW20;
     double lineWidthW50;
+    double lineWidthWm50;
     double peakFlux;
     double totalFlux;
     double ellMaj;

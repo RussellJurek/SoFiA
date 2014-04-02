@@ -31,7 +31,7 @@ Parametrization::Parametrization()
     
     noiseSubCube         = 0.0;
     
-    for(size_t i = 0; i < BUSYFIT_FREE_PARAM; ++i)
+    for(size_t i = 0; i < BUSYFIT_FREE_PARAM; i++)
     {
         busyFitParameters[i]    = 0.0;
         busyFitUncertainties[i] = 0.0;
@@ -61,14 +61,14 @@ int Parametrization::parametrize(DataCube<float> *d, DataCube<short> *m, Source 
         std::cerr << "Warning (Parametrization): Failed to measure source centroid." << std::endl;
     }
     
-    if(measureLineWidth() != 0)
-    {
-        std::cerr << "Warning (Parametrization): Failed to measure source line width." << std::endl;
-    }
-    
     if(measureFlux() != 0)
     {
         std::cerr << "Warning (Parametrization): Source flux measurement failed." << std::endl;
+    }
+    
+    if(measureLineWidth() != 0)
+    {
+        std::cerr << "Warning (Parametrization): Failed to measure source line width." << std::endl;
     }
     
     if(fitEllipse() != 0)
@@ -186,11 +186,11 @@ int Parametrization::loadData(DataCube<float> *d, DataCube<short> *m, Source *s)
     size_t counter = 0;
     noiseSubCube   = 0.0;
     
-    for(long x = subRegionX1; x <= subRegionX2; ++x)
+    for(long x = subRegionX1; x <= subRegionX2; x++)
     {
-        for(long y = subRegionY1; y <= subRegionY2; ++y)
+        for(long y = subRegionY1; y <= subRegionY2; y++)
         {
-            for(long z = subRegionZ1; z <= subRegionZ2; ++z)
+            for(long z = subRegionZ1; z <= subRegionZ2; z++)
             {
                 // Add only those pixels that are masked as being part of the source:
                 float tmpFlux = dataCube->getData(x, y, z);
@@ -210,7 +210,7 @@ int Parametrization::loadData(DataCube<float> *d, DataCube<short> *m, Source *s)
                 else if(maskCube->getData(x, y, z) == 0 and !isnan(tmpFlux))
                 {
                     noiseSubCube += static_cast<double>(tmpFlux * tmpFlux);
-                    ++counter;
+                    counter++;
                 }
             }
         }
@@ -251,12 +251,15 @@ int Parametrization::measureCentroid()
     centroidY  = 0.0;
     centroidZ  = 0.0;
     
-    for(size_t i = 0; i < data.size(); ++i)
+    for(size_t i = 0; i < data.size(); i++)
     {
-        centroidX += data[i].value * data[i].x;
-        centroidY += data[i].value * data[i].y;
-        centroidZ += data[i].value * data[i].z;
-        sum       += data[i].value;
+        if(data[i].value > 0.0)        // NOTE: Only positive pixels considered here!
+        {
+            centroidX += data[i].value * data[i].x;
+            centroidY += data[i].value * data[i].y;
+            centroidZ += data[i].value * data[i].z;
+            sum       += data[i].value;
+        }
     }
     
     centroidX /= sum;
@@ -281,8 +284,8 @@ int Parametrization::measureFlux()
     totalFlux = 0.0;
     peakFlux  = -std::numeric_limits<double>::max();
     
-    // Sum over all pixels:
-    for(unsigned long i = 0L; i < data.size(); ++i)
+    // Sum over all pixels (including negative ones):
+    for(unsigned long i = 0L; i < data.size(); i++)
     {
         totalFlux  += static_cast<double>(data[i].value);
         if(peakFlux < static_cast<double>(data[i].value)) peakFlux = static_cast<double>(data[i].value);
@@ -314,11 +317,11 @@ int Parametrization::fitEllipse()
     double momXY = 0.0;
     double sum   = 0.0;
     
-    for(unsigned long i = 0L; i < data.size(); ++i)
+    for(unsigned long i = 0L; i < data.size(); i++)
     {
         double fluxValue = static_cast<double>(data[i].value);
         
-        if(fluxValue > 0.0)
+        if(fluxValue > 0.0)           // NOTE: Only positive pixels considered here!
         {
             momX  += (static_cast<double>(data[i].x) - source->getParameter("X")) * (static_cast<double>(data[i].x) - source->getParameter("X")) * fluxValue;
             momY  += (static_cast<double>(data[i].y) - source->getParameter("Y")) * (static_cast<double>(data[i].y) - source->getParameter("Y")) * fluxValue;
@@ -353,7 +356,7 @@ int Parametrization::createIntegratedSpectrum()
     spectrum.clear();
     noiseSpectrum.clear();
     
-    for(long i = 0; i <= subRegionZ2 - subRegionZ1; ++i)
+    for(long i = 0; i <= subRegionZ2 - subRegionZ1; i++)
     {
         spectrum.push_back(0.0);
         noiseSpectrum.push_back(0.0);
@@ -362,7 +365,7 @@ int Parametrization::createIntegratedSpectrum()
     std::vector<size_t> counter(spectrum.size(), 0);
     
     // Extract spectrum...
-    for(size_t i = 0; i < data.size(); ++i)
+    for(size_t i = 0; i < data.size(); i++)
     {
         spectrum[data[i].z - subRegionZ1] += static_cast<double>(data[i].value);
         counter[data[i].z - subRegionZ1]  += 1;
@@ -374,7 +377,7 @@ int Parametrization::createIntegratedSpectrum()
     // ### WARNING: is zero (because there are no data) the BF fitting will just produce NaNs.
     // ### WARNING: Even worse: the noise will not scale with sqrt(N), because pixels are
     // ### WARNING: spatially correlated!!!
-    for(size_t i = 0; i < noiseSpectrum.size(); ++i)
+    for(size_t i = 0; i < noiseSpectrum.size(); i++)
     {
         if(counter[i] > 0) noiseSpectrum[i] = sqrt(static_cast<double>(counter[i])) * noiseSubCube;
         else noiseSpectrum[i] = std::numeric_limits<double>::infinity();
@@ -398,7 +401,7 @@ int Parametrization::measureLineWidth()
     // Determine maximum:
     double specMax = 0.0;    // WARNING: This assumes that sources are always positive!
     
-    for(size_t i = 0; i < spectrum.size(); ++i)
+    for(size_t i = 0; i < spectrum.size(); i++)
     {
         if(spectrum[i] > specMax) specMax = spectrum[i];
     }
@@ -406,11 +409,11 @@ int Parametrization::measureLineWidth()
     //Determine w₅₀:
     size_t i = 0;
     
-    while(i < spectrum.size() and spectrum[i] < specMax / 2.0) ++i;
+    while(i < spectrum.size() and spectrum[i] < specMax / 2.0) i++;
     
     if(i >= spectrum.size())
     {
-        std::cerr << "Error (Parametrization): Calculation of line width failed." << std::endl;
+        std::cerr << "Error (Parametrization): Calculation of W50 failed (1)." << std::endl;
         lineWidthW50 = 0.0;
         return 1;
     }
@@ -420,11 +423,11 @@ int Parametrization::measureLineWidth()
     
     i = spectrum.size() - 1;
     
-    while(i >= 0 and spectrum[i] < specMax / 2.0) --i;
+    while(i >= 0 and spectrum[i] < specMax / 2.0) i--;
     
     if(i < 0)
     {
-        std::cerr << "Error (Parametrization): Calculation of line width failed." << std::endl;
+        std::cerr << "Error (Parametrization): Calculation of W50 failed (2)." << std::endl;
         lineWidthW50 = 0.0;
         return 1;
     }
@@ -434,7 +437,7 @@ int Parametrization::measureLineWidth()
     
     if(lineWidthW50 <= 0.0)
     {
-        std::cerr << "Error (Parametrization): Calculation of line width failed." << std::endl;
+        std::cerr << "Error (Parametrization): Calculation of W50 failed (3)." << std::endl;
         lineWidthW50 = 0.0;
         return 1;
     }
@@ -442,11 +445,11 @@ int Parametrization::measureLineWidth()
     //Determine w₂₀:
     i = 0;
     
-    while(i < spectrum.size() and spectrum[i] < specMax / 5.0) ++i;
+    while(i < spectrum.size() and spectrum[i] < specMax / 5.0) i++;
     
     if(i >= spectrum.size())
     {
-        std::cerr << "Error (Parametrization): Calculation of W20 failed." << std::endl;
+        std::cerr << "Error (Parametrization): Calculation of W20 failed (1)." << std::endl;
         lineWidthW20 = 0.0;
         return 1;
     }
@@ -456,11 +459,11 @@ int Parametrization::measureLineWidth()
     
     i = spectrum.size() - 1;
     
-    while(i >= 0 and spectrum[i] < specMax / 5.0) --i;
+    while(i >= 0 and spectrum[i] < specMax / 5.0) i--;
     
     if(i < 0)
     {
-        std::cerr << "Error (Parametrization): Calculation of W20 failed." << std::endl;
+        std::cerr << "Error (Parametrization): Calculation of W20 failed (2)." << std::endl;
         lineWidthW20 = 0.0;
         return 1;
     }
@@ -470,15 +473,100 @@ int Parametrization::measureLineWidth()
     
     if(lineWidthW20 <= 0.0)
     {
-        std::cerr << "Error (Parametrization): Calculation of W20 failed." << std::endl;
+        std::cerr << "Error (Parametrization): Calculation of W20 failed (3)." << std::endl;
         lineWidthW20 = 0.0;
         return 1;
     }
     
     //Determine Wₘ₅₀:
     double sum = 0.0;
+    double mean = 0.0;
+    double bound90l = 0.0;
+    double bound90r = 0.0;
+    i = 0;
     
-    // ### CONTINUE HERE...
+    while(sum < 0.05 * totalFlux and i < spectrum.size())
+    {
+        sum += spectrum[i];
+        i++;
+    }
+    
+    i--;
+    
+    if(i >= spectrum.size())
+    {
+        std::cerr << "Error (Parametrization): Calculation of Wm50 failed (1)." << std::endl;
+        lineWidthWm50 = 0.0;
+        return 1;
+    }
+    
+    bound90l = static_cast<double>(i);
+    if(i > 0) bound90l -= (spectrum[i] - 0.05 * totalFlux) / (spectrum[i] - spectrum[i - 1]);      // Interpolate if not at edge.
+    
+    i = spectrum.size() - 1;
+    sum = 0.0;
+    
+    while(sum < 0.05 * totalFlux and i >= 0)
+    {
+        sum += spectrum[i];
+        i--;
+    }
+    
+    i++;
+    
+    if(i < 0)
+    {
+        std::cerr << "Error (Parametrization): Calculation of Wm50 failed (2)." << std::endl;
+        lineWidthWm50 = 0.0;
+        return 1;
+    }
+    
+    bound90r = static_cast<double>(i);
+    if(i < spectrum.size() - 1) bound90r += (spectrum[i] - 0.05 * totalFlux) / (spectrum[i] - spectrum[i + 1]);   // Interpolate if not at edge.
+    
+    mean = 0.9 * totalFlux / (bound90r - bound90l);
+    
+    if(mean <= 0)
+    {
+        std::cerr << "Error (Parametrization): Calculation of Wm50 failed (3)." << std::endl;
+        lineWidthWm50 = 0.0;
+        return 1;
+    }
+    
+    i = 0;
+    
+    while(spectrum[i] < 0.5 * mean and i < spectrum.size()) i++;
+    
+    if(i >= spectrum.size())
+    {
+        std::cerr << "Error (Parametrization): Calculation of Wm50 failed (4)." << std::endl;
+        lineWidthWm50 = 0.0;
+        return 1;
+    }
+    
+    lineWidthWm50 = static_cast<double>(i);
+    if(i > 0) lineWidthWm50 -= (spectrum[i] - 0.5 * mean) / (spectrum[i] - spectrum[i - 1]);      // Interpolate if not at edge.
+    
+    i = spectrum.size() - 1;
+    
+    while(spectrum[i] < 0.5 * mean and i >= 0) i--;
+    
+    if(i < 0)
+    {
+        std::cerr << "Error (Parametrization): Calculation of Wm50 failed (5)." << std::endl;
+        lineWidthWm50 = 0.0;
+        return 1;
+    }
+    
+    lineWidthWm50 = static_cast<double>(i) - lineWidthWm50;
+    if(i < spectrum.size() - 1) lineWidthWm50 += (spectrum[i] - 0.5 * mean) / (spectrum[i] - spectrum[i + 1]);   // Interpolate if not at edge.
+    
+    if(lineWidthWm50 <= 0)
+    {
+        std::cerr << "Error (Parametrization): Calculation of Wm50 failed (6)." << std::endl;
+        lineWidthWm50 = 0.0;
+        return 1;
+    }
     
     return 0;
 }
@@ -518,6 +606,7 @@ int Parametrization::writeParameters()
     source->setParameter("Z",        centroidZ);
     source->setParameter("W50",      lineWidthW50);
     source->setParameter("W20",      lineWidthW20);
+    source->setParameter("Wm50",     lineWidthWm50);
     source->setParameter("F_PEAK",   peakFlux);
     source->setParameter("F_TOT",    totalFlux);
     
