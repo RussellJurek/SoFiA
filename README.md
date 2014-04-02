@@ -28,6 +28,7 @@ SoFiA:
         numpy (≥ 1.7)
         scipy (≥ 0.7)
         pyfits (≥ 3.0)
+        astropy (≥ 0.2.5)
     Packages (C++):
         GCC (≥ 4.6)
         GNU Scientific Library (≥ 1.15)
