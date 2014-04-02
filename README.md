@@ -5,9 +5,12 @@ Introduction
 ------------
 
 SoFiA, the Source Finding Application, is a new HI source finding pipeline 
-intended to find and parametrise galaxies in HI data cubes. While the 
-software is still under development, the first beta version of SoFiA has 
-now been released and can be obtained from this web page. 
+intended to find and parametrise galaxies in HI data cubes. SoFiA can be 
+launched from the command line, but it also comes with an easy-to-use 
+graphical user interface that allows control parameters to be manipulated 
+interactively. While the software is still under development, the first 
+stable version of SoFiA has been released and can be obtained from this web 
+page. 
 
 
 Requirements
@@ -101,6 +104,13 @@ basic help is available at this stage.
 
 Version history
 ---------------
+
+* SoFiA 0.2.1
+  * Released 25/02/2014
+  * Some more bug fixes, including fixing the threshold finder.
+  * Implementation of VO table output.
+  * See release notes for details:
+    https://github.com/SoFiA-Admin/SoFiA/releases/tag/v0.2.1
 
 * SoFiA 0.2
   * Released 10/02/2014
