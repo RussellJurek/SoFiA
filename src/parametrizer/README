@@ -1,0 +1,7 @@
+If you make changes to cparametrizer.pyx or .pxd do not forget
+to re-run 
+
+python cythonize.py
+
+to recreate the cparametrizer.cpp. The sofia setup-script won't do
+this for you and instead just use the (outdated) .cpp!
