@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from sofia import parametrizer2
+from sofia import cparametrizer
 import numpy as np
 
 
@@ -8,11 +8,11 @@ def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
   
   cathead=np.array(cathead)
   objects=np.array(objects)
-  initcatalog=parametrizer2.PySourceCatalog()
+  initcatalog=cparametrizer.PySourceCatalog()
   for obj in objects:
-    newSource=parametrizer2.PySource()
+    newSource=cparametrizer.PySource()
     newSource.setSourceID(obj[cathead=='ID'])
-    newMeasurement=parametrizer2.PyMeasurement()
+    newMeasurement=cparametrizer.PyMeasurement()
     newMeasurement.set("X",obj[cathead=='Xg'],0.,"")
     newSource.setParameter(newMeasurement)
     newMeasurement.set("Y",obj[cathead=='Yg'],0.,"")
@@ -33,7 +33,7 @@ def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
     newSource.setParameter(newMeasurement)
     initcatalog.insert(newSource)
 
-  moduleParametrizer = parametrizer2.PyModuleParametrisation()
+  moduleParametrizer = cparametrizer.PyModuleParametrisation()
   moduleParametrizer.setFlags(Parameters['parameters']['optimiseMask'], Parameters['parameters']['fitBusyFunction'])
   
   cube = cube.astype('<f4')
