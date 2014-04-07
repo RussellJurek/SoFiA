@@ -1,7 +1,6 @@
 cimport numpy as np
 from cython.operator cimport dereference as deref, preincrement as inc
 from libcpp.string cimport string
-#from cpython cimport bool # don't use this, doesn't work!
 from libcpp cimport bool
 from libcpp.map cimport map
 cimport cython
@@ -33,27 +32,25 @@ cdef extern from "Unit.h":
     cdef cppclass Unit:
         Unit() except +
         Unit(Unit &) except +
-        
+
         int getPrefix()
-        
+
         void set(const string value)
         string printString(const unsigned int mode)
-        
+
         void invert()
-        
+
         void clear()
         bool isEmpty()
         bool isDefined()
-        
+
         Unit & equal "operator=" (Unit &)
         bool isequal "operator==" (Unit &)
         Unit & mult_equal "operator*=" (Unit &)
-        
-        
 
 
 cdef class PyUnit:
-    cdef Unit *thisptr      # hold a C++ instance which we're wrapping
+    cdef Unit *thisptr  # holds the C++ instance being wrapped
 
 
 cdef extern from "Measurement.h":
@@ -64,30 +61,30 @@ cdef extern from "Measurement.h":
     cdef cppclass Measurement[T]:
         Measurement() except +
         Measurement(Measurement[T] &) except +
-        
+
         void clear()
-        
+
         void setInt "set" (const string newName, T newValue, T newUncertainty, const int mode)
         void setStr "set" (const string newName, T newValue, T newUncertainty, const string newUnit)
         void setUnit "set" (const string newName, T newValue, T newUncertainty, const Unit newUnit)
-        
+
         void setName(const string newName)
         void setValue(T newValue)
         void setUncertainty(T newValue)
         void setUnitUnit "setUnit" (const Unit newUnit)
         void setUnitStr "setUnit" (const string newUnitStr)
-        
+
         string printString "print" (unsigned int mode, int decimals, bool scientific)
-        
+
         string getName()
         T getValue()
         T getUncertainty()
         Unit getUnit()
-        
+
         void invert()
-        
+
         int convert(T &newValue, T &newUncertainty, unsigned int mode)
-        
+
         Measurement & equal "operator=" (Measurement &)
         bool isequal "operator==" (Measurement &)
         bool islarger "operator>" (Measurement &)
@@ -103,56 +100,65 @@ cdef extern from "Measurement.h":
 
 
 cdef class PyMeasurement:
-    cdef Measurement[double] *thisptr      # hold a C++ instance which we're wrapping
+    cdef Measurement[double] *thisptr  # holds the C++ instance being wrapped
 
 
 cdef extern from "Source.h":
     cdef cppclass Source:
         Source() except +
         Source(const Source &source) except +
-        
+
         bool isDefined()
         bool parameterDefined(const string &name)
         unsigned int findParameter(const string &name)
-        
+
         int setParameter(const string parameter, double value, double uncertainty, string &unit)
         int setParameter(const string parameter, double value, double uncertainty)
         int setParameter(Measurement[double] &measurement)
         Measurement[double] & getParameterMeasurement(const string &parameter)
-        
+
         int setSourceID(unsigned long sid)
         unsigned long getSourceID()
-        
+
         int setSourceName(const string name)
         string   getSourceName()
-        
+
         map[string,Measurement[double]] getParameters()
         void clear()
 
 cdef class PySource:
-    cdef Source *thisptr      # hold a C++ instance which we're wrapping
+    cdef Source *thisptr  # holds the C++ instance being wrapped
 
 cdef extern from "SourceCatalog.h":
     cdef cppclass SourceCatalog:
         SourceCatalog() except +
         SourceCatalog(const SourceCatalog &sourceCatalog) except +
-        
+
         int insert(Source &source)
-        map[unsigned long,Source] & getSources()
+        map[unsigned long,Source] getSources()
         void clear()
-        
+
         int readDuchampFile(const string &filename)
 
 cdef class PySourceCatalog:
-    cdef SourceCatalog *thisptr      # hold a C++ instance which we're wrapping
+    cdef SourceCatalog *thisptr  # holds the C++ instance being wrapped
 
 cdef extern from "ModuleParametrisation.h":
     cdef cppclass ModuleParametrisation:
         ModuleParametrisation() except +
-        
-        int run(float *d, short *m, long dx, long dy, long dz, map[string,string] &fitsHeader, SourceCatalog &initCatalog)
+
+        int run(
+            float *d,
+            short *m,
+            long dx,
+            long dy,
+            long dz,
+            map[string, string] &fitsHeader,
+            SourceCatalog &initCatalog
+            )
+
         SourceCatalog getCatalog()
         void setFlags(bool doMO, bool doBF)
 
 cdef class PyModuleParametrisation:
-    cdef ModuleParametrisation *thisptr      # hold a C++ instance which we're wrapping
+    cdef ModuleParametrisation *thisptr  # holds the C++ instance being wrapped
