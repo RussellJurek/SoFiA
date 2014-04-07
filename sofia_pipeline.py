@@ -390,7 +390,11 @@ if Parameters['steps']['doMerge'] and NRdet:
 		hdulist = fits.open(Parameters['import']['inFile'])
 		wcsin = wcs.WCS(hdulist[0].header)
 		hdulist.close()
- 		objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
+ 		#objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
+		if hdulist[0].header['naxis']==4:
+ 			objects=np.concatenate((objects,wcsin.wcs_pix2world(np.concatenate((objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],np.zeros((objects.shape[0],1))),axis=1),0)[:,:-1]),axis=1)
+		else:
+ 			objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
 		catParNames = tuple(list(catParNames) + ['%sg'%(dict_Header['ctype1']),'%sg'%(dict_Header['ctype2']),'%sg'%(dict_Header['ctype3'])])
 		catParFormt = tuple(list(catParFormt) + ['%12.7e', '%12.7e', '%12.7e'])
 
