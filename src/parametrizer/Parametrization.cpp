@@ -207,7 +207,7 @@ int Parametrization::loadData(DataCube<float> *d, DataCube<short> *m, Source *s)
                     
                     data.push_back(dataPoint);
                 }
-                else if(maskCube->getData(x, y, z) == 0 and !isnan(tmpFlux))
+                else if(maskCube->getData(x, y, z) == 0 and !std::isnan(tmpFlux))
                 {
                     noiseSubCube += static_cast<double>(tmpFlux * tmpFlux);
                     counter++;
