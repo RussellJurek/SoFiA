@@ -280,15 +280,15 @@ if Parameters['steps']['doParameterise'] and Parameters['steps']['doMerge'] and 
 	#print "\n--- SoFiA: Parametrising sources ---"
 	#sys.stdout.flush()
         
-	#from sofia import parametrizer2
+	#from sofia import cparametrizer
 	#cathead = np.array(catParNames)
-	#initcatalog = parametrizer2.PySourceCatalog()
+	#initcatalog = cparametrizer.PySourceCatalog()
         
 	#for rr in reliable:
 		#obj = np.array(objects[rr - 1])
-		#newSource = parametrizer2.PySource()
+		#newSource = cparametrizer.PySource()
 		#newSource.setSourceID(obj[cathead == 'ID'])
-		#newMeasurement = parametrizer2.PyMeasurement()
+		#newMeasurement = cparametrizer.PyMeasurement()
 		#newMeasurement.set('X', obj[cathead == 'Xg'], 0.0, '')
 		#newSource.setParameter(newMeasurement)
 		#newMeasurement.set('Y', obj[cathead == 'Yg'], 0.0, '')
@@ -309,7 +309,7 @@ if Parameters['steps']['doParameterise'] and Parameters['steps']['doMerge'] and 
 		#newSource.setParameter(newMeasurement)
 		#initcatalog.insert(newSource)
 
-	#moduleParametrizer = parametrizer2.PyModuleParametrisation()
+	#moduleParametrizer = cparametrizer.PyModuleParametrisation()
 	#moduleParametrizer.setFlags(Parameters['parameters']['optimiseMask'], Parameters['parameters']['fitBusyFunction'])
         
 	#np_Cube = np_Cube.astype('<f4')

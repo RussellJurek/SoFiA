@@ -69,10 +69,10 @@ linker_src_files = [
 linker_src = [linker_src_base + f for f in linker_src_files]
 
 # Interface to the parametrization2 code
-parametrizer2_src_base = 'src/parametrizer/'
-parametrizer2_src_files = [
+parametrizer_src_base = 'src/parametrizer/'
+parametrizer_src_files = [
     "helperFunctions.cpp",
-    "parametrizer2.cpp",
+    "cparametrizer.cpp",
     "ModuleParametrisation.cpp",
     "Unit.cpp",
     "Measurement.cpp",
@@ -85,7 +85,7 @@ parametrizer2_src_files = [
     "Parametrization.cpp",
     #"WorldCoordinateSystem.cpp"
 ]
-parametrizer2_src = [parametrizer2_src_base + f for f in parametrizer2_src_files]
+parametrizer_src = [parametrizer_src_base + f for f in parametrizer_src_files]
 
 setup(
     name = "sofia",
@@ -99,8 +99,8 @@ setup(
             include_dirs = include_dirs
         ),
         Extension(
-            "parametrizer2",
-            parametrizer2_src,
+            "cparametrizer",
+            parametrizer_src,
             extra_compile_args = ["-O3"],
             include_dirs = include_dirs + ext_include_dirs,
             library_dirs = ext_library_dirs + ext_include_dirs,

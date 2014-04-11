@@ -1,7 +1,8 @@
 # distutils: language = c++
-# distutils: sources = Unit.cpp Measurement.cpp Source.cpp SourceCatalog.cpp helperFunctions.cpp
+# distutils: sources = ModuleParametrisation.cpp Unit.cpp Measurement.cpp Source.cpp SourceCatalog.cpp helperFunctions.cpp MaskOptimization.cpp BusyFit.cpp DataCube.cpp MetaData.cpp Parametrization.cpp WorldCoordinateSystem.cpp
 
-from catalog cimport *
+
+from cparametrizer cimport *
 from cython.operator cimport dereference as deref, preincrement as inc
 
 
@@ -309,3 +310,43 @@ cdef class PySourceCatalog:
 
     def copy(self):
         return PySourceCatalog(self)
+
+cdef class PyModuleParametrisation:
+
+    def __cinit__(self, sc=None):
+        self.thisptr = new ModuleParametrisation()
+
+    def __dealloc__(self):
+        del self.thisptr
+
+    def run(
+            self,
+            np.ndarray datacube,
+            np.ndarray maskcube,
+            PySourceCatalog initCatalog,
+            header
+            ):
+        cdef long dz = datacube.shape[0]
+        cdef long dy = datacube.shape[1]
+        cdef long dx = datacube.shape[2]
+        cdef map[string, string] headermap
+        for key in header.keys():
+            headermap[<string> key] = <string> (str(header[key]))
+        initCatalogPtr = new SourceCatalog(deref((<PySourceCatalog> initCatalog).thisptr))
+        self.thisptr.run(
+            <float*> datacube.data,
+            <short*> maskcube.data,
+            dx,
+            dy,
+            dz,
+            headermap,
+            deref(initCatalogPtr)
+            )
+
+    def getCatalog(self):
+        c = PySourceCatalog()
+        c.thisptr = new SourceCatalog(self.thisptr.getCatalog())
+        return c
+
+    def setFlags(self, doMO, doBF):
+        self.thisptr.setFlags(doMO, doBF)
