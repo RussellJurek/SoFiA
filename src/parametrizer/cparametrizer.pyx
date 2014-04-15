@@ -324,14 +324,14 @@ cdef class PyModuleParametrisation:
             np.ndarray datacube,
             np.ndarray maskcube,
             PySourceCatalog initCatalog,
-            header
-            ):
+#            header
+    ):
         cdef long dz = datacube.shape[0]
         cdef long dy = datacube.shape[1]
         cdef long dx = datacube.shape[2]
-        cdef map[string, string] headermap
-        for key in header.keys():
-            headermap[<string> key] = <string> (str(header[key]))
+#        cdef map[string, string] headermap
+#        for key in header.keys():
+#            headermap[<string> key] = <string> (str(header[key]))
         initCatalogPtr = new SourceCatalog(deref((<PySourceCatalog> initCatalog).thisptr))
         self.thisptr.run(
             <float*> datacube.data,
@@ -339,7 +339,7 @@ cdef class PyModuleParametrisation:
             dx,
             dy,
             dz,
-            headermap,
+#            headermap,
             deref(initCatalogPtr)
             )
 

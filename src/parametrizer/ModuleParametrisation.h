@@ -14,7 +14,8 @@ public:
     ModuleParametrisation();
     ~ModuleParametrisation();
     
-    int run(float *d, short *m, long dx, long dy, long dz, std::map<std::string, std::string> &fitsHeader, SourceCatalog &initCatalog);
+    //int run(float *d, short *m, long dx, long dy, long dz, std::map<std::string, std::string> &fitsHeader, SourceCatalog &initCatalog);
+    int run(float *d, short *m, long dx, long dy, long dz, SourceCatalog &initCatalog);
     
     SourceCatalog getCatalog()
     {

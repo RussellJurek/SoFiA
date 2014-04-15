@@ -131,14 +131,14 @@ int MaskOptimization::loadData(DataCube<float> *d, DataCube<short> *m, Source *s
         {
             searchRadiusZ = static_cast<long>(0.6 * (source->getParameter("BBOX_Z_MAX") - source->getParameter("BBOX_Z_MIN")));
         }
-        else if(source->parameterDefined("W50") and !dataCube->getHeader("cdelt3", dz))
+        /*else if(source->parameterDefined("W50") and !dataCube->getHeader("cdelt3", dz))
         {
             // WARNING This assumes that the units of w50 of the source are the same as
             // WARNING those of cdelt3 in the data cube!!! However, this may not be the case!
             // WARNING Either we need to ensure that they are always the same, or we have 
             // WARNING to compare units at this point!
             searchRadiusZ = static_cast<long>(source->getParameter("W50") / mathAbs(dz));
-        }
+        }*/
         else
         {
             searchRadiusZ = MASKOPTIMIZATION_DEFAULT_SPECTRAL_RADIUS;

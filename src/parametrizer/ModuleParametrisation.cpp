@@ -32,7 +32,8 @@ ModuleParametrisation::~ModuleParametrisation()
 // Function to run parametrisation module //
 // -------------------------------------- //
 
-int ModuleParametrisation::run(float *d, short *m, long dx, long dy, long dz, std::map<std::string, std::string> &fitsHeader, SourceCatalog &initCatalog)
+//int ModuleParametrisation::run(float *d, short *m, long dx, long dy, long dz, std::map<std::string, std::string> &fitsHeader, SourceCatalog &initCatalog)
+int ModuleParametrisation::run(float *d, short *m, long dx, long dy, long dz, SourceCatalog &initCatalog)
 {
     // Check data
     
@@ -51,10 +52,10 @@ int ModuleParametrisation::run(float *d, short *m, long dx, long dy, long dz, st
     dataCube.createNewCubeFromPointer(dx, dy, dz, d);
     maskCube.createNewCubeFromPointer(dx, dy, dz, m);
     
-    for(std::map<std::string, std::string>::iterator it = fitsHeader.begin(); it != fitsHeader.end(); it++)
+    /*for(std::map<std::string, std::string>::iterator it = fitsHeader.begin(); it != fitsHeader.end(); it++)
     {
         dataCube.setHeader(it->first, it->second);
-    }
+    }*/
     
     catalog = initCatalog;
     

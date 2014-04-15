@@ -4,7 +4,8 @@ from sofia import cparametrizer
 import numpy as np
 
 
-def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
+#def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
+def parametrise(cube, mask, objects, cathead, catformt, Parameters):
   
   cathead=np.array(cathead)
   objects=np.array(objects)
@@ -39,7 +40,8 @@ def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
   cube = cube.astype('<f4')
   mask = mask.astype('<i2')
   
-  moduleParametrizer.run(cube, mask, initcatalog, header)
+  #moduleParametrizer.run(cube, mask, initcatalog, header)
+  moduleParametrizer.run(cube, mask, initcatalog)
   results = moduleParametrizer.getCatalog()
   
 
@@ -80,4 +82,5 @@ def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
   print
   
   #print objects.shape,cathead.shape
-  return cube,header,mask,objects,cathead,catformt
+  #return cube,header,mask,objects,cathead,catformt
+  return cube, mask, objects, cathead, catformt
