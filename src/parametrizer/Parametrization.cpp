@@ -345,7 +345,7 @@ int Parametrization::fitEllipse()
     //          This means that PA will no longer have the mathematically correct orientation!
     ellPA += 90.0;
     
-    // NOTE:    PA should now have a value between 0° and 180°.
+    // NOTE:    PA should now be between 0° and 180°.
     
     return 0;
 }
