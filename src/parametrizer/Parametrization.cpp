@@ -338,6 +338,15 @@ int Parametrization::fitEllipse()
     ellMaj = sqrt(2.0 * (momX + momY + sqrt((momX - momY) * (momX - momY) + 4.0 * momXY * momXY)));
     ellMin = sqrt(2.0 * (momX + momY - sqrt((momX - momY) * (momX - momY) + 4.0 * momXY * momXY)));
     
+    // WARNING: Converting PA from rad to deg:
+    ellPA *= 180.0 / MATH_CONST_PI;
+    
+    // WARNING: Adding 90° to PA here, because astronomers like to have 0° corresponding to north.
+    //          This means that PA will no longer have the mathematically correct orientation!
+    ellPA += 90.0;
+    
+    // NOTE:    PA should now have a value between 0° and 180°.
+    
     return 0;
 }
 
@@ -612,7 +621,7 @@ int Parametrization::writeParameters()
     
     source->setParameter("ELL_MAJ",  ellMaj);
     source->setParameter("ELL_MIN",  ellMin);
-    source->setParameter("ELL_PA",   180.0 * ellPA / MATH_CONST_PI);
+    source->setParameter("ELL_PA",   ellPA);
     
     source->setParameter("RMS_CUBE", noiseSubCube);
     
