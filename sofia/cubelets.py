@@ -179,7 +179,7 @@ def writeSubcube(cube,header,mask,objects,cathead,outroot):
 	hdu.writeto(name,clobber=True)
 	
 	# spectra
-	spec = np.sum(subcube*submask,axis=(1,2))
+	spec = np.nansum(subcube*submask,axis=(1,2))
 	f = open(outputDir+cubename+'_'+str(int(obj[0]))+'_spec.txt', 'w')
 	#f.write('# '+specTypeX+' ('+specUnitX+')'+'  '+specTypeY+' ('+specUnitY+')\n')
 	for i in range(0,len(spec)):
