@@ -150,8 +150,10 @@ def writeSubcube(cube,header,mask,objects,cathead,outroot):
 	m0*=abs(header['cdelt3'])/1e+3
 	hdu = pyfits.PrimaryHDU(data=m0,header=header)
 	hdu.header['bunit']+='.km/s'
-	hdu.header['datamin']=m0.min()
-	hdu.header['datamax']=m0.max()
+	#hdu.header['datamin']=m0.min()
+	#hdu.header['datamax']=m0.max()
+	hdu.header['datamin']=np.nanmin(m0)
+	hdu.header['datamax']=np.nanmax(m0)
 	del(hdu.header['crpix3'])
 	del(hdu.header['crval3'])
 	del(hdu.header['cdelt3'])
