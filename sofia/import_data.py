@@ -17,7 +17,7 @@ def read_data(inFile,weightsFile,maskFile):
 	print 'start loading cube: ' , inFile 
 	f = pyfits.open(inFile)
 	np_Cube = f[0].data
-	dict_Header = f[0].header[:]
+	dict_Header = f[0].header
 	f.close
 
 
@@ -31,8 +31,8 @@ def read_data(inFile,weightsFile,maskFile):
 
 
 	# if there are more than 4 dimensions it will complain and later on probably crash
-	if dict_Header['NAXIS'] > 4:
-		print 'ERROR: The file has more than 4 dimensions'
+	if dict_Header['NAXIS'] > 4 or dict_Header['NAXIS'] < 1:
+		print 'ERROR: The file has less than 1 or more than 4 dimensions'
 	if dict_Header['NAXIS'] == 4:
 		if dict_Header['NAXIS4'] != 1:
 			print 'type: ', dict_Header['CTYPE1'], dict_Header['CTYPE2'], dict_Header['CTYPE3'], dict_Header['CTYPE4']  

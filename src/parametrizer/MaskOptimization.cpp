@@ -125,7 +125,7 @@ int MaskOptimization::loadData(DataCube<float> *d, DataCube<short> *m, Source *s
     
     if(searchRadiusZ <= 0L)
     {
-        double dz;
+        //double dz;
         
         if(source->parameterDefined("BBOX_Z_MIN") and source->parameterDefined("BBOX_Z_MAX"))
         {
