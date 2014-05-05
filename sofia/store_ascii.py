@@ -44,7 +44,7 @@ def make_ascii(objects,store_pars,outname):
 
 
 
-def make_ascii_from_array(objects,cathead,catfmt,store_pars,outname):
+def make_ascii_from_array(objects,cathead,catunits,catfmt,store_pars,outname):
 	print 'Store the results to ascii file: ', outname
 	header = 'SoFia catalogue\n'
 	
@@ -61,17 +61,20 @@ def make_ascii_from_array(objects,cathead,catfmt,store_pars,outname):
 	# creating the header
 	header1 = ''
 	header2 = ''
+	header3 = ''
 	if store_pars == ['*']:
 		for i in range(0,len(cathead)):
 			header1 += cathead[i].rjust(lenCathead[i])
-			header2 += catNum[i].rjust(lenCathead[i])
-		header += header1[3:]+'\n'+header2[3:]
+			header2 += catunits[i].rjust(lenCathead[i])
+			header3 += catNum[i].rjust(lenCathead[i])
+		header += header1[3:]+'\n'+header2[3:]+'\n'+header3[3:]
 	else:	
 		for i in range (0,len(store_pars)):
 			index = list(cathead).index(store_pars[i])
 			header1 += store_pars[i].rjust(lenCathead[index])
-			header2 += catNum[i].rjust(lenCathead[index])
-		header += header1[3:]+'\n'+header2[3:]
+			header2 += catunits[index].rjust(lenCathead[index])
+			header3 += catNum[i].rjust(lenCathead[index])
+		header += header1[3:]+'\n'+header2[3:]+'\n'+header3[3:]
 
 
 	if store_pars == ['*']:
