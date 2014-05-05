@@ -192,14 +192,16 @@ else: reliable=[1,] # if not merging, all detected voxels have ID = 1 and here t
 
 if Parameters['steps']['doMerge'] and NRdet:
 	catParNames = ('ID','Xg','Yg','Zg','Xm','Ym','Zm','Xmin','Xmax','Ymin','Ymax','Zmin','Zmax','NRvox','Fmin','Fmax','Ftot')
+	catParUnits = ('-','pix','pix','pix','pix','pix','pix','pix','pix','pix','pix','pix','pix','-','data_units','data_units','data_units')
 	catParFormt = ('%10i', '%10.3f', '%10.3f', '%10.3f', '%10.3f', '%10.3f', '%10.3f', '%7i', '%7i', '%7i', '%7i', '%7i', '%7i', '%8i', '%12.3e', '%12.3e', '%12.3e')
 	if Parameters['steps']['doReliability']:
 		catParNames = tuple(list(catParNames) + ['NRpos',  'NRneg',  'Rel'])
+		catParUnits = tuple(list(catParUnits) + ['-','-','-'])
 		catParFormt = tuple(list(catParFormt) + ['%12.3e', '%12.3e', '%12.6f'])
 	if Parameters['steps']['doDebug']:
 		print "\n--- SoFiA: Writing all-source catalogue for debugging ---"
 		#sys.stdout.flush()
-		store_ascii.make_ascii_from_array(objects, catParNames, catParFormt, Parameters['writeCat']['parameters'], outroot+'_cat.debug.ascii')
+		store_ascii.make_ascii_from_array(objects, catParNames, catParUnits, catParFormt, Parameters['writeCat']['parameters'], outroot+'_cat.debug.ascii')
 
 
 
@@ -228,6 +230,8 @@ if Parameters['steps']['doMerge'] and NRdet:
 
 	tmpCatParFormt = list(catParFormt)
 	catParFormt= tuple(['%10i'] + tmpCatParFormt)
+	tmpCatParUnits = list(catParUnits)
+	catParUnits= tuple(['-'] + tmpCatParUnits)
 
 	# in the mask file
 	mask *= -1
@@ -272,6 +276,7 @@ if Parameters['steps']['doParameterise'] and Parameters['steps']['doMerge'] and 
 #	np_Cube, dict_Header, mask, objects, catParNames, catParFormt = parametrisation.parametrise(np_Cube, dict_Header, mask, objects, catParNames, catParFormt, Parameters)
 	np_Cube, mask, objects, catParNames, catParFormt = parametrisation.parametrise(np_Cube, mask, objects, catParNames, catParFormt, Parameters)
 	catParNames=tuple(catParNames)
+	catParUnits=tuple(catParUnits)
 	catParFormt=tuple(catParFormt)
 	##print catParFormt
 	
@@ -383,40 +388,38 @@ if Parameters['steps']['doMerge'] and NRdet:
 	    found = True
 	except ImportError: found = False
 	if found:
-		try:
-			print "\n--- SoFiA: Adding WCS position to catalog ---"
-			sys.stdout.flush()
-			# get wcs of the cube
-			from astropy import wcs
-			from astropy.io import fits
-			hdulist = fits.open(Parameters['import']['inFile'])
-			wcsin = wcs.WCS(hdulist[0].header)
-			hdulist.close()
- 			#objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
-			if hdulist[0].header['naxis']==4:
- 				objects=np.concatenate((objects,wcsin.wcs_pix2world(np.concatenate((objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],np.zeros((objects.shape[0],1))),axis=1),0)[:,:-1]),axis=1)
-			else:
- 				objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
-			catParNames = tuple(list(catParNames) + ['%sg'%(dict_Header['ctype1']),'%sg'%(dict_Header['ctype2']),'%sg'%(dict_Header['ctype3'])])
-			catParFormt = tuple(list(catParFormt) + ['%12.7e', '%12.7e', '%12.7e'])
+		print "\n--- SoFiA: Adding WCS position to catalog ---"
+		sys.stdout.flush()
+		# get wcs of the cube
+		from astropy import wcs
+		from astropy.io import fits
+		hdulist = fits.open(Parameters['import']['inFile'])
+		wcsin = wcs.WCS(hdulist[0].header)
+		hdulist.close()
+ 		#objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
+		if hdulist[0].header['naxis']==4:
+ 			objects=np.concatenate((objects,wcsin.wcs_pix2world(np.concatenate((objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],np.zeros((objects.shape[0],1))),axis=1),0)[:,:-1]),axis=1)
+		else:
+ 			objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
+		catParNames = tuple(list(catParNames) + ['%sg'%(dict_Header['ctype1']),'%sg'%(dict_Header['ctype2']),'%sg'%(dict_Header['ctype3'])])
+		catParUnits = tuple(list(catParUnits) + ['FITS_units','FITS_units','FITS_units'])
+		catParFormt = tuple(list(catParFormt) + ['%12.7e', '%12.7e', '%12.7e'])
 
-# 			if 'vopt' in dict_Header['ctype3'].lower() or 'vrad' in dict_Header['ctype3'].lower() or 'velo' in dict_Header['ctype3'].lower() or 'felo' in dict_Header['ctype3'].lower():
-# 				if not 'cunit3' in dict_Header: dkms=abs(dict_Header['cdelt3'])/1e+3 # assuming m/s
-# 				elif dict_Header['cunit3'].lower()=='km/s': dkms=abs(dict_Header['cdelt3'])
-# 			elif 'freq' in dict_Header['ctype3'].lower():
-# 				if not 'cunit3' in dict_Header: dkms=abs(dict_Header['cdelt3'])/1.42040575177e+9*2.99792458e+5 # assuming Hz
-# 				elif dict_Header['cunit3'].lower()=='kHz': dkms=abs(dict_Header['cdelt3'])/1.42040575177e+6*2.99792458e+5
-# 			objects[:,4]*=dkms/abs(dict_Header['cdelt3'])
-# 			objects[:,7]*=dkms
-# 			catformt='%10i %10i %12.5f %12.5f %10.1f %15.3e %15.3e %15.3e'
-# 			catheadf='%8s %10s %12s %12s %10s %15s %15s %15s'
-# 			cathead1=('ID','ID_old','RA','DEC','VEL','MIN','MAX','FTOT')
-# 			cathead2=('','','(deg)','(deg)','(km/s)','(%s)'%dict_Header['bunit'],'(%s)'%dict_Header['bunit'],'(%s.km/s)'%dict_Header['bunit'])
-# 			cathead3=tuple(['(%i)'%jj for jj in range(len(cathead1))])
-# 			cathead=catheadf%cathead1+'\n'+catheadf%cathead2+'\n'+catheadf%cathead3
-# 			np.savetxt('%s_cat.debug_physical.ascii'%outroot,np.array(objects),fmt=catformt,header=cathead)
-		except:
-			print '\nWARNING: FITS header contains invalid keywords. WCS positions could not be added to catalog.\n'
+# 		if 'vopt' in dict_Header['ctype3'].lower() or 'vrad' in dict_Header['ctype3'].lower() or 'velo' in dict_Header['ctype3'].lower() or 'felo' in dict_Header['ctype3'].lower():
+# 			if not 'cunit3' in dict_Header: dkms=abs(dict_Header['cdelt3'])/1e+3 # assuming m/s
+# 			elif dict_Header['cunit3'].lower()=='km/s': dkms=abs(dict_Header['cdelt3'])
+# 		elif 'freq' in dict_Header['ctype3'].lower():
+# 			if not 'cunit3' in dict_Header: dkms=abs(dict_Header['cdelt3'])/1.42040575177e+9*2.99792458e+5 # assuming Hz
+# 			elif dict_Header['cunit3'].lower()=='kHz': dkms=abs(dict_Header['cdelt3'])/1.42040575177e+6*2.99792458e+5
+# 		objects[:,4]*=dkms/abs(dict_Header['cdelt3'])
+# 		objects[:,7]*=dkms
+# 		catformt='%10i %10i %12.5f %12.5f %10.1f %15.3e %15.3e %15.3e'
+# 		catheadf='%8s %10s %12s %12s %10s %15s %15s %15s'
+# 		cathead1=('ID','ID_old','RA','DEC','VEL','MIN','MAX','FTOT')
+# 		cathead2=('','','(deg)','(deg)','(km/s)','(%s)'%dict_Header['bunit'],'(%s)'%dict_Header['bunit'],'(%s.km/s)'%dict_Header['bunit'])
+# 		cathead3=tuple(['(%i)'%jj for jj in range(len(cathead1))])
+# 		cathead=catheadf%cathead1+'\n'+catheadf%cathead2+'\n'+catheadf%cathead3
+# 		np.savetxt('%s_cat.debug_physical.ascii'%outroot,np.array(objects),fmt=catformt,header=cathead)
 
 
 
@@ -431,7 +434,7 @@ if Parameters['steps']['doWriteCat'] and Parameters['steps']['doMerge'] and NRde
 		store_xml.make_xml_from_array(objects, catParNames, catParFormt, Parameters['writeCat']['parameters'],outroot + '_cat.xml')
 		#store_xml.make_xml(results, outroot + '_cat.xml')
 	if Parameters['writeCat']['writeASCII'] and Parameters['steps']['doMerge'] and NRdet:
-		store_ascii.make_ascii_from_array(objects, catParNames, catParFormt, Parameters['writeCat']['parameters'], outroot+'_cat.ascii')
+		store_ascii.make_ascii_from_array(objects, catParNames, catParUnits, catParFormt, Parameters['writeCat']['parameters'], outroot+'_cat.ascii')
 		#store_ascii.make_ascii(results, Parameters['writeCat']['parameters'], outroot + '_cat.ascii')
 
 
