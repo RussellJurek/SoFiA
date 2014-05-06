@@ -274,7 +274,7 @@ if Parameters['steps']['doParameterise'] and Parameters['steps']['doMerge'] and 
 	print "\n--- SoFiA: Parametrising sources ---"
 	sys.stdout.flush()
 #	np_Cube, dict_Header, mask, objects, catParNames, catParFormt = parametrisation.parametrise(np_Cube, dict_Header, mask, objects, catParNames, catParFormt, Parameters)
-	np_Cube, mask, objects, catParNames, catParFormt = parametrisation.parametrise(np_Cube, mask, objects, catParNames, catParFormt, Parameters)
+	np_Cube, mask, objects, catParNames, catParFormt, catParUnits = parametrisation.parametrise(np_Cube, mask, objects, catParNames, catParFormt, catParUnits, Parameters)
 	catParNames=tuple(catParNames)
 	catParUnits=tuple(catParUnits)
 	catParFormt=tuple(catParFormt)
@@ -388,23 +388,25 @@ if Parameters['steps']['doMerge'] and NRdet:
 	    found = True
 	except ImportError: found = False
 	if found:
-		print "\n--- SoFiA: Adding WCS position to catalog ---"
-		sys.stdout.flush()
-		# get wcs of the cube
-		from astropy import wcs
-		from astropy.io import fits
-		hdulist = fits.open(Parameters['import']['inFile'])
-		wcsin = wcs.WCS(hdulist[0].header)
-		hdulist.close()
- 		#objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
-		if hdulist[0].header['naxis']==4:
- 			objects=np.concatenate((objects,wcsin.wcs_pix2world(np.concatenate((objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],np.zeros((objects.shape[0],1))),axis=1),0)[:,:-1]),axis=1)
-		else:
- 			objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
-		catParNames = tuple(list(catParNames) + ['%sg'%(dict_Header['ctype1']),'%sg'%(dict_Header['ctype2']),'%sg'%(dict_Header['ctype3'])])
-		catParUnits = tuple(list(catParUnits) + ['FITS_units','FITS_units','FITS_units'])
-		catParFormt = tuple(list(catParFormt) + ['%12.7e', '%12.7e', '%12.7e'])
-
+		try:
+			print "\n--- SoFiA: Adding WCS position to catalog ---"
+			sys.stdout.flush()
+			# get wcs of the cube
+			from astropy import wcs
+			from astropy.io import fits
+			hdulist = fits.open(Parameters['import']['inFile'])
+			wcsin = wcs.WCS(hdulist[0].header)
+			hdulist.close()
+ 			#objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
+			if hdulist[0].header['naxis']==4:
+ 				objects=np.concatenate((objects,wcsin.wcs_pix2world(np.concatenate((objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],np.zeros((objects.shape[0],1))),axis=1),0)[:,:-1]),axis=1)
+			else:
+ 				objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
+			catParNames = tuple(list(catParNames) + ['%sg'%(dict_Header['ctype1']),'%sg'%(dict_Header['ctype2']),'%sg'%(dict_Header['ctype3'])])
+			catParUnits = tuple(list(catParUnits) + ['FITS_units','FITS_units','FITS_units'])
+			catParFormt = tuple(list(catParFormt) + ['%12.7e', '%12.7e', '%12.7e'])
+		except:
+			print "WARNING: WCS conversion of parameters could not be executed!\n"
 # 		if 'vopt' in dict_Header['ctype3'].lower() or 'vrad' in dict_Header['ctype3'].lower() or 'velo' in dict_Header['ctype3'].lower() or 'felo' in dict_Header['ctype3'].lower():
 # 			if not 'cunit3' in dict_Header: dkms=abs(dict_Header['cdelt3'])/1e+3 # assuming m/s
 # 			elif dict_Header['cunit3'].lower()=='km/s': dkms=abs(dict_Header['cdelt3'])

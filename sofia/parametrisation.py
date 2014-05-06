@@ -5,7 +5,7 @@ import numpy as np
 
 
 #def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
-def parametrise(cube, mask, objects, cathead, catformt, Parameters):
+def parametrise(cube, mask, objects, cathead, catformt, catparunits, Parameters):
   
   cathead=np.array(cathead)
   objects=np.array(objects)
@@ -56,10 +56,12 @@ def parametrise(cube, mask, objects, cathead, catformt, Parameters):
   pars = d[d.keys()[index]].getParametersDict()
   cathead = list(cathead)
   catformt = list(catformt)
+  catparunits = list(catparunits)
   for i in sorted(pars):
     if i not in replParam:
       cathead.append(i)
       catformt.append('%12.3f')
+      catparunits.append('-')
   # extend the parameter array
   tmpObjects = np.empty((objects.shape[0],len(cathead)))
   tmpObjects[:,:] = np.NAN
@@ -77,10 +79,11 @@ def parametrise(cube, mask, objects, cathead, catformt, Parameters):
 
   objects = np.array(objects)
   cathead = np.array(cathead)
+  catparunits = np.array(catparunits)
   catformt = np.array(catformt)
   print 'The parameterisation has completed'
   print
   
   #print objects.shape,cathead.shape
   #return cube,header,mask,objects,cathead,catformt
-  return cube, mask, objects, cathead, catformt
+  return cube, mask, objects, cathead, catformt, catparunits
