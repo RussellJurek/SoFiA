@@ -99,39 +99,40 @@ def writeSubcube(cube,header,mask,objects,cathead,outroot):
 	hdulist.close()
 	
 	# make PV diagram
-	pv_sampling=10
-	pv_r=np.arange(-max(subcube.shape[1:]),max(subcube.shape[1:])-1+1./pv_sampling,1./pv_sampling)
-	pv_y=Yc-YminNew+pv_r*math.cos(float(obj[cathead=='ELL_PA'][0])/180*math.pi)
-	pv_x=Xc-XminNew-pv_r*math.sin(float(obj[cathead=='ELL_PA'][0])/180*math.pi)
-	pv_x,pv_y=pv_x[(pv_x>=0)*(pv_x<=subcube.shape[2]-1)],pv_y[(pv_x>=0)*(pv_x<=subcube.shape[2]-1)]
-	pv_x,pv_y=pv_x[(pv_y>=0)*(pv_y<=subcube.shape[1]-1)],pv_y[(pv_y>=0)*(pv_y<=subcube.shape[1]-1)]
-	pv_x.resize((1,pv_x.shape[0]))
-	pv_y.resize((pv_x.shape))
-	pv_coords=np.concatenate((pv_y,pv_x),axis=0)
-	pv_array=[]
-	for jj in range(subcube.shape[0]):
-		plane=map_coordinates(subcube[jj],pv_coords)
-		plane=[plane[ii::pv_sampling] for ii in range(pv_sampling)]
-		plane=np.array([ii[:plane[-1].shape[0]] for ii in plane])
-		pv_array.append(plane.mean(axis=0))
-	pv_array=np.array(pv_array)
-	hdu = pyfits.PrimaryHDU(data=pv_array,header=header)
-	hdulist = pyfits.HDUList([hdu])
-	hdulist[0].header['CTYPE1']='PV--DIST'
-	hdulist[0].header['CDELT1']=hdulist[0].header['CDELT2']
-	hdulist[0].header['CRVAL1']=0
-	hdulist[0].header['CRPIX1']=pv_array.shape[1]/2
-	hdulist[0].header['CTYPE2']=hdulist[0].header['CTYPE3']
-	hdulist[0].header['CDELT2']=hdulist[0].header['CDELT3']
-	hdulist[0].header['CRVAL2']=hdulist[0].header['CRVAL3']
-	hdulist[0].header['CRPIX2']=hdulist[0].header['CRPIX3']
-	del hdulist[0].header['CTYPE3']
-	del hdulist[0].header['CDELT3']
-	del hdulist[0].header['CRVAL3']
-	del hdulist[0].header['CRPIX3']
-	name = outputDir+cubename+'_'+str(int(obj[0]))+'_pv.fits'
-	hdulist.writeto(name,clobber=True)
-	hdulist.close()
+	if 'ELL_PA' in cathead:
+		pv_sampling=10
+		pv_r=np.arange(-max(subcube.shape[1:]),max(subcube.shape[1:])-1+1./pv_sampling,1./pv_sampling)
+		pv_y=Yc-YminNew+pv_r*math.cos(float(obj[cathead=='ELL_PA'][0])/180*math.pi)
+		pv_x=Xc-XminNew-pv_r*math.sin(float(obj[cathead=='ELL_PA'][0])/180*math.pi)
+		pv_x,pv_y=pv_x[(pv_x>=0)*(pv_x<=subcube.shape[2]-1)],pv_y[(pv_x>=0)*(pv_x<=subcube.shape[2]-1)]
+		pv_x,pv_y=pv_x[(pv_y>=0)*(pv_y<=subcube.shape[1]-1)],pv_y[(pv_y>=0)*(pv_y<=subcube.shape[1]-1)]
+		pv_x.resize((1,pv_x.shape[0]))
+		pv_y.resize((pv_x.shape))
+		pv_coords=np.concatenate((pv_y,pv_x),axis=0)
+		pv_array=[]
+		for jj in range(subcube.shape[0]):
+			plane=map_coordinates(subcube[jj],pv_coords)
+			plane=[plane[ii::pv_sampling] for ii in range(pv_sampling)]
+			plane=np.array([ii[:plane[-1].shape[0]] for ii in plane])
+			pv_array.append(plane.mean(axis=0))
+		pv_array=np.array(pv_array)
+		hdu = pyfits.PrimaryHDU(data=pv_array,header=header)
+		hdulist = pyfits.HDUList([hdu])
+		hdulist[0].header['CTYPE1']='PV--DIST'
+		hdulist[0].header['CDELT1']=hdulist[0].header['CDELT2']
+		hdulist[0].header['CRVAL1']=0
+		hdulist[0].header['CRPIX1']=pv_array.shape[1]/2
+		hdulist[0].header['CTYPE2']=hdulist[0].header['CTYPE3']
+		hdulist[0].header['CDELT2']=hdulist[0].header['CDELT3']
+		hdulist[0].header['CRVAL2']=hdulist[0].header['CRVAL3']
+		hdulist[0].header['CRPIX2']=hdulist[0].header['CRPIX3']
+		del hdulist[0].header['CTYPE3']
+		del hdulist[0].header['CDELT3']
+		del hdulist[0].header['CRVAL3']
+		del hdulist[0].header['CRPIX3']
+		name = outputDir+cubename+'_'+str(int(obj[0]))+'_pv.fits'
+		hdulist.writeto(name,clobber=True)
+		hdulist.close()
 
 	# remove all other sources from the mask
 	submask = mask[ZminNew:ZmaxNew+1,YminNew:YmaxNew+1,XminNew:XmaxNew+1].astype('int')

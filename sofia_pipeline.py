@@ -192,14 +192,16 @@ else: reliable=[1,] # if not merging, all detected voxels have ID = 1 and here t
 
 if Parameters['steps']['doMerge'] and NRdet:
 	catParNames = ('ID','Xg','Yg','Zg','Xm','Ym','Zm','Xmin','Xmax','Ymin','Ymax','Zmin','Zmax','NRvox','Fmin','Fmax','Ftot')
+	catParUnits = ('-','pix','pix','pix','pix','pix','pix','pix','pix','pix','pix','pix','pix','-','data_units','data_units','data_units')
 	catParFormt = ('%10i', '%10.3f', '%10.3f', '%10.3f', '%10.3f', '%10.3f', '%10.3f', '%7i', '%7i', '%7i', '%7i', '%7i', '%7i', '%8i', '%12.3e', '%12.3e', '%12.3e')
 	if Parameters['steps']['doReliability']:
 		catParNames = tuple(list(catParNames) + ['NRpos',  'NRneg',  'Rel'])
+		catParUnits = tuple(list(catParUnits) + ['-','-','-'])
 		catParFormt = tuple(list(catParFormt) + ['%12.3e', '%12.3e', '%12.6f'])
 	if Parameters['steps']['doDebug']:
 		print "\n--- SoFiA: Writing all-source catalogue for debugging ---"
 		#sys.stdout.flush()
-		store_ascii.make_ascii_from_array(objects, catParNames, catParFormt, Parameters['writeCat']['parameters'], outroot+'_cat.debug.ascii')
+		store_ascii.make_ascii_from_array(objects, catParNames, catParUnits, catParFormt, Parameters['writeCat']['parameters'], outroot+'_cat.debug.ascii')
 
 
 
@@ -228,6 +230,8 @@ if Parameters['steps']['doMerge'] and NRdet:
 
 	tmpCatParFormt = list(catParFormt)
 	catParFormt= tuple(['%10i'] + tmpCatParFormt)
+	tmpCatParUnits = list(catParUnits)
+	catParUnits= tuple(['-'] + tmpCatParUnits)
 
 	# in the mask file
 	mask *= -1
@@ -272,6 +276,7 @@ if Parameters['steps']['doParameterise'] and Parameters['steps']['doMerge'] and 
 #	np_Cube, dict_Header, mask, objects, catParNames, catParFormt = parametrisation.parametrise(np_Cube, dict_Header, mask, objects, catParNames, catParFormt, Parameters)
 	np_Cube, mask, objects, catParNames, catParFormt = parametrisation.parametrise(np_Cube, mask, objects, catParNames, catParFormt, Parameters)
 	catParNames=tuple(catParNames)
+	catParUnits=tuple(catParUnits)
 	catParFormt=tuple(catParFormt)
 	##print catParFormt
 	
@@ -397,6 +402,7 @@ if Parameters['steps']['doMerge'] and NRdet:
 		else:
  			objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
 		catParNames = tuple(list(catParNames) + ['%sg'%(dict_Header['ctype1']),'%sg'%(dict_Header['ctype2']),'%sg'%(dict_Header['ctype3'])])
+		catParUnits = tuple(list(catParUnits) + ['FITS_units','FITS_units','FITS_units'])
 		catParFormt = tuple(list(catParFormt) + ['%12.7e', '%12.7e', '%12.7e'])
 
 # 		if 'vopt' in dict_Header['ctype3'].lower() or 'vrad' in dict_Header['ctype3'].lower() or 'velo' in dict_Header['ctype3'].lower() or 'felo' in dict_Header['ctype3'].lower():
@@ -428,7 +434,7 @@ if Parameters['steps']['doWriteCat'] and Parameters['steps']['doMerge'] and NRde
 		store_xml.make_xml_from_array(objects, catParNames, catParFormt, Parameters['writeCat']['parameters'],outroot + '_cat.xml')
 		#store_xml.make_xml(results, outroot + '_cat.xml')
 	if Parameters['writeCat']['writeASCII'] and Parameters['steps']['doMerge'] and NRdet:
-		store_ascii.make_ascii_from_array(objects, catParNames, catParFormt, Parameters['writeCat']['parameters'], outroot+'_cat.ascii')
+		store_ascii.make_ascii_from_array(objects, catParNames, catParUnits, catParFormt, Parameters['writeCat']['parameters'], outroot+'_cat.ascii')
 		#store_ascii.make_ascii(results, Parameters['writeCat']['parameters'], outroot + '_cat.ascii')
 
 
