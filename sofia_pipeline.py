@@ -191,6 +191,8 @@ else: reliable=[1,] # if not merging, all detected voxels have ID = 1 and here t
 # ------------------------------------------
 
 if Parameters['steps']['doMerge'] and NRdet:
+	if 'bunit' in dict_Header: dunits=dict_Header['bunit']
+	else: dunits='-'
 	catParNames = ('ID','Xg','Yg','Zg','Xm','Ym','Zm','Xmin','Xmax','Ymin','Ymax','Zmin','Zmax','NRvox','Fmin','Fmax','Ftot')
 	catParUnits = ('-','pix','pix','pix','pix','pix','pix','pix','pix','pix','pix','pix','pix','-','data_units','data_units','data_units')
 	catParFormt = ('%10i', '%10.3f', '%10.3f', '%10.3f', '%10.3f', '%10.3f', '%10.3f', '%7i', '%7i', '%7i', '%7i', '%7i', '%7i', '%8i', '%12.3e', '%12.3e', '%12.3e')
