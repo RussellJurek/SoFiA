@@ -389,41 +389,29 @@ if Parameters['steps']['doMerge'] and NRdet:
 	    imp.find_module('astropy')
 	    found = True
 	except ImportError: found = False
+	
 	if found:
 		try:
 			print "\n--- SoFiA: Adding WCS position to catalog ---"
 			sys.stdout.flush()
-			# get wcs of the cube
 			from astropy import wcs
 			from astropy.io import fits
 			hdulist = fits.open(Parameters['import']['inFile'])
 			wcsin = wcs.WCS(hdulist[0].header)
 			hdulist.close()
- 			#objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
+			catParUnits = tuple(list(catParUnits) + [str(cc).replace(' ','') for cc in wcsin.wcs.cunit])
+			catParNames = tuple(list(catParNames) + [cc+'g' for cc in wcsin.wcs.ctype])
+			catParFormt = tuple(list(catParFormt) + ['%12.7e', '%12.7e', '%12.7e'])
 			if hdulist[0].header['naxis']==4:
  				objects=np.concatenate((objects,wcsin.wcs_pix2world(np.concatenate((objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],np.zeros((objects.shape[0],1))),axis=1),0)[:,:-1]),axis=1)
 			else:
  				objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
-			catParNames = tuple(list(catParNames) + ['%sg'%(dict_Header['ctype1']),'%sg'%(dict_Header['ctype2']),'%sg'%(dict_Header['ctype3'])])
-			catParUnits = tuple(list(catParUnits) + ['FITS_units','FITS_units','FITS_units'])
-			catParFormt = tuple(list(catParFormt) + ['%12.7e', '%12.7e', '%12.7e'])
+
+			#catParNames = tuple(list(catParNames) + ['%sg'%(dict_Header['ctype1']),'%sg'%(dict_Header['ctype2']),'%sg'%(dict_Header['ctype3'])])
+			#catParUnits = tuple(list(catParUnits) + ['FITS_units','FITS_units','FITS_units'])
+			#catParFormt = tuple(list(catParFormt) + ['%12.7e', '%12.7e', '%12.7e'])
 		except:
 			print "WARNING: WCS conversion of parameters could not be executed!\n"
-# 		if 'vopt' in dict_Header['ctype3'].lower() or 'vrad' in dict_Header['ctype3'].lower() or 'velo' in dict_Header['ctype3'].lower() or 'felo' in dict_Header['ctype3'].lower():
-# 			if not 'cunit3' in dict_Header: dkms=abs(dict_Header['cdelt3'])/1e+3 # assuming m/s
-# 			elif dict_Header['cunit3'].lower()=='km/s': dkms=abs(dict_Header['cdelt3'])
-# 		elif 'freq' in dict_Header['ctype3'].lower():
-# 			if not 'cunit3' in dict_Header: dkms=abs(dict_Header['cdelt3'])/1.42040575177e+9*2.99792458e+5 # assuming Hz
-# 			elif dict_Header['cunit3'].lower()=='kHz': dkms=abs(dict_Header['cdelt3'])/1.42040575177e+6*2.99792458e+5
-# 		objects[:,4]*=dkms/abs(dict_Header['cdelt3'])
-# 		objects[:,7]*=dkms
-# 		catformt='%10i %10i %12.5f %12.5f %10.1f %15.3e %15.3e %15.3e'
-# 		catheadf='%8s %10s %12s %12s %10s %15s %15s %15s'
-# 		cathead1=('ID','ID_old','RA','DEC','VEL','MIN','MAX','FTOT')
-# 		cathead2=('','','(deg)','(deg)','(km/s)','(%s)'%dict_Header['bunit'],'(%s)'%dict_Header['bunit'],'(%s.km/s)'%dict_Header['bunit'])
-# 		cathead3=tuple(['(%i)'%jj for jj in range(len(cathead1))])
-# 		cathead=catheadf%cathead1+'\n'+catheadf%cathead2+'\n'+catheadf%cathead3
-# 		np.savetxt('%s_cat.debug_physical.ascii'%outroot,np.array(objects),fmt=catformt,header=cathead)
 
 
 
