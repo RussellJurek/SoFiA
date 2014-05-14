@@ -194,7 +194,7 @@ if Parameters['steps']['doMerge'] and NRdet:
 	if 'bunit' in dict_Header: dunits=dict_Header['bunit']
 	else: dunits='-'
 	catParNames = ('ID','Xg','Yg','Zg','Xm','Ym','Zm','Xmin','Xmax','Ymin','Ymax','Zmin','Zmax','NRvox','Fmin','Fmax','Ftot')
-	catParUnits = ('-','pix','pix','pix','pix','pix','pix','pix','pix','pix','pix','pix','pix','-','data_units','data_units','data_units')
+	catParUnits = ('-','pix','pix','chan','pix','pix','chan','pix','pix','pix','pix','chan','chan','-',dunits,dunits,dunits)
 	catParFormt = ('%10i', '%10.3f', '%10.3f', '%10.3f', '%10.3f', '%10.3f', '%10.3f', '%7i', '%7i', '%7i', '%7i', '%7i', '%7i', '%8i', '%12.3e', '%12.3e', '%12.3e')
 	if Parameters['steps']['doReliability']:
 		catParNames = tuple(list(catParNames) + ['NRpos',  'NRneg',  'Rel'])
@@ -276,7 +276,7 @@ if Parameters['steps']['doParameterise'] and Parameters['steps']['doMerge'] and 
 	print "\n--- SoFiA: Parametrising sources ---"
 	sys.stdout.flush()
 #	np_Cube, dict_Header, mask, objects, catParNames, catParFormt = parametrisation.parametrise(np_Cube, dict_Header, mask, objects, catParNames, catParFormt, Parameters)
-	np_Cube, mask, objects, catParNames, catParFormt, catParUnits = parametrisation.parametrise(np_Cube, mask, objects, catParNames, catParFormt, catParUnits, Parameters)
+	np_Cube, mask, objects, catParNames, catParFormt, catParUnits = parametrisation.parametrise(np_Cube, mask, objects, catParNames, catParFormt, catParUnits, Parameters, dunits)
 	catParNames=tuple(catParNames)
 	catParUnits=tuple(catParUnits)
 	catParFormt=tuple(catParFormt)
@@ -400,20 +400,14 @@ if Parameters['steps']['doMerge'] and NRdet:
 			wcsin = wcs.WCS(hdulist[0].header)
 			hdulist.close()
 			catParUnits = tuple(list(catParUnits) + [str(cc).replace(' ','') for cc in wcsin.wcs.cunit])
-			catParNames = tuple(list(catParNames) + [cc+'g' for cc in wcsin.wcs.ctype])
-			catParFormt = tuple(list(catParFormt) + ['%12.7e', '%12.7e', '%12.7e'])
+			catParNames = tuple(list(catParNames) + [cc.split('--')[0]+'g' for cc in wcsin.wcs.ctype])
+			catParFormt = tuple(list(catParFormt) + ['%15.7e', '%15.7e', '%15.7e'])
 			if hdulist[0].header['naxis']==4:
  				objects=np.concatenate((objects,wcsin.wcs_pix2world(np.concatenate((objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],np.zeros((objects.shape[0],1))),axis=1),0)[:,:-1]),axis=1)
 			else:
  				objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
-
-			#catParNames = tuple(list(catParNames) + ['%sg'%(dict_Header['ctype1']),'%sg'%(dict_Header['ctype2']),'%sg'%(dict_Header['ctype3'])])
-			#catParUnits = tuple(list(catParUnits) + ['FITS_units','FITS_units','FITS_units'])
-			#catParFormt = tuple(list(catParFormt) + ['%12.7e', '%12.7e', '%12.7e'])
 		except:
 			print "WARNING: WCS conversion of parameters could not be executed!\n"
-
-
 
 # --------------------
 # ---- STORE DATA ----
@@ -423,7 +417,7 @@ if Parameters['steps']['doWriteCat'] and Parameters['steps']['doMerge'] and NRde
 	print "\n--- SoFiA: Writing output catalogue ---"
 	sys.stdout.flush()
 	if Parameters['writeCat']['writeXML'] and Parameters['steps']['doMerge'] and NRdet:
-		store_xml.make_xml_from_array(objects, catParNames, catParFormt, Parameters['writeCat']['parameters'],outroot + '_cat.xml')
+		store_xml.make_xml_from_array(objects, catParNames, catParUnits, catParFormt, Parameters['writeCat']['parameters'],outroot + '_cat.xml')
 		#store_xml.make_xml(results, outroot + '_cat.xml')
 	if Parameters['writeCat']['writeASCII'] and Parameters['steps']['doMerge'] and NRdet:
 		store_ascii.make_ascii_from_array(objects, catParNames, catParUnits, catParFormt, Parameters['writeCat']['parameters'], outroot+'_cat.ascii')
