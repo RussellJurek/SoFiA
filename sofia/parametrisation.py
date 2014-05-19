@@ -5,7 +5,7 @@ import numpy as np
 
 
 #def parametrise(cube,header,mask,objects,cathead,catformt,Parameters):
-def parametrise(cube, mask, objects, cathead, catformt, catparunits, Parameters):
+def parametrise(cube, mask, objects, cathead, catformt, catparunits, Parameters, dunits):
   
   cathead=np.array(cathead)
   objects=np.array(objects)
@@ -55,13 +55,46 @@ def parametrise(cube, mask, objects, cathead, catformt, catparunits, Parameters)
   # add parameter names from parametrization
   pars = d[d.keys()[index]].getParametersDict()
   cathead = list(cathead)
+  newunits={'ID':'-',
+            'X':'pix',
+            'Y':'pix',
+            'Z':'pix',
+            'BBOX_X_MAX':'pix',
+            'BBOX_X_MIN':'pix',
+            'BBOX_Y_MIN':'pix',
+            'BBOX_Y_MAX':'pix',
+            'BBOX_Z_MIN':'chan',
+            'BBOX_Z_MAX':'chan',
+            'W50':'chan',
+            'W20':'chan',
+            'Wm50':'chan',
+            'ELL_MAJ':'pix',
+            'ELL_MIN':'pix',
+            'ELL_PA':'deg',
+            'F_TOT':dunits,
+            'BF_FLAG':'-',
+            'BF_CHI2':'-',
+            'BF_Z':'chan',
+            'BF_A':dunits,
+            'BF_B1':'chan**(-1)',
+            'BF_B2':'chan**(-1)',
+            'BF_C':'chan**(-2)',
+            'BF_XE0':'chan',
+            'BF_XP0':'chan',
+            'BF_W':'chan',
+            'BF_W50':'chan',
+            'BF_W20':'chan',
+            'BF_F_PEAK':dunits,
+            'BF_F_INT':dunits,
+            'RMS_CUBE':dunits,
+            'F_PEAK':dunits}
   catformt = list(catformt)
   catparunits = list(catparunits)
   for i in sorted(pars):
     if i not in replParam:
       cathead.append(i)
-      catformt.append('%12.3f')
-      catparunits.append('-')
+      catformt.append('%12.4f')
+      catparunits.append(newunits[i])
   # extend the parameter array
   tmpObjects = np.empty((objects.shape[0],len(cathead)))
   tmpObjects[:,:] = np.NAN

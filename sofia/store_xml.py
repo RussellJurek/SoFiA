@@ -65,7 +65,7 @@ def make_xml(objects,outname):
 
 
 
-def make_xml_from_array(objects,cathead,catfmt,store_pars,outname):
+def make_xml_from_array(objects,cathead,catunits,catfmt,store_pars,outname):
 	print 'Store the results to xml file: ', outname
 	top = Element('VOTABLE')
 	resource = SubElement(top, 'RESOURCE', name='SoFiA catalogue')
@@ -79,11 +79,11 @@ def make_xml_from_array(objects,cathead,catfmt,store_pars,outname):
 	# write the parameters in fields:
 	if store_pars == ['*']:
 		for i in cathead:
-			field = SubElement(table, 'FIELD', name=i, datatype='float', unit='-')
+			field = SubElement(table, 'FIELD', name=i, datatype='float', unit=catunits[cathead.index(i)])
 	else:
 		for par in store_pars:
 			index = list(cathead).index(par)
-			field = SubElement(table, 'FIELD', name=cathead[index], datatype='float', unit='-')
+			field = SubElement(table, 'FIELD', name=cathead[index], datatype='float', unit=catunits[index])
 	
 	# write the data	
 	data = SubElement(table, 'DATA')
@@ -112,5 +112,3 @@ def make_xml_from_array(objects,cathead,catfmt,store_pars,outname):
 	f1.close
 
 	return
-
-
