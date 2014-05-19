@@ -1824,8 +1824,8 @@ void SoFiA::createInterface()
     
     tabOutputFieldBaseName = new QLineEdit(tabOutputGroupBox1);
     tabOutputFieldBaseName->setObjectName("writeCat.basename");
-    tabOutputFieldBaseName->setToolTip("Specify base name to be used for all output. Defaults to input file name.");
-    tabOutputFieldBaseName->setEnabled(false);
+    tabOutputFieldBaseName->setToolTip("Name to be used for all output files (optional). Defaults to input file name.");
+    tabOutputFieldBaseName->setEnabled(true);
     tabOutputButtonASCII = new QCheckBox(tr("ASCII "), tabOutputGroupBox1);
     tabOutputButtonASCII->setObjectName("writeCat.writeASCII");
     tabOutputButtonASCII->setToolTip(tr("Human-readable ASCII format"));
