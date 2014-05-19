@@ -288,51 +288,7 @@ if Parameters['steps']['doParameterise'] and Parameters['steps']['doMerge'] and 
 	catParNames=tuple(catParNames)
 	catParUnits=tuple(catParUnits)
 	catParFormt=tuple(catParFormt)
-	##print catParFormt
-	
 
-#objects = np.array(objects)
-#if Parameters['steps']['doParameterise'] and Parameters['steps']['doMerge']:
-	#print "\n--- SoFiA: Parametrising sources ---"
-	#sys.stdout.flush()
-        
-	#from sofia import cparametrizer
-	#cathead = np.array(catParNames)
-	#initcatalog = cparametrizer.PySourceCatalog()
-        
-	#for rr in reliable:
-		#obj = np.array(objects[rr - 1])
-		#newSource = cparametrizer.PySource()
-		#newSource.setSourceID(obj[cathead == 'ID'])
-		#newMeasurement = cparametrizer.PyMeasurement()
-		#newMeasurement.set('X', obj[cathead == 'Xg'], 0.0, '')
-		#newSource.setParameter(newMeasurement)
-		#newMeasurement.set('Y', obj[cathead == 'Yg'], 0.0, '')
-		#newSource.setParameter(newMeasurement)
-		#newMeasurement.set('Z', obj[cathead == 'Zg'], 0.0, '')
-		#newSource.setParameter(newMeasurement)
-		#newMeasurement.set('BBOX_X_MIN', obj[cathead == 'Xmin'], 0.0, '')
-		#newSource.setParameter(newMeasurement)
-		#newMeasurement.set('BBOX_X_MAX', obj[cathead == 'Xmax'], 0.0, '')
-		#newSource.setParameter(newMeasurement)
-		#newMeasurement.set('BBOX_Y_MIN', obj[cathead == 'Ymin'], 0.0, '')
-		#newSource.setParameter(newMeasurement)
-		#newMeasurement.set('BBOX_Y_MAX', obj[cathead == 'Ymax'], 0.0, '')
-		#newSource.setParameter(newMeasurement)
-		#newMeasurement.set('BBOX_Z_MIN', obj[cathead == 'Zmin'], 0.0, '')
-		#newSource.setParameter(newMeasurement)
-		#newMeasurement.set('BBOX_Z_MAX', obj[cathead == 'Zmax'], 0.0, '')
-		#newSource.setParameter(newMeasurement)
-		#initcatalog.insert(newSource)
-
-	#moduleParametrizer = cparametrizer.PyModuleParametrisation()
-	#moduleParametrizer.setFlags(Parameters['parameters']['optimiseMask'], Parameters['parameters']['fitBusyFunction'])
-        
-	#np_Cube = np_Cube.astype('<f4')
-	#mask = mask.astype('<i2')
-        
-	#moduleParametrizer.run(np_Cube, mask, initcatalog, dict_Header)
-	#results = moduleParametrizer.getCatalog()
         
 	print 'Parameterisation complete'
 	print
@@ -407,13 +363,13 @@ if Parameters['steps']['doMerge'] and NRdet:
 			hdulist = fits.open(Parameters['import']['inFile'])
 			wcsin = wcs.WCS(hdulist[0].header)
 			hdulist.close()
-			catParUnits = tuple(list(catParUnits) + [str(cc).replace(' ','') for cc in wcsin.wcs.cunit])
-			catParNames = tuple(list(catParNames) + [cc.split('--')[0]+'g' for cc in wcsin.wcs.ctype])
-			catParFormt = tuple(list(catParFormt) + ['%15.7e', '%15.7e', '%15.7e'])
 			if hdulist[0].header['naxis']==4:
  				objects=np.concatenate((objects,wcsin.wcs_pix2world(np.concatenate((objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],np.zeros((objects.shape[0],1))),axis=1),0)[:,:-1]),axis=1)
 			else:
  				objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
+			catParUnits = tuple(list(catParUnits) + [str(cc).replace(' ','') for cc in wcsin.wcs.cunit])
+			catParNames = tuple(list(catParNames) + [cc.split('--')[0]+'g' for cc in wcsin.wcs.ctype])
+			catParFormt = tuple(list(catParFormt) + ['%15.7e', '%15.7e', '%15.7e'])
 		except:
 			print "WARNING: WCS conversion of parameters could not be executed!\n"
 
