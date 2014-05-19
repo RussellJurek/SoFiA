@@ -4,7 +4,6 @@
 import numpy as np
 import sys, os
 import string
-import re
 
 # import source finding modules
 sys.path.insert(0, os.environ['SOFIA_MODULE_PATH'])
