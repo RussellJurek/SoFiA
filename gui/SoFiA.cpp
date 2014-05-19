@@ -1147,8 +1147,19 @@ void SoFiA::pipelineProcessError(QProcess::ProcessError error)
 
 void SoFiA::showCatalogue()
 {
-    QString filename = tabInputFieldData->text();
-    filename.replace(".fits", "_cat.xml", Qt::CaseInsensitive);
+    QString filename = tabOutputFieldBaseName->text();
+    filename = filename.trimmed();
+    
+    if(filename.isEmpty() or filename.contains("/") or filename.contains("\\") or filename == "." or filename == "..")
+    {
+        filename = tabInputFieldData->text();
+        if((filename.toLower()).endsWith(".fits") and filename.size() > 5)
+        {
+            filename = filename.left(filename.size() - 5);
+        }
+    }
+    
+    filename.append("_cat.xml");
     
     if(spreadsheet->loadCatalog(filename))
     {

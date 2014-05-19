@@ -4,6 +4,7 @@
 import numpy as np
 import sys, os
 import string
+import re
 
 # import source finding modules
 sys.path.insert(0, os.environ['SOFIA_MODULE_PATH'])
@@ -51,14 +52,22 @@ parameter_file = sys.argv[1]
 print 'Parameters extracted from: ', parameter_file
 print
 User_Parameters = readoptions.readPipelineOptions(parameter_file)
-outroot = string.split(User_Parameters['import']['inFile'], '.fits')[0]
 
 # Overwrite default parameters with user parameters (if exist):
 for task in User_Parameters.iterkeys():
-	if(task in Parameters):
-		for key in User_Parameters[task].iterkeys():
-			if(key in Parameters[task]):
-				Parameters[task][key] = User_Parameters[task][key]
+        if(task in Parameters):
+                for key in User_Parameters[task].iterkeys():
+                        if(key in Parameters[task]):
+                                Parameters[task][key] = User_Parameters[task][key]
+
+# Define the base name used for output files (defaults to input file 
+# name if writeCat.basename is found to be invalid):
+outroot = Parameters['writeCat']['basename']
+if((not outroot) or outroot.isspace() or ("/" in outroot) or ("\\" in outroot) or (outroot == ".") or (outroot == "..")):
+	outroot = Parameters['import']['inFile']
+	if((outroot.lower()).endswith(".fits") and len(outroot) > 5):
+		outroot = outroot[0:-5]
+#	outroot = string.split(User_Parameters['import']['inFile'], '.fits')[0]
 
 
 
