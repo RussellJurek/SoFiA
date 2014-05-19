@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <title>SoFiA Handbook - Output Products</title>
+  </head>
+  
+  <body style="margin:5px;">
+    <h1 style="color:#4060A0;">Output Products</h1>
+    
+    <h2 style="color:#4060A0;">Catalogues</h2>
+    
+    <p>
+      SoFiA currently offers two different catalogue formats:
+    </p>
+    
+    <ul>
+      <li>A simple <b>ASCII file</b> that contains the source catalogue in human-readable format. Each source is listed in a separate line, and the columns contain the source parameters. The file also contains a few header lines with additional information such as parameters names, units, etc.</li>
+      <li>An <b>XML file</b> that contains the source catalogue in <a href="http://www.ivoa.net/documents/VOTable/">VOTable</a> format to be used in <a href="http://www.ivoa.net/">Virtual Observatory</a> tools such as <a href="http://www.star.bris.ac.uk/~mbt/topcat/">TOPCAT</a>.</li>
+    </ul>
+    
+    <h2 style="color:#4060A0;">Additional Data Products</h2>
+    
+    <p>
+      In addition to source catalogues, SoFiA can also generate a range of other useful data products. These can be selected in the output tab and include:
+    </p>
+    
+    <ul>
+      <li>A <b>mask cube</b> in FITS format that contains a pixel mask of all sources identified by SoFiA. The mask contains integer numbers that are equal to the unique source identification number. Mask files can also be read into SoFiA again to facilitate the parametrisation of sources that were detected in a previous source finding run.</li>
+      <li>Maps of the <b>0<sup>th</sup></b> and <b>1<sup>st</sup> moment</b> of all detections in FITS format. These are integrated across all pixels masked as part of a source.</li>
+      <li>Small sub-cubes, so-called <b>cubelets</b>, of each individual source detected by SoFiA. This also includes <b>0<sup>th</sup></b> and <b>1<sup>st</sup> moment</b> maps created from the cubelet, a <b>position&ndash;velocity diagram</b> along the morphological major axis of each source, and an <b>integrated spectrum</b> of the source. All these individual products will be stored in a sub-folder named &lsquo;objects&rsquo;. Maps and cubes are stored in FITS format, while the integrated spectrum is stored as a plain text file.</li>
+    </ul>
+    
+    <p align="center">
+      <a href="pipeline.html">&larr;&nbsp;Previous</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="index.html">&uarr;&nbsp;Up</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="references.html">Next&nbsp;&rarr;</a>
+    </p>
+    
+    <p>&nbsp;</p>
+  </body>
+</html>
