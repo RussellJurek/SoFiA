@@ -1983,6 +1983,7 @@ void SoFiA::createInterface()
     tabOutputButtonParameterAll = new QCheckBox(tr("All "), tabOutputGroupBox2);
     tabOutputButtonParameterAll->setObjectName("parameterAll");
     tabOutputButtonParameterAll->setChecked(true);
+    tabOutputButtonParameterAll->setEnabled(false);
     tabOutputButtonParameterAll->setToolTip(tr("Select all available parameters"));
     connect(tabOutputButtonParameterAll, SIGNAL(toggled(bool)), this, SLOT(updateFields()));
     
