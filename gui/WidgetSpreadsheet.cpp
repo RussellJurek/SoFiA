@@ -1,6 +1,6 @@
 /// ____________________________________________________________________ ///
 ///                                                                      ///
-/// SoFiA 0.2 (WidgetSpreadsheet.cpp) - Source Finding Application       ///
+/// SoFiA 0.3 (WidgetSpreadsheet.cpp) - Source Finding Application       ///
 /// Copyright (C) 2013-2014 Tobias Westmeier                             ///
 /// ____________________________________________________________________ ///
 ///                                                                      ///

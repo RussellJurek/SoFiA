@@ -1,6 +1,6 @@
 /// ____________________________________________________________________ ///
 ///                                                                      ///
-/// SoFiA 0.2 (SoFiA.h) - Source Finding Application                     ///
+/// SoFiA 0.3 (SoFiA.h) - Source Finding Application                     ///
 /// Copyright (C) 2013-2014 Tobias Westmeier                             ///
 /// ____________________________________________________________________ ///
 ///                                                                      ///
