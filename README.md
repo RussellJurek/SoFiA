@@ -106,6 +106,14 @@ basic help is available at this stage.
 Version history
 ---------------
 
+* SoFiA 0.3
+  * Released 20/05/2014
+  * Adds several new features, including WCS support, PV diagrams, and 
+    handling of units.
+  * Fixes a few bugs related to FITS import and handling of blanked pixels.
+  * See release notes for details:
+    https://github.com/SoFiA-Admin/SoFiA/releases/tag/v0.3
+
 * SoFiA 0.2.1
   * Released 25/02/2014
   * Some more bug fixes, including fixing the threshold finder.
