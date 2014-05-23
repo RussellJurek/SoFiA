@@ -97,8 +97,6 @@ def add_wcs_coordinates(objects,catParNames,catParFormt,catParUnits,Parameters):
 	
 	if found:
 		try:	
-			print "\n--- SoFiA: Adding WCS position to catalog ---"
-			sys.stdout.flush()
 			from astropy import wcs
 			from astropy.io import fits
 			
