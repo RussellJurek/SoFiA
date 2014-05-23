@@ -22,6 +22,7 @@ from sofia import store_xml
 from sofia import store_ascii
 from sofia import cubelets
 from sofia import parametrisation
+from sofia import wcs_coordinates
 
 
 
@@ -348,30 +349,11 @@ if Parameters['steps']['doCubelets'] and Parameters['steps']['doMerge'] and NRde
 # ---------------------------------------------------
 
 if Parameters['steps']['doMerge'] and NRdet:
-	import imp
-	try:
-	    imp.find_module('astropy')
-	    found = True
-	except ImportError: found = False
-	
-	if found:
-		try:
-			print "\n--- SoFiA: Adding WCS position to catalog ---"
-			sys.stdout.flush()
-			from astropy import wcs
-			from astropy.io import fits
-			hdulist = fits.open(Parameters['import']['inFile'])
-			wcsin = wcs.WCS(hdulist[0].header)
-			hdulist.close()
-			if hdulist[0].header['naxis']==4:
- 				objects=np.concatenate((objects,wcsin.wcs_pix2world(np.concatenate((objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],np.zeros((objects.shape[0],1))),axis=1),0)[:,:-1]),axis=1)
-			else:
- 				objects=np.concatenate((objects,wcsin.wcs_pix2world(objects[:,catParNames.index('Xg'):catParNames.index('Xg')+3],0)),axis=1)
-			catParUnits = tuple(list(catParUnits) + [str(cc).replace(' ','') for cc in wcsin.wcs.cunit])
-			catParNames = tuple(list(catParNames) + [cc.split('--')[0]+'g' for cc in wcsin.wcs.ctype])
-			catParFormt = tuple(list(catParFormt) + ['%15.7e', '%15.7e', '%15.7e'])
-		except:
-			print "WARNING: WCS conversion of parameters could not be executed!\n"
+	print "\n--- SoFiA: Adding WCS position to catalog ---"
+	sys.stdout.flush()
+	objects, catParNames, catParFormt, catParUnits = wcs_coordinates.add_wcs_coordinates(objects,catParNames,catParFormt,catParUnits,Parameters)
+
+
 
 # --------------------
 # ---- STORE DATA ----
