@@ -109,7 +109,7 @@ def read_data(inFile,weightsFile,maskFile):
 	#	try:
 	#		np_Weighted_cube = np_Cube * eval(weightsFunction)
 	#	except:
-	#		print 'Could not evaluate weights function:
+	#		print 'Could not evaluate weights function:'
 	#		print weightsFunction
 	#		print 'Check Syntax.'
 	#	# the input cube is replaced by the weighted cube, 			
