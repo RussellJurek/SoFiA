@@ -20,7 +20,7 @@ def flag(cube,regions):
 			print 'Cube has been flagged'
 
 		except:
-			print 'WARNING: Flagging did not succeed. Please chech the dimensions of your cube and filters!'
+			print 'WARNING: Flagging did not succeed. Please check the dimensions of your cube and filters!'
 		
 			
 	return cube
