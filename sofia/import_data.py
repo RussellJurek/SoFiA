@@ -106,7 +106,12 @@ def read_data(inFile,weightsFile,maskFile):
 		
 	#elif weightsFunction:
 	#	z,y,x=np.indices(np_Cube.shape)
-	#	np_Weighted_cube = np_Cube * eval(weightsFunction)
+	#	try:
+	#		np_Weighted_cube = np_Cube * eval(weightsFunction)
+	#	except:
+	#		print 'Could not evaluate weights function:
+	#		print weightsFunction
+	#		print 'Check Syntax.'
 	#	# the input cube is replaced by the weighted cube, 			
 	#	np_Cube = np_Weighted_cube
 	#	del np_Weighted_cube
