@@ -6,6 +6,7 @@ import os
 import numpy as np
 
 
+#def read_data(inFile,weightsFile,maskFile,weightsFunction=None):
 def read_data(inFile,weightsFile,maskFile):
 	# import the fits file into an numpy array for the cube and a dictionary for the header:
 
@@ -103,6 +104,15 @@ def read_data(inFile,weightsFile,maskFile):
 				print 'Weighted cube created'
 				print
 		
+	#elif weightsFunction:
+	#	z,y,x=np.indices(np_Cube.shape)
+	#	np_Weighted_cube = np_Cube * eval(weightsFunction)
+	#	# the input cube is replaced by the weighted cube, 			
+	#	np_Cube = np_Weighted_cube
+	#	del np_Weighted_cube
+	#	print 'Function-weighted cube created'
+	#	print
+
 	if maskFile:
 		# check whether the mask cube exists:
 		if os.path.isfile(maskFile) == False:
