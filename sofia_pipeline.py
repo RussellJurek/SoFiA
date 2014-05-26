@@ -23,6 +23,7 @@ from sofia import store_ascii
 from sofia import cubelets
 from sofia import parametrisation
 from sofia import wcs_coordinates
+from sofia import flag_cube
 
 
 
@@ -89,13 +90,16 @@ np_Cube, dict_Header, mask = import_data.read_data(**Parameters['import'])
 print "\n--- SoFiA: Running input filters ---"
 sys.stdout.flush()
 
+# ---- FLAGGING ----
+if Parameters['steps']['doFlag']:
+	np_Cube = flag_cube.flag(np_Cube,**Parameters['flag'])
+
 # ---- SMOOTHING ----
 if Parameters['steps']['doSmooth']:
 	np_Cube = smooth_cube.smooth(np_Cube, **Parameters['smooth'])	
 
 # ---- RFI ----
 
-# ---- FLAGGING ----
 
 # ---- SIGMA CUBE ---- 
 if Parameters['steps']['doScaleNoise']:
