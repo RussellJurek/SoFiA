@@ -163,8 +163,12 @@ print '  for (t)csh (~/.cshrc)'
 print '      setenv SOFIA_MODULE_PATH '+sofiaModulesPath
 print '      setenv SOFIA_PIPELINE_PATH \"'+cwd+'/sofia_pipeline.py\"'
 print '      setenv PATH {$PATH}:'+sofiaApplicationPath+':'+cwd
+print '\n'
 
-print 
+## test sofia installation
+#print 'If you want to test your SoFiA installation, please open a new terminal and type:'
+#print '  cd '+cwd+'/test_data; sofia_pipeline.py parameters.txt'
+#print '\n'
 
 
 
