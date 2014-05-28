@@ -165,6 +165,7 @@ private:
     QWidget      *tabInputWidgetWeights;
     QHBoxLayout  *tabInputLayoutMask;
     QWidget      *tabInputWidgetMask;
+    
     QGroupBox    *tabInputGroupBox1;
     QFormLayout  *tabInputForm1;
     QLineEdit    *tabInputFieldData;
@@ -173,6 +174,14 @@ private:
     QPushButton  *tabInputButtonWeights;
     QLineEdit    *tabInputFieldMask;
     QPushButton  *tabInputButtonMask;
+    
+    QGroupBox    *tabInputGroupBox2;
+    QFormLayout  *tabInputForm2;
+    QLineEdit    *tabInputFieldWeightsFunction;
+    
+    QGroupBox    *tabInputGroupBox3;
+    QFormLayout  *tabInputForm3;
+    QLineEdit    *tabInputFieldFlags;
     
     QHBoxLayout  *tabInputLayoutControls;
     QWidget      *tabInputWidgetControls;

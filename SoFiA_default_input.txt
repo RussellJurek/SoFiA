@@ -26,6 +26,7 @@ steps.doDebug                   =       false
 import.inFile                   =       
 import.weightsFile              =       
 import.maskFile                 =       
+import.weightsFunction          =       
 
 
 # Flagging module

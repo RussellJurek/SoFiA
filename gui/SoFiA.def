@@ -3,6 +3,7 @@
 
 # Pipeline modules
 
+steps.doFlag                    =       false
 steps.doSmooth                  =       false
 steps.doScaleNoise              =       false
 steps.doSCfind                  =       true
@@ -10,7 +11,7 @@ steps.doThreshold               =       false
 steps.doWavelet                 =       false
 steps.doCNHI                    =       false
 steps.doMerge                   =       true
-steps.doReliability             =       false
+steps.doReliability             =       true
 steps.doParameterise            =       true
 steps.doWriteMask               =       false
 steps.doWriteCat                =       true
@@ -25,6 +26,12 @@ steps.doDebug                   =       false
 import.inFile                   =       
 import.weightsFile              =       
 import.maskFile                 =       
+import.weightsFunction          =       
+
+
+# Flagging module
+
+flag.regions                    =       
 
 
 # Smoothing module

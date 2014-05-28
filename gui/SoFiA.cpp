@@ -1240,8 +1240,15 @@ void SoFiA::createInterface()
     tabInputLayout = new QVBoxLayout;
     
     tabInputGroupBox1 = new QGroupBox(tr("Input files"), tabInput);
+    tabInputGroupBox2 = new QGroupBox(tr("Weights function"), tabInput);
+    tabInputGroupBox3 = new QGroupBox(tr("Initial flagging"), tabInput);
+    tabInputGroupBox3->setObjectName("steps.doFlag");
+    tabInputGroupBox3->setCheckable(true);
+    tabInputGroupBox3->setChecked(false);
     
     tabInputForm1 = new QFormLayout;
+    tabInputForm2 = new QFormLayout;
+    tabInputForm3 = new QFormLayout;
     
     tabInputFieldData  = new QLineEdit(tabInputGroupBox1);
     tabInputFieldData->setObjectName("import.inFile");
@@ -1302,7 +1309,24 @@ void SoFiA::createInterface()
     tabInputWidgetControls->setLayout(tabInputLayoutControls);
     
     tabInputGroupBox1->setLayout(tabInputForm1);
+    
+    tabInputFieldWeightsFunction = new QLineEdit(tabInputGroupBox2);
+    tabInputFieldWeightsFunction->setObjectName("import.weightsFunction");
+    tabInputFieldWeightsFunction->setToolTip("Analytic function describing data weights (optional)");
+    
+    tabInputForm2->addRow(tr("Function:"), tabInputFieldWeightsFunction);
+    tabInputGroupBox2->setLayout(tabInputForm2);
+    
+    tabInputFieldFlags = new QLineEdit(tabInputGroupBox3);
+    tabInputFieldFlags->setObjectName("flag.regions");
+    tabInputFieldFlags->setToolTip("Pixel/channel ranges to be flagged (optional)");
+    
+    tabInputForm3->addRow(tr("Range:"), tabInputFieldFlags);
+    tabInputGroupBox3->setLayout(tabInputForm3);
+    
     tabInputLayout->addWidget(tabInputGroupBox1);
+    tabInputLayout->addWidget(tabInputGroupBox2);
+    tabInputLayout->addWidget(tabInputGroupBox3);
     tabInputLayout->addStretch();
     tabInputLayout->addWidget(tabInputWidgetControls);
     tabInput->setLayout(tabInputLayout);

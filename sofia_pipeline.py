@@ -68,7 +68,6 @@ if((not outroot) or outroot.isspace() or ("/" in outroot) or ("\\" in outroot) o
 	outroot = Parameters['import']['inFile']
 	if((outroot.lower()).endswith(".fits") and len(outroot) > 5):
 		outroot = outroot[0:-5]
-#	outroot = string.split(User_Parameters['import']['inFile'], '.fits')[0]
 
 
 
