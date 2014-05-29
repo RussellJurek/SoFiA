@@ -1337,6 +1337,9 @@ void SoFiA::createInterface()
     
     tabInFilterLayout = new QVBoxLayout;
     
+    tabInFilterWidget2 = new QWidget(tabInFilter);
+    tabInFilterLayout2 = new QHBoxLayout;
+    
     tabInFilterGroupBox1 = new QGroupBox(tr("Smoothing"), tabInFilter);
     tabInFilterGroupBox1->setObjectName("steps.doSmooth");
     tabInFilterGroupBox1->setCheckable(true);
@@ -1419,6 +1422,7 @@ void SoFiA::createInterface()
     tabInFilterForm2->addRow(tr("Edge Y:"), tabInFilterFieldEdgeY);
     tabInFilterForm2->addRow(tr("Edge Z:"), tabInFilterFieldEdgeZ);
     
+    
     tabInFilterButtonPrev = new QPushButton(tr("Previous"), tabInFilter);
     tabInFilterButtonPrev->setIcon(iconGoPreviousView);
     connect(tabInFilterButtonPrev, SIGNAL(clicked()), this, SLOT(displayPrevTab()));
@@ -1435,9 +1439,13 @@ void SoFiA::createInterface()
     tabInFilterWidgetControls->setLayout(tabInFilterLayoutControls);
     
     tabInFilterGroupBox1->setLayout(tabInFilterForm1);
-    tabInFilterLayout->addWidget(tabInFilterGroupBox1);
+    tabInFilterLayout2->addWidget(tabInFilterGroupBox1, 1);
     tabInFilterGroupBox2->setLayout(tabInFilterForm2);
-    tabInFilterLayout->addWidget(tabInFilterGroupBox2);
+    tabInFilterLayout2->addWidget(tabInFilterGroupBox2, 1);
+    tabInFilterLayout2->setContentsMargins(0, 0, 0, 0);
+    tabInFilterLayout2->setSpacing(10);
+    tabInFilterWidget2->setLayout(tabInFilterLayout2);
+    tabInFilterLayout->addWidget(tabInFilterWidget2);
     tabInFilterLayout->addStretch();
     tabInFilterLayout->addWidget(tabInFilterWidgetControls);
     

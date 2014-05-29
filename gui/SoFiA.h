@@ -193,6 +193,9 @@ private:
     
     QVBoxLayout  *tabInFilterLayout;
     
+    QWidget      *tabInFilterWidget2;
+    QHBoxLayout  *tabInFilterLayout2;
+    
     QGroupBox    *tabInFilterGroupBox1;
     QFormLayout  *tabInFilterForm1;
     QLineEdit    *tabInFilterFieldSmoothingSpatialLon;
