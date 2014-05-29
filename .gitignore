@@ -4,6 +4,7 @@ build/
 # Ignore C++ object files and executables:
 *.o
 moc_*
+qrc_*
 Makefile
 SoFiA
 
