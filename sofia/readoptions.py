@@ -62,7 +62,7 @@ def readPipelineOptions(filename = "pipeline.options"):
                  "import.weightsFile": "string", \
                  "import.maskFile": "string", \
                  "import.weightsFunction": "string", \
-                 "flag.regions": "string", \
+                 "flag.regions": "array", \
                  "smooth.kernel": "string", \
                  "smooth.edgeMode": "string", \
                  "smooth.kernelX": "float", \
