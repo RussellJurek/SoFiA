@@ -75,7 +75,7 @@ class SoFiA : public QMainWindow
     Q_OBJECT
     
 public:
-    SoFiA();
+    SoFiA(int argc, char *argv[]);
     ~SoFiA();
     
 private slots:

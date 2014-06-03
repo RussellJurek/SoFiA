@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     
-    SoFiA pipelineInterface;
+    SoFiA pipelineInterface(argc, argv);
     pipelineInterface.show();
     
     return app.exec();

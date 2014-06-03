@@ -38,7 +38,7 @@
 // Constructor
 // -----------
 
-SoFiA::SoFiA()
+SoFiA::SoFiA(int argc, char *argv[])
 {
     pipelineProcess = new QProcess(this);
     connect(pipelineProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(pipelineProcessReadStd()));
@@ -54,6 +54,27 @@ SoFiA::SoFiA()
     // Create catalogue viewer window, but don't show it yet:
     spreadsheet = new WidgetSpreadsheet(this);
     spreadsheet->hide();
+    
+    // Load parameter file if specified:
+    if(argc > 1)
+    {
+        QString fileName = QString(argv[1]);
+        
+        if(!fileName.isEmpty() and fileName[0] != '/')
+        {
+            fileName.prepend('/');
+            fileName.prepend(QDir::currentPath());
+        }
+        
+        if(loadFile(fileName))
+        {
+            QString messageText = tr("<p>Failed to read input file %1.</p>").arg(fileName.section('/', -1));
+            QString statusText = tr("Failed to read input file %1.").arg(fileName.section('/', -1));
+            showMessage(2, messageText, statusText);
+        }
+        
+        //std::cout << filename.toLocal8Bit().constData() << '\n';
+    }
     
     return;
 }
