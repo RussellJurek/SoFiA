@@ -32,7 +32,7 @@
 #ifndef PIPELINEINTERFACE_H
 #define PIPELINEINTERFACE_H
 
-#define SOFIA_DEFAULT_SETTINGS ":/SoFiA.def"
+#define SOFIA_DEFAULT_SETTINGS ":/SoFiA_default_input.txt"
 #define SOFIA_TEMP_FILE "SoFiA_parameters.tmp"
 
 #include <iostream>

@@ -20,6 +20,6 @@
         <file>icons/22/help-contents.png</file>
         <file>icons/22/view-refresh.png</file>
         <file>icons/32/SoFiA.png</file>
-        <file>SoFiA.def</file>
+        <file>../SoFiA_default_input.txt</file>
     </qresource>
 </RCC>
