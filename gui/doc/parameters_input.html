@@ -80,8 +80,8 @@
       <tr style="background-color:#F0F8FF;">
         <td>flag.regions</td>
         <td>string</td>
-        <td>range(s) to be flagged</td>
-        <td>Pixel/channel range(s) to be flagged prior to source finding. Format: [[x1, x2, y1, y2, z1, z2], ...]. A place holder, '' (two single quotes), can be used for the upper range limit (x2, y2, and z2) to flag all the way to the end, e.g. [0, '', 0, '', 0, 19] will flag the first 20&nbsp;channels of the entire cube. The default is to not flag anything.</td>
+        <td>range(s) to be flagged; default: <b>[]</b></td>
+        <td>Pixel/channel range(s) to be flagged prior to source finding. Format: [[x1, x2, y1, y2, z1, z2], ...]. A place holder, '' (two single quotes), can be used for the upper range limit (x2, y2, and z2) to flag all the way to the end, e.g. [0, '', 0, '', 0, 19] will flag the first 20&nbsp;channels of the entire cube. The default is an empty array, [], which means to not flag anything.</td>
       </tr>
     </table>
     

@@ -120,7 +120,7 @@ void HelpBrowser::showPage(const QString &page)
     
     HelpBrowser *browser = new HelpBrowser(path, page);    // Set up in constructor to be deleted on close()!
     
-    browser->resize(500, 640);
+    browser->resize(600, 640);
     browser->show();
     
     return;
