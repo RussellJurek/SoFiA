@@ -58,7 +58,7 @@
         <td>import.weightsFunction</td>
         <td>string</td>
         <td>analytic function</td>
-        <td>Analytic function used to describe the data weights as a function of x, y, and z. The default is to not apply weights. The following numpy functions are supported: sin(), cos(), tan(), arcsin(), arccos(), arctan(), arctan2(), sinh(), cosh(), tanh(), arcsinh(), arccosh(), arctanh(), exp(), log(), log10(), log2(), sqrt(), square(), power(), absolute(), fabs(), and sign(). Note that the weights function is not applied whenever a weights cube is specified (see import.weightsFile).</td>
+        <td>Analytic function used to describe the data weights as a function of x, y, and z. The default is to not apply weights. The following mathematical functions from <a href="http://docs.scipy.org/doc/numpy/reference/routines.math.html">Numpy</a> are supported: sin(), cos(), tan(), arcsin(), arccos(), arctan(), arctan2(), sinh(), cosh(), tanh(), arcsinh(), arccosh(), arctanh(), exp(), log(), log10(), log2(), sqrt(), square(), power(), absolute(), fabs(), and sign(). Note that the weights function is not applied whenever a weights cube is specified (see import.weightsFile).</td>
       </tr>
     </table>
     
@@ -81,7 +81,7 @@
         <td>flag.regions</td>
         <td>string</td>
         <td>range(s) to be flagged; default: <b>[]</b></td>
-        <td>Pixel/channel range(s) to be flagged prior to source finding. Format: [[x1, x2, y1, y2, z1, z2], ...]. A place holder, '' (two single quotes), can be used for the upper range limit (x2, y2, and z2) to flag all the way to the end, e.g. [0, '', 0, '', 0, 19] will flag the first 20&nbsp;channels of the entire cube. The default is an empty array, [], which means to not flag anything.</td>
+        <td>Pixel/channel range(s) to be flagged prior to source finding. Format: [[x1, x2, y1, y2, z1, z2], ...]. A place holder, '' (two single quotes), can be used for the upper range limit (x2, y2, and z2) to flag all the way to the end, e.g. [[0, '', 0, '', 0, 19]] will flag the first 20&nbsp;channels of the entire cube. The default is an empty array, [], which means to not flag anything.</td>
       </tr>
     </table>
     
