@@ -31,7 +31,7 @@ import.weightsFunction          =
 
 # Flagging module
 
-flag.regions                    =       
+flag.regions                    =       []
 
 
 # Smoothing module
