@@ -56,7 +56,7 @@
         <td>Are kernel parameters specified in pixel of world coordinates?</td>
       </tr>
       <tr>
-        <td>SCfind.kernel</td>
+        <td>SCfind.kernels</td>
         <td>string</td>
         <td>list of kernels; default: <b>[[0, 0, 0, 'b'],[0, 0, 2, 'b'],[0, 0, 4, 'b'],[0, 0, 8, 'b'],[0, 0, 16, 'b'],[3, 3, 0, 'b'],[3, 3, 2, 'b'],[3, 3, 4, 'b'],[3, 3, 8, 'b'],[3, 3, 16, 'b'],[6, 6, 0, 'b'],[6, 6, 2, 'b'],[6, 6, 4, 'b'],[6, 6, 8, 'b'],[6, 6, 16, 'b'],[9, 9, 0, 'b'],[9, 9, 2, 'b'],[9, 9, 4, 'b'],[9, 9, 8, 'b'],[9, 9, 16, 'b']]</b></td>
         <td>List of kernels to be used for smoothing. Format is [[dx, dy, dz, 'type'], ...] where dx, dy, and dz are the spatial and spectral kernel sizes (FWHM), and 'type' can be boxcar ('b') or Gaussian ('g'). Note that 'type' only applies to the spectral axis, and the spatial kernel is always Gaussian.</td>
