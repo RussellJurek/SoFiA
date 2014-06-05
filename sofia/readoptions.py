@@ -28,7 +28,7 @@ def readPipelineOptions(filename = "pipeline.options"):
     lines = [line for line in lines if len(line) > 0]
     lines2 = []
     
-    # The following piece of code if meant to allow line breaks in parameter settings 
+    # The following piece of code is meant to allow line breaks in parameter settings 
     # indicated by a double backwards slash (\\):
     for l in lines:
         if len(lines2) > 0:
