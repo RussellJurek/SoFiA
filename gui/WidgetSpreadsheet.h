@@ -34,19 +34,33 @@
 
 #include <iostream>
 
+#include <QtGlobal>
+
 #include <QtCore/QString>
 #include <QtCore/QFile>
 
+#include <QtGui/QCloseEvent>
+
 #include <QtXml/QDomDocument>
 
-#include <QtGui/QWidget>
-#include <QtGui/QTableWidget>
-#include <QtGui/QTableWidgetItem>
-#include <QtGui/QLayout>
-#include <QtGui/QFormLayout>
-#include <QtGui/QCloseEvent>
-#include <QtGui/QPushButton>
-#include <QtGui/QComboBox>
+// Import correct headers depending on Qt version:
+#if QT_VERSION < 0x050000
+  #include <QtGui/QWidget>
+  #include <QtGui/QTableWidget>
+  #include <QtGui/QTableWidgetItem>
+  #include <QtGui/QLayout>
+  #include <QtGui/QFormLayout>
+  #include <QtGui/QPushButton>
+  #include <QtGui/QComboBox>
+#else
+  #include <QtWidgets/QWidget>
+  #include <QtWidgets/QTableWidget>
+  #include <QtWidgets/QTableWidgetItem>
+  #include <QtWidgets/QLayout>
+  #include <QtWidgets/QFormLayout>
+  #include <QtWidgets/QPushButton>
+  #include <QtWidgets/QComboBox>
+#endif
 
 class WidgetSpreadsheet : public QWidget
 {

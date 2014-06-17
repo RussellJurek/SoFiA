@@ -1,12 +1,18 @@
-######################################################################
-# Created by hand from a qmake template
-######################################################################
+#########################################
+# Created by hand from a qmake template #
+#########################################
 
 TEMPLATE = app
-TARGET = 
+TARGET = SoFiA
 DEPENDPATH += .
 INCLUDEPATH += .
 QT += xml
+
+# Include module 'widgets' for Qt 5 or greater:
+greaterThan(QT_MAJOR_VERSION, 4)
+{
+    QT += widgets
+}
 
 # Input
 HEADERS   += HelpBrowser.h \

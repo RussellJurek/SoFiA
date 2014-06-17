@@ -37,29 +37,8 @@
 
 #include <iostream>
 
-#include <QtGui/QMainWindow>
-#include <QtGui/QWidget>
-#include <QtGui/QDockWidget>
-#include <QtGui/QStyle>
-#include <QtGui/QMenuBar>
-#include <QtGui/QToolBar>
-#include <QtGui/QStatusBar>
-#include <QtGui/QAction>
-#include <QtGui/QLayout>
-#include <QtGui/QFormLayout>
-#include <QtGui/QGroupBox>
-#include <QtGui/QProgressBar>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QTextEdit>
-#include <QtGui/QPushButton>
-#include <QtGui/QCheckBox>
-#include <QtGui/QSpinBox>
-#include <QtGui/QComboBox>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
-#include <QtGui/QCloseEvent>
-#include <QtGui/QDropEvent>
+#include <QtGlobal>
+
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
@@ -67,6 +46,56 @@
 #include <QtCore/QProcess>
 #include <QtCore/QString>
 #include <QtCore/QMimeData>
+
+#include <QtGui/QCloseEvent>
+#include <QtGui/QDropEvent>
+
+// Import correct headers depending on Qt version:
+#if QT_VERSION < 0x050000
+    #include <QtGui/QMainWindow>
+    #include <QtGui/QWidget>
+    #include <QtGui/QDockWidget>
+    #include <QtGui/QStyle>
+    #include <QtGui/QMenuBar>
+    #include <QtGui/QToolBar>
+    #include <QtGui/QStatusBar>
+    #include <QtGui/QAction>
+    #include <QtGui/QLayout>
+    #include <QtGui/QFormLayout>
+    #include <QtGui/QGroupBox>
+    #include <QtGui/QProgressBar>
+    #include <QtGui/QLabel>
+    #include <QtGui/QLineEdit>
+    #include <QtGui/QTextEdit>
+    #include <QtGui/QPushButton>
+    #include <QtGui/QCheckBox>
+    #include <QtGui/QSpinBox>
+    #include <QtGui/QComboBox>
+    #include <QtGui/QFileDialog>
+    #include <QtGui/QMessageBox>
+#else
+    #include <QtWidgets/QMainWindow>
+    #include <QtWidgets/QWidget>
+    #include <QtWidgets/QDockWidget>
+    #include <QtWidgets/QStyle>
+    #include <QtWidgets/QMenuBar>
+    #include <QtWidgets/QToolBar>
+    #include <QtWidgets/QStatusBar>
+    #include <QtWidgets/QAction>
+    #include <QtWidgets/QLayout>
+    #include <QtWidgets/QFormLayout>
+    #include <QtWidgets/QGroupBox>
+    #include <QtWidgets/QProgressBar>
+    #include <QtWidgets/QLabel>
+    #include <QtWidgets/QLineEdit>
+    #include <QtWidgets/QTextEdit>
+    #include <QtWidgets/QPushButton>
+    #include <QtWidgets/QCheckBox>
+    #include <QtWidgets/QSpinBox>
+    #include <QtWidgets/QComboBox>
+    #include <QtWidgets/QFileDialog>
+    #include <QtWidgets/QMessageBox>
+#endif
 
 #include "WidgetSpreadsheet.h"
 

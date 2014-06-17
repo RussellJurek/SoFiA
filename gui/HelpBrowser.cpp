@@ -29,14 +29,6 @@
 /// ____________________________________________________________________ ///
 ///                                                                      ///
 
-#include <QtCore/QString>
-
-#include <QtGui/QApplication>
-#include <QtGui/QTextBrowser>
-#include <QtGui/QPushButton>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-
 #include "HelpBrowser.h"
 
 HelpBrowser::HelpBrowser(const QString &path, const QString &page, QWidget *parent)

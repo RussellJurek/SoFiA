@@ -32,11 +32,27 @@
 #ifndef HELPBROWSER_H
 #define HELPBROWSER_H
 
+#include <QtGlobal>
+
 #include <QtCore/QString>
 
-#include <QtGui/QWidget>
-#include <QtGui/QTextBrowser>
-#include <QtGui/QPushButton>
+// Import correct headers depending on Qt version:
+#if QT_VERSION < 0x050000
+    #include <QtGui/QApplication>
+    #include <QtGui/QWidget>
+    #include <QtGui/QTextBrowser>
+    #include <QtGui/QPushButton>
+    #include <QtGui/QHBoxLayout>
+    #include <QtGui/QVBoxLayout>
+#else
+    #include <QtWidgets/QApplication>
+    #include <QtWidgets/QWidget>
+    #include <QtWidgets/QTextBrowser>
+    #include <QtWidgets/QPushButton>
+    #include <QtWidgets/QHBoxLayout>
+    #include <QtWidgets/QVBoxLayout>
+#endif
+
 
 class HelpBrowser : public QWidget
 {

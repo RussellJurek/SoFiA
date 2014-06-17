@@ -29,7 +29,14 @@
 /// ____________________________________________________________________ ///
 ///                                                                      ///
 
-#include <QApplication>
+#include <QtGlobal>
+
+// Import correct headers depending on Qt version:
+#if QT_VERSION < 0x050000
+    #include <QtGui/QApplication>
+#else
+    #include <QtWidgets/QApplication>
+#endif
 
 #include "SoFiA.h"
 
