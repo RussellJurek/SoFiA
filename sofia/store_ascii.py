@@ -93,5 +93,6 @@ def make_ascii_from_array(objects,cathead,catunits,catfmt,store_pars,outname):
 		for obj in objects:
 			tmpObjects.append([])
 			for par in store_pars:
-				tmpObjects[-1].append(obj[cathead==par])
+				index = list(cathead).index(par)
+				tmpObjects[-1].append(obj[index])
 		np.savetxt(outname,np.array(tmpObjects),fmt=outputFormat,header=header)
