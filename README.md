@@ -32,7 +32,7 @@ SoFiA:
     Packages (C++):
         GCC (≥ 4.6)
         GNU Scientific Library (≥ 1.15)
-        Qt 4 (≥ 4.7; some tweaking will be necessary if Qt 5 is to be used)
+        Qt (≥ 4.7)
 
 All of the above packages must be installed before SoFiA can be compiled and 
 run. It is recommended that you install them through your operating system’s 
