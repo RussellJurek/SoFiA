@@ -89,7 +89,7 @@ that some of the packages are outdated. Please check that the required
 versions of all packages are installed and properly set up such that they 
 can be found by Python and the GCC. On some systems it may be necessary to 
 explicitly install the GNU C++ compiler (g++, should normally be part of 
-the GCC) as well as the development packages (dev) of Qt 4 and the GNU 
+the GCC) as well as the development packages (dev) of Qt and the GNU 
 Scientific Library. 
 
 
