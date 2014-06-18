@@ -1563,7 +1563,7 @@ void SoFiA::createInterface()
     tabSourceFindingFieldRmsMode2->addItem(tr("std"));
     
     tabSourceFindingForm2->addRow(tr("Threshold:"), tabSourceFindingFieldThreshold2);
-    tabSourceFindingForm2->addRow(tr("CLip mode:"), tabSourceFindingFieldClipMethod);
+    tabSourceFindingForm2->addRow(tr("Clip mode:"), tabSourceFindingFieldClipMethod);
     tabSourceFindingForm2->addRow(tr("RMS mode:"), tabSourceFindingFieldRmsMode2);
     tabSourceFindingGroupBox2->setLayout(tabSourceFindingForm2);
     
