@@ -36,20 +36,35 @@ measurement_full = MEASUREMENT_FULL
 measurement_unit = MEASUREMENT_UNIT
 
 cdef class PyUnit:
+    """Wrapper around (C++) Unit class"""
 
     def __cinit__(self, u=None):
+        """Constructor PyUnit(u=None)
+
+        u can be None (empty Unit is returned), a string or another PyUnit"""
+
         if u is None:
             self.thisptr = new Unit()
-        elif type(u) == str:
+        elif isinstance(u, str):
             self.thisptr = new Unit()
             self.thisptr.set(<string> u)
-        else:
+        elif isinstance(u, unicode):
+            u = str(u)  # might raise UnicodeEncodeError
+            self.thisptr = new Unit()
+            self.thisptr.set(<string> u)
+        elif isinstance(u, PyUnit):
             self.thisptr = new Unit(deref((<PyUnit> u).thisptr))
+        else:
+            raise TypeError('Incompatible input type')
 
     def __dealloc__(self):
         del self.thisptr
 
     def set(self, s):
+        if not (isinstance(s, str) or isinstance(s, unicode)):
+            raise TypeError('Incompatible input type (must be str())')
+        if isinstance(s, unicode):
+            s = str(s)   # might raise UnicodeEncodeError
         self.thisptr.set(<string> s)
 
     def getPrefix(self):
@@ -67,24 +82,24 @@ cdef class PyUnit:
     def isDefined(self):
         return self.thisptr.isDefined()
 
-    def asString(self, mode=unit_std):
-        return self.thisptr.printString(<const unsigned int> mode)
+    def asString(self, const unsigned int mode=unit_std):
+        return self.thisptr.printString(mode)
 
     def copy(self):
         return PyUnit(self)
 
-    def __mul__(self, other not None):
+    def __mul__(self, PyUnit other not None):
         result = PyUnit(self)
         result.thisptr.mult_equal(deref(PyUnit(other).thisptr))
         return result
 
-    def __richcmp__(PyUnit self, other not None, int op):
+    def __richcmp__(PyUnit self, PyUnit other not None, int op):
         if op == 2:
             return self.thisptr.isequal(deref(PyUnit(other).thisptr))
         if op == 3:
             return not self.thisptr.isequal(deref(PyUnit(other).thisptr))
         else:
-            print "not implemented"
+            raise NotImplementedError('requested operator not implemented')
 
 
 cdef class PyMeasurement:
