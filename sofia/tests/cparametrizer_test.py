@@ -338,6 +338,112 @@ class PySourceCatalogInterfaceTests(unittest.TestCase):
         self.assertIsInstance(sDictReturned.values()[0], cp.PySource)
 
 
+class PyModuleParametrisationInterfaceTests(unittest.TestCase):
+    """This tests the cython *interface* of PyModuleParametrisation
+    (wrapping ModuleParametrisation)"""
+
+    def testConstructor(self):
+        p = cp.PyModuleParametrisation()
+
+    def testRunTypeSafety(self):
+        p = cp.PyModuleParametrisation()
+        cube = np.zeros((100, 100, 100), dtype=np.float32)
+        mask = np.zeros((100, 100, 100), dtype=np.int16)
+        initcatalog = cp.PySourceCatalog()
+        doMaskOptimization = True
+        doBusyFitting = True
+        p.setFlags(doMaskOptimization, doBusyFitting)
+        with self.assertRaises(ValueError):
+            p.run(cube.astype(np.float64), mask, initcatalog)
+        with self.assertRaises(ValueError):
+            p.run(cube, mask.astype(np.float64), initcatalog)
+        with self.assertRaises(TypeError):
+            p.run(cube, mask, 1)
+        with self.assertRaises(TypeError):
+            p.setFlags('1', doBusyFitting)
+
+    def testRun(self):
+
+        def addGauss(sName, sID, cube, mask, amp, x0, y0, z0, xw, yw, zw):
+            """adds a fake source (3D gauss) and initial mask (few pixels large)
+
+            since cube/mask are ndarrays, it's 'call-by-reference'
+
+            returns a PySource with just the right parameters"""
+
+            def gaussian1D(dist, sigma):
+                return np.exp(- dist**2 / 2. / sigma**2)
+
+            # first need xyz indices
+            z, y, x = np.indices(cube.shape)
+
+            cube += amp * gaussian1D(x-x0, xw) * gaussian1D(y-y0, yw) * gaussian1D(z-z0, zw)
+            mask[
+                z0 - 3*zw: z0 + 3*zw,
+                y0 - 3*yw: y0 + 3*yw,
+                x0 - 3*xw: x0 + 3*xw,
+                ] = sID
+
+            s = cp.PySource()
+            s.setSourceName(sName)
+            s.setSourceID(sID)
+            m = cp.PyMeasurement()
+            m.set('X', x0, 0.0, '')
+            s.setParameter(m)
+            m.set('Y', y0, 0.0, '')  # no need to creat a new instance, because 'set' already does so
+            s.setParameter(m)
+            m.set('Z', z0, 0.0, '')
+            s.setParameter(m)
+            m.set('BBOX_X_MIN', x0 - 3*xw, 0.0, '')
+            s.setParameter(m)
+            m.set('BBOX_X_MAX', x0 + 3*xw, 0.0, '')
+            s.setParameter(m)
+            m.set('BBOX_Y_MIN', y0 - 3*yw, 0.0, '')
+            s.setParameter(m)
+            m.set('BBOX_Y_MAX', y0 + 3*yw, 0.0, '')
+            s.setParameter(m)
+            m.set('BBOX_Z_MIN', z0 - 3*zw, 0.0, '')
+            s.setParameter(m)
+            m.set('BBOX_Z_MAX', z0 + 3*zw, 0.0, '')
+            s.setParameter(m)
+
+            return s
+
+
+        cube = np.random.normal(0., 1., (100, 100, 100)).astype(np.float32)
+        mask = np.zeros((100, 100, 100), dtype=np.int16)
+
+        # add some sources
+        initcatalog = cp.PySourceCatalog()
+        initcatalog.insert(addGauss("source1", 1, cube, mask, 20., 20, 25, 30, 2, 3, 5))
+        initcatalog.insert(addGauss("source2", 2, cube, mask, 20., 50, 55, 60, 5, 3, 2))
+
+        for k, v in initcatalog.getSources().iteritems():
+            print '\n-----------------'
+            print 'source', k
+            print '-----------------'
+            for _k, _v in sorted(v.getParameters().iteritems()):
+                print _k, _v.asString()
+
+        print "\nmax amp"
+        print np.where(cube == np.max(cube)), np.max(cube)
+
+        p = cp.PyModuleParametrisation()
+        doMaskOptimization = True
+        doBusyFitting = True
+        p.setFlags(doMaskOptimization, doBusyFitting)
+        p.run(cube, mask, initcatalog)
+        results = p.getCatalog()
+
+        for k, v in results.getSources().iteritems():
+            print '\n-----------------'
+            print 'source', k
+            print '-----------------'
+            for _k, _v in sorted(v.getParameters().iteritems()):
+                print _k, _v.asString()
+
+        self.assertIsInstance(results.getSources(), dict)
+        self.assertEqual(len(results.getSources()), 2)
 
 def main():
     unittest.main()
