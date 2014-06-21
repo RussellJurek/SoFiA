@@ -4,6 +4,7 @@
 
 from cparametrizer cimport *
 from cython.operator cimport dereference as deref, preincrement as inc
+from cpython cimport bool as python_bool
 
 unit_std = UNIT_STD
 unit_exp = UNIT_EXP
@@ -223,7 +224,7 @@ cdef class PyMeasurement:
             self,
             unsigned int mode=measurement_default,
             int decimals=-1,
-            bool scientific=False
+            python_bool scientific=False
             ):
         if not mode in measurement_list:
             raise TypeError(
@@ -232,8 +233,6 @@ cdef class PyMeasurement:
                     measurement_names
                     )
                 )
-        #assert isinstance(scientific, bool)  # TODO: make this working
-        assert scientific is True or scientific is False
 
         return self.thisptr.printString(<unsigned int> mode, decimals, <bool> scientific)
 
@@ -508,5 +507,5 @@ cdef class PyModuleParametrisation:
         c.thisptr = new SourceCatalog(self.thisptr.getCatalog())
         return c
 
-    def setFlags(self, doMO, doBF):
-        self.thisptr.setFlags(doMO, doBF)
+    def setFlags(self, python_bool doMaskOptimization, python_bool doBusyFitting):
+        self.thisptr.setFlags(<bool> doMaskOptimization, <bool> doBusyFitting)
