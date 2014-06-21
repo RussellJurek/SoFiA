@@ -35,8 +35,8 @@ def make_xml(objects,outname):
 	description.text='Output catalogue from SoFiA'
 	
 	# write the parameters in fields:
-	d = objects.getSourcesDict()
-	pars = d[d.keys()[0]].getParametersDict()
+	d = objects.getSources()
+	pars = d[d.keys()[0]].getParameters()
 	for i in pars:
 		# this has to be updated with proper types and units
 		field = SubElement(table, 'FIELD', name=i, datatype='float', unit='-')
@@ -47,7 +47,7 @@ def make_xml(objects,outname):
 
 	for i in d:
 		tr = SubElement(tabledata,'TR')
-		source_dict = d[i].getParametersDict()
+		source_dict = d[i].getParameters()
 		for j in source_dict:
 			td = SubElement(tr,'TD')
 			td.text = str(source_dict[j].getValue())

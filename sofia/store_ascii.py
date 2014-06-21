@@ -10,8 +10,8 @@ def make_ascii(objects,store_pars,outname):
 	f1.write('#\n')
 	
 	# write the parameters in
-	d = objects.getSourcesDict()
-	pars = d[d.keys()[0]].getParametersDict()
+	d = objects.getSources()
+	pars = d[d.keys()[0]].getParameters()
 	f1.write('# ')
 	if store_pars == ['*']:
 		for i in sorted(pars):
@@ -24,7 +24,7 @@ def make_ascii(objects,store_pars,outname):
 	
 	# write the data	
 	for i in d:
-		source_dict = d[i].getParametersDict()
+		source_dict = d[i].getParameters()
 		if store_pars == ['*']:
 			for j in sorted(source_dict):
 				f1.write(str(source_dict[j].getValue()) + '\t')

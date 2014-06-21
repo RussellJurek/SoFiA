@@ -48,12 +48,12 @@ def parametrise(cube, mask, objects, cathead, catformt, catparunits, Parameters,
   # append the results to the objects array or reset
   replParam = ['BBOX_X_MAX','BBOX_X_MIN','BBOX_Y_MAX','BBOX_Y_MIN','BBOX_Z_MAX','BBOX_Z_MIN','F_PEAK','F_TOT','ID','X','Y','Z','NRvox']
   origParam = ['Xmax','Xmin','Ymax','Ymin','Zmax','Zmin','Fmax','Ftot','ID','Xm','Ym','Zm','NRvox']
-  d = results.getSourcesDict()
+  d = results.getSources()
   # select data set with maximum number of parameters
-  parsListLen = [len(d[d.keys()[i]].getParametersDict()) for i in range(0,len(d))]
+  parsListLen = [len(d[d.keys()[i]].getParameters()) for i in range(0,len(d))]
   index = parsListLen.index(max(parsListLen))
   # add parameter names from parametrization
-  pars = d[d.keys()[index]].getParametersDict()
+  pars = d[d.keys()[index]].getParameters()
   cathead = list(cathead)
   newunits={'ID':'-',
             'X':'pix',
@@ -101,7 +101,7 @@ def parametrise(cube, mask, objects, cathead, catformt, catparunits, Parameters,
   tmpObjects[:,0:objects.shape[1]] = objects
   objects = tmpObjects
   for i in d:
-    source_dict = d[i].getParametersDict()
+    source_dict = d[i].getParameters()
     # check the source index
     index = int(source_dict['ID'].getValue())
     for j in sorted(source_dict):

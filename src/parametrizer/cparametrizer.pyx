@@ -405,7 +405,7 @@ cdef class PySource:
     def getSourceName(self):
         return self.thisptr.getSourceName()
 
-    def getParametersDict(self):
+    def getParameters(self):
         pdict = {}
         cdef map[string, Measurement[double]].iterator mapiter
         cdef map[string, Measurement[double]] pmap
@@ -418,7 +418,7 @@ cdef class PySource:
             inc(mapiter)
         return pdict
 
-    def setParametersDict(self, dictionary):
+    def setParameters(self, dictionary):
         self.clear()
         for key in dictionary.keys():
             self.setParameter(dictionary[key])
@@ -447,7 +447,7 @@ cdef class PySourceCatalog:
     def insert(self,PySource s):
         self.thisptr.insert(deref(PySource(s).thisptr))
 
-    def getSourcesDict(self):
+    def getSources(self):
         pdict = {}
         cdef map[unsigned long, Source].iterator mapiter
         cdef map[unsigned long, Source] pmap
@@ -460,7 +460,7 @@ cdef class PySourceCatalog:
             inc(mapiter)
         return pdict
 
-    def setSourcesDict(self, dictionary):
+    def setSources(self, dictionary):
         self.clear()
         for key in dictionary.keys():
             self.insert(dictionary[key])
