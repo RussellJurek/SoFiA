@@ -35,7 +35,7 @@ cdef extern from "Unit.h":
 
         int getPrefix()
 
-        void set(const string value)
+        int set(const string value)
         string printString(const unsigned int mode)
 
         void invert()
@@ -64,15 +64,15 @@ cdef extern from "Measurement.h":
 
         void clear()
 
-        void setInt "set" (const string newName, T newValue, T newUncertainty, const int mode)
-        void setStr "set" (const string newName, T newValue, T newUncertainty, const string newUnit)
+        int setInt "set" (const string newName, T newValue, T newUncertainty, const int mode)
+        int setStr "set" (const string newName, T newValue, T newUncertainty, const string newUnit)
         void setUnit "set" (const string newName, T newValue, T newUncertainty, const Unit newUnit)
 
         void setName(const string newName)
         void setValue(T newValue)
         void setUncertainty(T newValue)
         void setUnitUnit "setUnit" (const Unit newUnit)
-        void setUnitStr "setUnit" (const string newUnitStr)
+        int setUnitStr "setUnit" (const string newUnitStr)
 
         string printString "print" (unsigned int mode, int decimals, bool scientific)
 
@@ -81,7 +81,7 @@ cdef extern from "Measurement.h":
         T getUncertainty()
         Unit getUnit()
 
-        void invert()
+        int invert()
 
         int convert(T &newValue, T &newUncertainty, unsigned int mode)
 

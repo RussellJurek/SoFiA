@@ -5,7 +5,6 @@
 from cparametrizer cimport *
 from cython.operator cimport dereference as deref, preincrement as inc
 
-
 unit_std = UNIT_STD
 unit_exp = UNIT_EXP
 unit_none = UNIT_NONE
@@ -29,28 +28,67 @@ unit_dyn = UNIT_DYN
 unit_c = UNIT_C
 unit_e = UNIT_E
 
+unit_list = [
+    unit_std, unit_exp, unit_none, unit_jy, unit_mjy, unit_g,
+    unit_deg, unit_arcmin, unit_arcsec, unit_mas,
+    unit_pc, unit_kpc, unit_mpc, unit_au, unit_ly,
+    unit_min, unit_h, unit_a, unit_erg, unit_dyn, unit_c, unit_e
+    ]
+
+unit_names = [
+    'unit_std', 'unit_exp', 'unit_none', 'unit_jy', 'unit_mjy', 'unit_g',
+    'unit_deg', 'unit_arcmin', 'unit_arcsec', 'unit_mas',
+    'unit_pc', 'unit_kpc', 'unit_mpc', 'unit_au', 'unit_ly',
+    'unit_min', 'unit_h', 'unit_a', 'unit_erg', 'unit_dyn', 'unit_c', 'unit_e'
+    ]
+
 
 measurement_default = MEASUREMENT_DEFAULT
 measurement_compact = MEASUREMENT_COMPACT
 measurement_full = MEASUREMENT_FULL
 measurement_unit = MEASUREMENT_UNIT
 
+measurement_list = [
+    measurement_default, measurement_compact, measurement_full, measurement_unit
+    ]
+
+measurement_names = [
+    'measurement_default', 'measurement_compact', 'measurement_full', 'measurement_unit'
+    ]
+
 cdef class PyUnit:
+    """Wrapper around (C++) Unit class"""
 
     def __cinit__(self, u=None):
+        """Constructor PyUnit(u=None)
+
+        u can be None (empty Unit is returned), a string or another PyUnit"""
+
         if u is None:
             self.thisptr = new Unit()
-        elif type(u) == str:
+        elif isinstance(u, str):
             self.thisptr = new Unit()
             self.thisptr.set(<string> u)
-        else:
+        elif isinstance(u, unicode):
+            u = str(u)  # might raise UnicodeEncodeError
+            self.thisptr = new Unit()
+            self.thisptr.set(<string> u)
+        elif isinstance(u, PyUnit):
             self.thisptr = new Unit(deref((<PyUnit> u).thisptr))
+        else:
+            raise TypeError('PyUnit: Incompatible input type')
 
     def __dealloc__(self):
         del self.thisptr
 
     def set(self, s):
-        self.thisptr.set(<string> s)
+        if not (isinstance(s, str) or isinstance(s, unicode)):
+            raise TypeError('PyUnit: Incompatible input type (unit name must be str())')
+        if isinstance(s, unicode):
+            s = str(s)   # might raise UnicodeEncodeError
+        res = self.thisptr.set(<string> s)
+        if res == 1:
+            raise ValueError('Units error')
 
     def getPrefix(self):
         return self.thisptr.getPrefix()
@@ -67,67 +105,102 @@ cdef class PyUnit:
     def isDefined(self):
         return self.thisptr.isDefined()
 
-    def asString(self, mode=unit_std):
+    def asString(self, int mode=unit_std):
+        assert isinstance(mode, int)
+        assert mode >= 0  # cannot assert-isinstance (const unsigned int)
+
         return self.thisptr.printString(<const unsigned int> mode)
 
     def copy(self):
         return PyUnit(self)
 
-    def __mul__(self, other not None):
+    def __mul__(self, PyUnit other not None):
+        assert isinstance(other, PyUnit)
+
         result = PyUnit(self)
         result.thisptr.mult_equal(deref(PyUnit(other).thisptr))
         return result
 
-    def __richcmp__(PyUnit self, other not None, int op):
+    def __richcmp__(PyUnit self, PyUnit other not None, int op):
+        assert isinstance(other, PyUnit)
+        assert isinstance(op, int)
+
         if op == 2:
             return self.thisptr.isequal(deref(PyUnit(other).thisptr))
         if op == 3:
             return not self.thisptr.isequal(deref(PyUnit(other).thisptr))
         else:
-            print "not implemented"
+            raise NotImplementedError('PyUnit: requested operator not implemented')
 
 
 cdef class PyMeasurement:
+    """contains a var-name with value, uncertainty and a unit"""
 
-    def __cinit__(self, m=None): #,Measurement[double] m=None
+    def __cinit__(self, m=None):
         if m is None:
             self.thisptr = new Measurement[double]()
-        else:
+        elif isinstance(m, PyMeasurement):
             self.thisptr = new Measurement[double](deref((<PyMeasurement> m).thisptr))
+        else:
+            raise TypeError('PyMeasurement: Incompatible input type')
 
     def __dealloc__(self):
         del self.thisptr
 
-    def set(self, str newName, double newValue, double newUncertainty, newUnit):
-        if type(newUnit) == int:
-            self.thisptr.setInt(
+    def set(self, newName, double newValue, double newUncertainty, newUnit):
+        """If newUnit is an int/enum, the values are also multplied by a conversion factor
+
+        possible ints are:
+        unit_std, unit_exp, unit_none, unit_jy, unit_mjy, unit_g,
+        unit_deg, unit_arcmin, unit_arcsec, unit_mas,
+        unit_pc, unit_kpc, unit_mpc, unit_au, unit_ly,
+        unit_min, unit_h, unit_a, unit_erg, unit_dyn, unit_c, unit_e"""
+        # NOTE, it would be great to use proper enums here, there is a backport
+        # of the new python3.4 enum, called 'enum34'
+        # should we add this to the requirements?
+        if not (isinstance(newName, str) or isinstance(newName, unicode)):
+            raise TypeError('PyMeasurement: Incompatible input type (name must be str())')
+        if isinstance(newName, unicode):
+            newName = str(newName)   # might raise UnicodeEncodeError
+
+        if isinstance(newUnit, int):
+            if not newUnit in unit_list:
+                raise TypeError(
+                    '\n'.join(
+                        ['newUnit must be one of'] +
+                        unit_names +
+                        ['(if an integer/enum is used)']
+                        )
+                    )
+            res = self.thisptr.setInt(
                 newName, newValue, newUncertainty, <unsigned int> newUnit
                 )
-        elif type(newUnit) == str:
-            self.thisptr.setStr(
-                newName, newValue, newUncertainty, <string> newUnit
-                )
-        elif type(newUnit) == PyUnit:
+            if res == 1:
+                raise ValueError('Units error')
+        else:
+            newUnit = PyUnit(newUnit)
             self.thisptr.setUnit(
                 newName, newValue,newUncertainty, deref((<PyUnit> newUnit).thisptr)
                 )
-        else:
-            print "not implemented"
 
-    def setName(self, string newName):
-        self.thisptr.setName(newName)
+
+    def setName(self, newName):
+        if not (isinstance(newName, str) or isinstance(newName, unicode)):
+            raise TypeError('PyMeasurement: Incompatible input type (name must be str())')
+        if isinstance(newName, unicode):
+            newName = str(newName)   # might raise UnicodeEncodeError
+        self.thisptr.setName(<string> newName)
 
     def setValue(self, double newValue):
         self.thisptr.setValue(newValue)
 
-    def setUncertainty(self, double newValue):
-        self.thisptr.setUncertainty(newValue)
+    def setUncertainty(self, double newUncertainty):
+        self.thisptr.setUncertainty(newUncertainty)
 
     def setUnit(self, newUnit):
-        if type(newUnit) == str:
-            self.thisptr.setUnitStr(<string> newUnit)
-        elif type(newUnit) == PyUnit:
-            self.thisptr.setUnitUnit(deref((<PyUnit> newUnit).thisptr))
+        if not isinstance(newUnit, PyUnit):
+            newUnit = PyUnit(newUnit)
+        self.thisptr.setUnitUnit(deref((<PyUnit> newUnit).thisptr))
 
     def getName(self):
         return self.thisptr.getName()
@@ -140,7 +213,7 @@ cdef class PyMeasurement:
 
     def getUnit(self):
         pu = PyUnit()
-        pu.thisptr=new Unit(self.thisptr.getUnit())
+        pu.thisptr = new Unit(self.thisptr.getUnit())
         return pu
 
     def clear(self):
@@ -152,18 +225,51 @@ cdef class PyMeasurement:
             int decimals=-1,
             bool scientific=False
             ):
-        return self.thisptr.printString(mode, decimals, scientific)
+        if not mode in measurement_list:
+            raise TypeError(
+                '\n'.join(
+                    ['mode must be one of'] +
+                    measurement_names
+                    )
+                )
+        #assert isinstance(scientific, bool)  # TODO: make this working
+        assert scientific is True or scientific is False
 
-    def convert(self, int mode):
+        return self.thisptr.printString(<unsigned int> mode, decimals, <bool> scientific)
+
+    def convert(self, int unitenum):
+        if not unitenum in unit_list:
+            raise TypeError(
+                '\n'.join(
+                    ['newUnit must be one of'] +
+                    unit_names +
+                    ['(if an integer/enum is used)']
+                    )
+                )
         cdef double newValue = 0.
         cdef double newUncertainty = 0.
-        self.thisptr.convert(newValue, newUncertainty, mode)
+        res = self.thisptr.convert(newValue, newUncertainty, unitenum)
+        if res == 1:
+            raise ValueError('Units Incompatible')
         return newValue, newUncertainty
 
     def invert(self):
-        self.thisptr.invert()
+        res = self.thisptr.invert()
+        if res == 1:
+            raise ZeroDivisionError('float division by zero')
 
-    def __richcmp__(PyMeasurement self, other not None, int op):
+    def __richcmp__(PyMeasurement self, PyMeasurement other not None, int op):
+        assert isinstance(other, PyMeasurement)
+
+        # for some reason, the C++ implementation doesn't check for units being equal
+        _unit1 = self.getUnit()
+        _unit2 = other.getUnit()
+        if _unit1 != _unit2:
+            raise TypeError(
+                'PyMeasurement: Incompatible units <' +
+                _unit1.asString() + '> <' + _unit2.asString() + '>'
+                )
+
         if op == 0:
             return self.thisptr.issmaller(deref(PyMeasurement(other).thisptr))
         elif op == 1:
@@ -177,29 +283,61 @@ cdef class PyMeasurement:
         elif op == 5:
             return self.thisptr.islargereq(deref(PyMeasurement(other).thisptr))
         else:
-            print "not implemented"
+            raise NotImplementedError('PyMeasurement: requested operator not implemented')
+
 
     def copy(self):
         return PyMeasurement(self)
 
-    def __mul__(self, other not None):
+    def __mul__(self, PyMeasurement other not None):
+        assert isinstance(other, PyMeasurement)
+
         result = PyMeasurement(self)
         result.thisptr.mult_equal(deref(PyMeasurement(other).thisptr))
         return result
 
-    def __rdiv__(self, other not None):
+    def __rdiv__(self, PyMeasurement other not None):
+        assert isinstance(other, PyMeasurement)
+
         result = PyMeasurement(self)
         result.thisptr.div_equal(deref(PyMeasurement(other).thisptr))
         return result
 
-    def __add__(self, other not None):
+    def __add__(self, PyMeasurement other not None):
+        assert isinstance(other, PyMeasurement)
+
+        # this is also handled the C++ implementation but we want an exception raised
+        _unit1 = self.getUnit()
+        _unit2 = other.getUnit()
+        if _unit1 != _unit2:
+            raise TypeError(
+                'PyMeasurement: Incompatible units [' +
+                _unit1.asString() + '] [' + _unit2.asString() + ']'
+                )
+
         result = PyMeasurement(self)
         result.thisptr.plus_equal(deref(PyMeasurement(other).thisptr))
         return result
 
-    def __sub__(self, other not None):
+    def __sub__(self, PyMeasurement other not None):
+        assert isinstance(other, PyMeasurement)
+
+        # this is also handled the C++ implementation but we want an exception raised
+        _unit1 = self.getUnit()
+        _unit2 = other.getUnit()
+        if _unit1 != _unit2:
+            raise TypeError(
+                'PyMeasurement: Incompatible units [' +
+                _unit1.asString() + '] [' + _unit2.asString() + ']'
+                )
+
         result = PyMeasurement(self)
         result.thisptr.minus_equal(deref(PyMeasurement(other).thisptr))
+        return result
+
+    def __neg__(self):
+        result = PyMeasurement(self)
+        result.setValue(-self.getValue())
         return result
 
 
@@ -208,8 +346,10 @@ cdef class PySource:
     def __cinit__(self, s=None):
         if s is None:
             self.thisptr = new Source()
-        else:
+        elif isinstance(s, PySource):
             self.thisptr = new Source(deref((<PySource> s).thisptr))
+        else:
+            raise TypeError('PySource: Incompatible input type')
 
     def __dealloc__(self):
         del self.thisptr
@@ -218,17 +358,37 @@ cdef class PySource:
         return self.thisptr.isDefined()
 
     def parameterDefined(self, s):
+        assert isinstance(s, str) or isinstance(s, unicode)
+
         return self.thisptr.parameterDefined(<string> s)
 
     def setParameter(self, name, value=None, uncertainty=None, unit=None):
-        if type(name) == str:
+        if isinstance(name, PyMeasurement):
+            m = PyMeasurement(name)
+        elif isinstance(name, str) or isinstance(name, unicode):
+            if isinstance(name, unicode):
+                name = str(name)   # might raise UnicodeEncodeError
+
+            # TODO: should one raise an error, if value/error/unit is none, or
+            # silently make it zero? for now, we choose the latter
+            if value is None:
+                value = 0.0
+            if uncertainty is None:
+                uncertainty = 0.0
+            if unit is None:
+                unit = PyUnit(unit)
             m = PyMeasurement()
-            m.set(name, <double> value,<double> uncertainty, <string> unit)
-        elif type(name) == PyMeasurement:
-            m = name
+            m.set(name, value, uncertainty, unit)
+        else:
+            raise TypeError('PySource: Incompatible input type (name must be str or PyMeasurement)')
+
         self.thisptr.setParameter(deref(PyMeasurement(m).thisptr))
 
     def getParameter(self, s):
+        assert isinstance(s, str) or isinstance(s, unicode)
+        if isinstance(s, unicode):
+            s = str(s)   # might raise UnicodeEncodeError
+
         pm = PyMeasurement()
         pm.thisptr = new Measurement[double](self.thisptr.getParameterMeasurement(<string> s))
         return pm
