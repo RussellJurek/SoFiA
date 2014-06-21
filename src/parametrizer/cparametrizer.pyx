@@ -106,25 +106,22 @@ cdef class PyUnit:
     def isDefined(self):
         return self.thisptr.isDefined()
 
-    def asString(self, int mode=unit_std):
-        assert isinstance(mode, int)
-        assert mode >= 0  # cannot assert-isinstance (const unsigned int)
-
+    def asString(self, const unsigned int mode=unit_std):
+        # what is mode for? doesn't seem to work
         return self.thisptr.printString(<const unsigned int> mode)
 
     def copy(self):
         return PyUnit(self)
 
     def __mul__(self, PyUnit other not None):
-        assert isinstance(other, PyUnit)
+        assert isinstance(other, PyUnit), 'operation only allowed for PyUnit type'
 
         result = PyUnit(self)
         result.thisptr.mult_equal(deref(PyUnit(other).thisptr))
         return result
 
     def __richcmp__(PyUnit self, PyUnit other not None, int op):
-        assert isinstance(other, PyUnit)
-        assert isinstance(op, int)
+        assert isinstance(other, PyUnit), 'operation only allowed for PyUnit type'
 
         if op == 2:
             return self.thisptr.isequal(deref(PyUnit(other).thisptr))
@@ -258,7 +255,7 @@ cdef class PyMeasurement:
             raise ZeroDivisionError('float division by zero')
 
     def __richcmp__(PyMeasurement self, PyMeasurement other not None, int op):
-        assert isinstance(other, PyMeasurement)
+        assert isinstance(other, PyMeasurement), 'operation only allowed for PyMeasurement type'
 
         # for some reason, the C++ implementation doesn't check for units being equal
         _unit1 = self.getUnit()
@@ -289,21 +286,21 @@ cdef class PyMeasurement:
         return PyMeasurement(self)
 
     def __mul__(self, PyMeasurement other not None):
-        assert isinstance(other, PyMeasurement)
+        assert isinstance(other, PyMeasurement), 'operation only allowed for PyMeasurement type'
 
         result = PyMeasurement(self)
         result.thisptr.mult_equal(deref(PyMeasurement(other).thisptr))
         return result
 
     def __rdiv__(self, PyMeasurement other not None):
-        assert isinstance(other, PyMeasurement)
+        assert isinstance(other, PyMeasurement), 'operation only allowed for PyMeasurement type'
 
         result = PyMeasurement(self)
         result.thisptr.div_equal(deref(PyMeasurement(other).thisptr))
         return result
 
     def __add__(self, PyMeasurement other not None):
-        assert isinstance(other, PyMeasurement)
+        assert isinstance(other, PyMeasurement), 'operation only allowed for PyMeasurement type'
 
         # this is also handled the C++ implementation but we want an exception raised
         _unit1 = self.getUnit()
@@ -319,7 +316,7 @@ cdef class PyMeasurement:
         return result
 
     def __sub__(self, PyMeasurement other not None):
-        assert isinstance(other, PyMeasurement)
+        assert isinstance(other, PyMeasurement), 'operation only allowed for PyMeasurement type'
 
         # this is also handled the C++ implementation but we want an exception raised
         _unit1 = self.getUnit()
@@ -357,7 +354,7 @@ cdef class PySource:
         return self.thisptr.isDefined()
 
     def parameterDefined(self, s):
-        assert isinstance(s, str) or isinstance(s, unicode)
+        assert isinstance(s, str) or isinstance(s, unicode), 'parameter name must be str or unicode'
 
         return self.thisptr.parameterDefined(<string> s)
 
@@ -384,21 +381,27 @@ cdef class PySource:
         self.thisptr.setParameter(deref(PyMeasurement(m).thisptr))
 
     def getParameter(self, s):
-        assert isinstance(s, str) or isinstance(s, unicode)
+        assert isinstance(s, str) or isinstance(s, unicode), 'parameter name must be str or unicode'
         if isinstance(s, unicode):
             s = str(s)   # might raise UnicodeEncodeError
 
         pm = PyMeasurement()
         pm.thisptr = new Measurement[double](self.thisptr.getParameterMeasurement(<string> s))
+        if pm.getName() == 'notfound':
+            raise KeyError('PySource: Parameter not found')
         return pm
 
     def setSourceID(self, unsigned long sid):
+        """Note: floats will be silently converted (truncated) to Int"""
         self.thisptr.setSourceID(sid)
 
     def getSourceID(self):
         return self.thisptr.getSourceID()
 
     def setSourceName(self, s):
+        assert isinstance(s, str) or isinstance(s, unicode), 'source name must be str or unicode'
+        if isinstance(s, unicode):
+            s = str(s)
         self.thisptr.setSourceName(<string> s)
 
     def getSourceName(self):
@@ -418,6 +421,10 @@ cdef class PySource:
         return pdict
 
     def setParameters(self, dictionary):
+        assert isinstance(dictionary, dict), 'dictionary is not a python dict'
+        assert len(dictionary) > 0, 'dictionary empty'  # is this desired?
+        # one could also just let it be cleared
+
         self.clear()
         for key in dictionary.keys():
             self.setParameter(dictionary[key])
@@ -434,8 +441,10 @@ cdef class PySourceCatalog:
     def __cinit__(self, sc=None):
         if sc is None:
             self.thisptr = new SourceCatalog()
-        else:
+        elif isinstance(sc, PySourceCatalog):
             self.thisptr = new SourceCatalog(deref((<PySourceCatalog> sc).thisptr))
+        else:
+            raise TypeError('PySource: Incompatible input type')
 
     def __dealloc__(self):
         del self.thisptr
@@ -460,6 +469,10 @@ cdef class PySourceCatalog:
         return pdict
 
     def setSources(self, dictionary):
+        assert isinstance(dictionary, dict), 'dictionary is not a python dict'
+        assert len(dictionary) > 0, 'dictionary empty'  # is this desired?
+        # one could also just let it be cleared
+
         self.clear()
         for key in dictionary.keys():
             self.insert(dictionary[key])
@@ -472,7 +485,7 @@ cdef class PySourceCatalog:
 
 cdef class PyModuleParametrisation:
 
-    def __cinit__(self, sc=None):
+    def __cinit__(self):
         self.thisptr = new ModuleParametrisation()
 
     def __dealloc__(self):
@@ -480,17 +493,20 @@ cdef class PyModuleParametrisation:
 
     def run(
             self,
-            np.ndarray datacube,
-            np.ndarray maskcube,
+            np.ndarray[float, ndim=3] datacube,
+            np.ndarray[short, ndim=3] maskcube,
             PySourceCatalog initCatalog,
-#            header
-    ):
+            ):
+        """Note: for each source id there must be a corresponding region (subcube) in the
+        maskcube, having pixel values that equal source id"""
+        assert datacube.dtype is np.dtype('float32'), 'data must have type float (np.float32 aka <f4)'
+        assert maskcube.dtype is np.dtype('int16'), 'mask must have type short (np.int16 aka <i2)'
+        assert datacube.ndim == 3
+
         cdef long dz = datacube.shape[0]
         cdef long dy = datacube.shape[1]
         cdef long dx = datacube.shape[2]
-#        cdef map[string, string] headermap
-#        for key in header.keys():
-#            headermap[<string> key] = <string> (str(header[key]))
+
         initCatalogPtr = new SourceCatalog(deref((<PySourceCatalog> initCatalog).thisptr))
         self.thisptr.run(
             <float*> datacube.data,
@@ -498,7 +514,6 @@ cdef class PyModuleParametrisation:
             dx,
             dy,
             dz,
-#            headermap,
             deref(initCatalogPtr)
             )
 

@@ -153,7 +153,6 @@ cdef extern from "ModuleParametrisation.h":
             long dx,
             long dy,
             long dz,
-#            map[string, string] &fitsHeader,
             SourceCatalog &initCatalog
             )
 

@@ -4,6 +4,7 @@
 import traceback
 import sys
 import unittest
+import numpy as np
 from sofia import cparametrizer as cp
 
 
@@ -74,19 +75,33 @@ class PyMeasurementInterfaceTests(unittest.TestCase):
             m = cp.PyMeasurement()
             m.set('speed', 12.345, 0.987, 1000)
 
-    def testPrintMode(self):
+    def testAsString(self):
         m = cp.PyMeasurement()
         m.set('speed', 12.345, 0.987, 'm/s')
         self.assertEqual(m.asString(mode=cp.measurement_default), '12.345 ± 0.987 m s⁻¹')
         self.assertEqual(m.asString(mode=cp.measurement_compact), '12.345 m s⁻¹')
         self.assertEqual(m.asString(mode=cp.measurement_full), 'speed = 12.345 ± 0.987 m s⁻¹')
         self.assertEqual(m.asString(mode=cp.measurement_unit), 'm s⁻¹')
+        self.assertEqual(m.asString(decimals=1), '12.3 ± 1.0 m s⁻¹')
+        #self.assertEqual(m.asString(scientific=True), '')  # why is this not working?
 
-    def testPrintModeTypeSafety(self):
+    def testtestAsStringTypeSafety(self):
         with self.assertRaises(TypeError):
             m = cp.PyMeasurement()
             m.set('speed', 12.345, 0.987, 'm/s')
             m.asString(mode=1000)
+        with self.assertRaises(TypeError):
+            m = cp.PyMeasurement()
+            m.set('speed', 12.345, 0.987, 'm/s')
+            m.asString(scientific='')
+        with self.assertRaises(TypeError):
+            m = cp.PyMeasurement()
+            m.set('speed', 12.345, 0.987, 'm/s')
+            m.asString(scientific=1)
+        with self.assertRaises(TypeError):
+            m = cp.PyMeasurement()
+            m.set('speed', 12.345, 0.987, 'm/s')
+            m.asString(decimals='')
 
     def testConvert(self):
         m = cp.PyMeasurement()
@@ -154,7 +169,8 @@ class PySourceInterfaceTests(unittest.TestCase):
     """This tests the cython *interface* of PySource (wrapping Source)"""
 
     def testConstructor(self):
-        s = cp.PySource()
+        s1 = cp.PySource()
+        s2 = cp.PySource(s1)
 
     def testConstructorTypeSafety(self):
         with self.assertRaises(TypeError):
@@ -213,7 +229,7 @@ class PySourceInterfaceTests(unittest.TestCase):
     def testSetSourceNameTypeSafety(self):
         with self.assertRaises(AssertionError):
             s = cp.PySource()
-            s.setSourceName(1)  # this should raise AssertionError
+            s.setSourceName(1)
 
     def testGetSourceName(self):
         s = cp.PySource()
@@ -231,7 +247,7 @@ class PySourceInterfaceTests(unittest.TestCase):
     def testIsDefinedTypeSafety(self):
         with self.assertRaises(AssertionError):
             s = cp.PySource()
-            s.parameterDefined(1)  # this should raise AssertionError
+            s.parameterDefined(1)
 
     def testGetParameters(self):
         s = cp.PySource()
@@ -239,6 +255,87 @@ class PySourceInterfaceTests(unittest.TestCase):
         s.setParameter('speed2', 12.345, 0.987, 'm/s')
         s.getParameters()
         self.assertIsInstance(s.getParameters(), dict)
+        self.assertEqual(len(s.getParameters()), 2)
+        self.assertListEqual(s.getParameters().keys(), ['speed1', 'speed2'])
+        self.assertIsInstance(s.getParameters().values()[0], cp.PyMeasurement)
+
+    def testSetParameters(self):
+        s1 = cp.PySource()
+        s2 = cp.PySource()
+        s1.setParameter('speed1', 12.345, 0.987, 'm/s')
+        s1.setParameter('speed2', 12.345, 0.987, 'm/s')
+        s2.setParameters(s1.getParameters())
+        self.assertIsInstance(s2.getParameters(), dict)
+        self.assertEqual(len(s2.getParameters()), 2)
+        self.assertListEqual(s2.getParameters().keys(), ['speed1', 'speed2'])
+        self.assertIsInstance(s2.getParameters().values()[0], cp.PyMeasurement)
+
+    def testSetParametersTypeSafety(self):
+        with self.assertRaises(AssertionError):
+            s = cp.PySource()
+            s.setParameters(1)
+        with self.assertRaises(AssertionError):
+            s = cp.PySource()
+            s.setParameters({})
+
+
+class PySourceCatalogInterfaceTests(unittest.TestCase):
+    """This tests the cython *interface* of PySourceCatalog (wrapping SourceCatalog)"""
+
+    def testConstructor(self):
+        sc1 = cp.PySourceCatalog()
+        sc2 = cp.PySourceCatalog(sc1)
+
+    def testConstructorTypeSafety(self):
+        with self.assertRaises(TypeError):
+            sc = cp.PySourceCatalog(2)
+
+    def testDuchampReader(self):
+        # TODO: need example duchamp file for this
+        return
+
+    def testInsert(self):
+        s = cp.PySource()
+        s.setParameter('speed', 12.345, 0.987, 'm/s')
+        sc = cp.PySourceCatalog()
+        sc.insert(s)
+
+    def testInsertTypeSafety(self):
+        with self.assertRaises(TypeError):
+            sc = cp.PySourceCatalog()
+            sc.insert(1)
+
+    def testSetSources(self):
+        s1 = cp.PySource()
+        s2 = cp.PySource()
+        s1.setParameter('speed1', 12.345, 0.987, 'm/s')
+        s2.setParameter('speed2', 12.345, 0.987, 'm/s')
+        sDict = {1: s1, 2: s2}
+        sc = cp.PySourceCatalog()
+        sc.setSources(sDict)
+
+    def testSetSourcesTypeSafety(self):
+        with self.assertRaises(AssertionError):
+            sc = cp.PySourceCatalog()
+            sc.setSources(1)
+        with self.assertRaises(AssertionError):
+            sc = cp.PySourceCatalog()
+            sc.setSources({})
+
+    def testGetParameters(self):
+        s1 = cp.PySource()
+        s2 = cp.PySource()
+        s1.setSourceID(0)  # this is important, otherwise sources get overwritten
+        s2.setSourceID(1)
+        s1.setParameter('speed1', 12.345, 0.987, 'm/s')
+        s2.setParameter('speed2', 12.345, 0.987, 'm/s')
+        sDict = {1: s1, 2: s2}
+        sc = cp.PySourceCatalog()
+        sc.setSources(sDict)
+        sDictReturned = sc.getSources()
+        self.assertIsInstance(sDictReturned, dict)
+        self.assertEqual(len(sDict), len(sDictReturned))
+        self.assertIsInstance(sDictReturned.values()[0], cp.PySource)
 
 
 
