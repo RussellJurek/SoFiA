@@ -104,14 +104,16 @@ def readPipelineOptions(filename = "pipeline.options"):
                  "writeCat.parameters": "array"}
     
     # Loop through all lines:
-    for linenr,line in enumerate(lines):
+    for linenr, line in enumerate(lines):
         if line[0] == "#":
             continue
         
         try:
-            parameter,value = tuple(line.split("=", 1))
+            parameter, value = tuple(line.split("=", 1))
             if len(parameter) < 1:
-                sys.stderr.write("WARNING: Option name missing in line %02d: %s\n"%(linenr + 1, line))
+                sys.stderr.write(
+                    "WARNING: Option name missing in line {0:02d}: {1:s}\n".format(linenr + 1, line)
+                    )
                 continue
             
             subtasks = tasks
@@ -121,7 +123,11 @@ def readPipelineOptions(filename = "pipeline.options"):
                 module = module.strip()
                 
                 if len(module) < 1:
-                    sys.stderr.write("WARNING: (Sub)key name too short in line %02d: %s\n"%(linenr + 1, line))
+                    sys.stderr.write(
+                        "WARNING: (Sub)key name too short in line {0:02d}: {1:s}\n".format(
+                            linenr + 1, line
+                            )
+                        )
                     break
                 
                 parameter = str(".").join(parameter.split(".")[1:])
@@ -133,7 +139,11 @@ def readPipelineOptions(filename = "pipeline.options"):
                 
                 if parameter.count(".") == 0:
                     if subtasks.has_key(parameter):
-                        sys.stderr.write("WARNING: Option already present in line %02d: %s\n"%(linenr + 1, line))
+                        sys.stderr.write(
+                            "WARNING: Option already present in line {0:02d}: {1:s}\n".format(
+                                linenr + 1, line
+                                )
+                            )
                         break
                     try:
                         value = value.split('#')[0].strip()
@@ -151,11 +161,19 @@ def readPipelineOptions(filename = "pipeline.options"):
                             else:
                                 subtasks[parameter] = str(value)
                         else:
-                            sys.stderr.write("WARNING: No data type defined for parameter %s.\n"%searchKey)
+                            sys.stderr.write(
+                                "WARNING: No data type defined for parameter {0:s}.\n".format(
+                                    searchKey
+                                    )
+                                )
                             sys.stderr.write("         Guessing type based on value.\n")
                             subtasks[parameter] = ast.literal_eval(value)
                     except:
-                        sys.stderr.write("WARNING: Could not parse option in line %02d: %s\n"%(linenr + 1, line))
+                        sys.stderr.write(
+                            "WARNING: Could not parse option in line {0:02d}: {1:s}\n".format(
+                                linenr + 1, line
+                                )
+                            )
                         break
                     break
         except:
