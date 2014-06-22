@@ -3,7 +3,6 @@ try:
     from Cython.Build import cythonize
 
     pyx_src = [
-        'catalog.pyx',
         'cparametrizer.pyx'
         ]
 
