@@ -135,6 +135,7 @@ cdef extern from "SourceCatalog.h":
         SourceCatalog(const SourceCatalog &sourceCatalog) except +
 
         int insert(Source &source)
+        int update(unsigned long sourceID, Source &source)
         map[unsigned long,Source] getSources()
         void clear()
 

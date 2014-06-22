@@ -57,39 +57,50 @@ measurement_names = [
     'measurement_default', 'measurement_compact', 'measurement_full', 'measurement_unit'
     ]
 
-cdef class PyUnit:
+cdef class PyUnit(object):
     """Wrapper around (C++) Unit class"""
 
     def __cinit__(self, u=None):
         """Constructor PyUnit(u=None)
 
         u can be None (empty Unit is returned), a string or another PyUnit"""
-
-        if u is None:
-            self.thisptr = new Unit()
-        elif isinstance(u, str):
-            self.thisptr = new Unit()
-            self.thisptr.set(<string> u)
-        elif isinstance(u, unicode):
-            u = str(u)  # might raise UnicodeEncodeError
-            self.thisptr = new Unit()
-            self.thisptr.set(<string> u)
-        elif isinstance(u, PyUnit):
-            self.thisptr = new Unit(deref((<PyUnit> u).thisptr))
-        else:
-            raise TypeError('PyUnit: Incompatible input type')
+        self.thisptr = new Unit()
+        self.setU(u)
 
     def __dealloc__(self):
         del self.thisptr
 
-    def set(self, s):
-        if not (isinstance(s, str) or isinstance(s, unicode)):
-            raise TypeError('PyUnit: Incompatible input type (unit name must be str())')
-        if isinstance(s, unicode):
-            s = str(s)   # might raise UnicodeEncodeError
-        res = self.thisptr.set(<string> s)
+    def setU(self, u=None):
+        res = 0
+        if u is None:
+            self.clear()
+        elif isinstance(u, str):
+            res = self.thisptr.set(<string> u)
+        elif isinstance(u, unicode):
+            u = str(u)  # might raise UnicodeEncodeError
+            res = self.thisptr.set(<string> u)
+        elif isinstance(u, PyUnit):
+            del self.thisptr
+            self.thisptr = new Unit(deref((<PyUnit> u).thisptr))
+        else:
+            raise TypeError('PyUnit: Incompatible input type')
+
         if res == 1:
             raise ValueError('Units error')
+
+    def asString(self, const unsigned int mode=unit_std):
+        """mode can either be unit_std or unit_exp
+
+        the latter does some pretty printing (utf8 needed)"""
+        return self.thisptr.printString(<const unsigned int> mode)
+
+    def __repr__(self):
+        return self.asString()
+
+    def clear(self):
+        self.thisptr.clear()
+
+    unit = property(asString, setU, None, 'unit property')
 
     def getPrefix(self):
         return self.thisptr.getPrefix()
@@ -97,18 +108,11 @@ cdef class PyUnit:
     def invert(self):
         self.thisptr.invert()
 
-    def clear(self):
-        self.thisptr.clear()
-
     def isEmpty(self):
         return self.thisptr.isEmpty()
 
     def isDefined(self):
         return self.thisptr.isDefined()
-
-    def asString(self, const unsigned int mode=unit_std):
-        # what is mode for? doesn't seem to work
-        return self.thisptr.printString(<const unsigned int> mode)
 
     def copy(self):
         return PyUnit(self)
@@ -117,16 +121,16 @@ cdef class PyUnit:
         assert isinstance(other, PyUnit), 'operation only allowed for PyUnit type'
 
         result = PyUnit(self)
-        result.thisptr.mult_equal(deref(PyUnit(other).thisptr))
+        result.thisptr.mult_equal(deref((<PyUnit> other).thisptr))
         return result
 
     def __richcmp__(PyUnit self, PyUnit other not None, int op):
         assert isinstance(other, PyUnit), 'operation only allowed for PyUnit type'
 
         if op == 2:
-            return self.thisptr.isequal(deref(PyUnit(other).thisptr))
+            return self.thisptr.isequal(deref((<PyUnit> other).thisptr))
         if op == 3:
-            return not self.thisptr.isequal(deref(PyUnit(other).thisptr))
+            return not self.thisptr.isequal(deref((<PyUnit> other).thisptr))
         else:
             raise NotImplementedError('PyUnit: requested operator not implemented')
 
@@ -134,19 +138,20 @@ cdef class PyUnit:
 cdef class PyMeasurement:
     """contains a var-name with value, uncertainty and a unit"""
 
-    def __cinit__(self, m=None):
-        if m is None:
-            self.thisptr = new Measurement[double]()
-        elif isinstance(m, PyMeasurement):
-            self.thisptr = new Measurement[double](deref((<PyMeasurement> m).thisptr))
-        else:
-            raise TypeError('PyMeasurement: Incompatible input type')
+    def __cinit__(self, name='noname', double value=0.0, double uncertainty=0.0, unit=''):
+        """name can be str-type or another PyMeasurement
+        (in the latter case, value/uncertainty/unit won't be handled!)"""
+        self.thisptr = new Measurement[double]()
+        self.setM(name, value, uncertainty, unit)
 
     def __dealloc__(self):
         del self.thisptr
 
-    def set(self, newName, double newValue, double newUncertainty, newUnit):
-        """If newUnit is an int/enum, the values are also multplied by a conversion factor
+    def setM(self, name='noname', double value=0.0, double uncertainty=0.0, unit=''):
+        """Sets content of this Measurement, name can be str-type or another PyMeasurement
+        (in the latter case, value/uncertainty/unit won't be handled!)
+
+        If unit is an int/enum, the values are also multiplied by a conversion factor
 
         possible ints are:
         unit_std, unit_exp, unit_none, unit_jy, unit_mjy, unit_g,
@@ -156,13 +161,33 @@ cdef class PyMeasurement:
         # NOTE, it would be great to use proper enums here, there is a backport
         # of the new python3.4 enum, called 'enum34'
         # should we add this to the requirements?
-        if not (isinstance(newName, str) or isinstance(newName, unicode)):
-            raise TypeError('PyMeasurement: Incompatible input type (name must be str())')
-        if isinstance(newName, unicode):
-            newName = str(newName)   # might raise UnicodeEncodeError
+        if isinstance(name, PyMeasurement):
+            del self.thisptr
+            self.thisptr = new Measurement[double](deref((<PyMeasurement> name).thisptr))
+        elif (isinstance(name, str) or isinstance(name, unicode)):
+            self.setName(name)
+            self.setValue(value)
+            self.setUncertainty(uncertainty)
+            self.setUnit(unit)
+        else:
+            raise TypeError('PyMeasurement: Incompatible input type (name must be str or PyMeasurement)')
 
-        if isinstance(newUnit, int):
-            if not newUnit in unit_list:
+    def setName(self, n):
+        if not (isinstance(n, str) or isinstance(n, unicode)):
+            raise TypeError('PyMeasurement: Incompatible input type (name must be str())')
+        if isinstance(n, unicode):
+            n = str(n)   # might raise UnicodeEncodeError
+        self.thisptr.setName(<string> n)
+
+    def setValue(self, double v):
+        self.thisptr.setValue(v)
+
+    def setUncertainty(self, double u):
+        self.thisptr.setUncertainty(u)
+
+    def setUnit(self, u):
+        if isinstance(u, int):
+            if not u in unit_list:
                 raise TypeError(
                     '\n'.join(
                         ['newUnit must be one of'] +
@@ -171,34 +196,16 @@ cdef class PyMeasurement:
                         )
                     )
             res = self.thisptr.setInt(
-                newName, newValue, newUncertainty, <unsigned int> newUnit
+                <string> self.getName(),
+                <double> self.getValue(),
+                <double> self.getUncertainty(),
+                <unsigned int> u
                 )
             if res == 1:
                 raise ValueError('Units error')
         else:
-            newUnit = PyUnit(newUnit)
-            self.thisptr.setUnit(
-                newName, newValue,newUncertainty, deref((<PyUnit> newUnit).thisptr)
-                )
-
-
-    def setName(self, newName):
-        if not (isinstance(newName, str) or isinstance(newName, unicode)):
-            raise TypeError('PyMeasurement: Incompatible input type (name must be str())')
-        if isinstance(newName, unicode):
-            newName = str(newName)   # might raise UnicodeEncodeError
-        self.thisptr.setName(<string> newName)
-
-    def setValue(self, double newValue):
-        self.thisptr.setValue(newValue)
-
-    def setUncertainty(self, double newUncertainty):
-        self.thisptr.setUncertainty(newUncertainty)
-
-    def setUnit(self, newUnit):
-        if not isinstance(newUnit, PyUnit):
-            newUnit = PyUnit(newUnit)
-        self.thisptr.setUnitUnit(deref((<PyUnit> newUnit).thisptr))
+            u = PyUnit(u)
+            self.thisptr.setUnitUnit(deref((<PyUnit> u).thisptr))
 
     def getName(self):
         return self.thisptr.getName()
@@ -213,6 +220,11 @@ cdef class PyMeasurement:
         pu = PyUnit()
         pu.thisptr = new Unit(self.thisptr.getUnit())
         return pu
+
+    name = property(getName, setName, None, 'name name')
+    value = property(getValue, setValue, None, 'name value')
+    uncertainty = property(getUncertainty, setUncertainty, None, 'name uncertainty')
+    unit = property(getUnit, setUnit, None, 'name unit')
 
     def clear(self):
         self.thisptr.clear()
@@ -232,6 +244,9 @@ cdef class PyMeasurement:
                 )
 
         return self.thisptr.printString(<unsigned int> mode, decimals, <bool> scientific)
+
+    def __repr__(self):
+        return self.asString()
 
     def convert(self, int unitenum):
         if not unitenum in unit_list:
@@ -267,17 +282,17 @@ cdef class PyMeasurement:
                 )
 
         if op == 0:
-            return self.thisptr.issmaller(deref(PyMeasurement(other).thisptr))
+            return self.thisptr.issmaller(deref((<PyMeasurement> other).thisptr))
         elif op == 1:
-            return self.thisptr.issmallereq(deref(PyMeasurement(other).thisptr))
+            return self.thisptr.issmallereq(deref((<PyMeasurement> other).thisptr))
         elif op == 2:
-            return self.thisptr.isequal(deref(PyMeasurement(other).thisptr))
+            return self.thisptr.isequal(deref((<PyMeasurement> other).thisptr))
         elif op == 3:
-            return not self.thisptr.isequal(deref(PyMeasurement(other).thisptr))
+            return not self.thisptr.isequal(deref((<PyMeasurement> other).thisptr))
         elif op == 4:
-            return self.thisptr.islarger(deref(PyMeasurement(other).thisptr))
+            return self.thisptr.islarger(deref((<PyMeasurement> other).thisptr))
         elif op == 5:
-            return self.thisptr.islargereq(deref(PyMeasurement(other).thisptr))
+            return self.thisptr.islargereq(deref((<PyMeasurement> other).thisptr))
         else:
             raise NotImplementedError('PyMeasurement: requested operator not implemented')
 
@@ -289,14 +304,14 @@ cdef class PyMeasurement:
         assert isinstance(other, PyMeasurement), 'operation only allowed for PyMeasurement type'
 
         result = PyMeasurement(self)
-        result.thisptr.mult_equal(deref(PyMeasurement(other).thisptr))
+        result.thisptr.mult_equal(deref((<PyMeasurement> other).thisptr))
         return result
 
     def __rdiv__(self, PyMeasurement other not None):
         assert isinstance(other, PyMeasurement), 'operation only allowed for PyMeasurement type'
 
         result = PyMeasurement(self)
-        result.thisptr.div_equal(deref(PyMeasurement(other).thisptr))
+        result.thisptr.div_equal(deref((<PyMeasurement> other).thisptr))
         return result
 
     def __add__(self, PyMeasurement other not None):
@@ -312,7 +327,7 @@ cdef class PyMeasurement:
                 )
 
         result = PyMeasurement(self)
-        result.thisptr.plus_equal(deref(PyMeasurement(other).thisptr))
+        result.thisptr.plus_equal(deref((<PyMeasurement> other).thisptr))
         return result
 
     def __sub__(self, PyMeasurement other not None):
@@ -328,7 +343,7 @@ cdef class PyMeasurement:
                 )
 
         result = PyMeasurement(self)
-        result.thisptr.minus_equal(deref(PyMeasurement(other).thisptr))
+        result.thisptr.minus_equal(deref((<PyMeasurement> other).thisptr))
         return result
 
     def __neg__(self):
@@ -340,12 +355,8 @@ cdef class PyMeasurement:
 cdef class PySource:
 
     def __cinit__(self, s=None):
-        if s is None:
-            self.thisptr = new Source()
-        elif isinstance(s, PySource):
-            self.thisptr = new Source(deref((<PySource> s).thisptr))
-        else:
-            raise TypeError('PySource: Incompatible input type')
+        self.thisptr = new Source()
+        self.setParameters(s)
 
     def __dealloc__(self):
         del self.thisptr
@@ -358,27 +369,11 @@ cdef class PySource:
 
         return self.thisptr.parameterDefined(<string> s)
 
-    def setParameter(self, name, value=None, uncertainty=None, unit=None):
-        if isinstance(name, PyMeasurement):
-            m = PyMeasurement(name)
-        elif isinstance(name, str) or isinstance(name, unicode):
-            if isinstance(name, unicode):
-                name = str(name)   # might raise UnicodeEncodeError
-
-            # TODO: should one raise an error, if value/error/unit is none, or
-            # silently make it zero? for now, we choose the latter
-            if value is None:
-                value = 0.0
-            if uncertainty is None:
-                uncertainty = 0.0
-            if unit is None:
-                unit = PyUnit(unit)
-            m = PyMeasurement()
-            m.set(name, value, uncertainty, unit)
-        else:
-            raise TypeError('PySource: Incompatible input type (name must be str or PyMeasurement)')
-
-        self.thisptr.setParameter(deref(PyMeasurement(m).thisptr))
+    def setParameter(self, name='noname', double value=0.0, double uncertainty=0.0, unit=''):
+        """name can be str-type or another PyMeasurement
+        (in the latter case, value/uncertainty/unit won't be handled!)"""
+        m = PyMeasurement(name, value, uncertainty, unit)
+        self.thisptr.setParameter(deref((<PyMeasurement> m).thisptr))
 
     def getParameter(self, s):
         assert isinstance(s, str) or isinstance(s, unicode), 'parameter name must be str or unicode'
@@ -407,6 +402,9 @@ cdef class PySource:
     def getSourceName(self):
         return self.thisptr.getSourceName()
 
+    ID = property(getSourceID, setSourceID, None, 'ID property')
+    name = property(getSourceName, setSourceName, None, 'Source name property')
+
     def getParameters(self):
         pdict = {}
         cdef map[string, Measurement[double]].iterator mapiter
@@ -420,31 +418,60 @@ cdef class PySource:
             inc(mapiter)
         return pdict
 
-    def setParameters(self, dictionary):
-        assert isinstance(dictionary, dict), 'dictionary is not a python dict'
-        assert len(dictionary) > 0, 'dictionary empty'  # is this desired?
-        # one could also just let it be cleared
+    def setParameters(self, parameters):
+        """parameters can be None (source gets cleared), another PySource instance or a dictionary
+        of PyMeasurements"""
+        self.clear()
+        if parameters is None:
+            return
+        elif isinstance(parameters, PySource):
+            pDict = parameters.getParameters()
+        elif isinstance(parameters, dict):
+            assert all([isinstance(m, PyMeasurement) for m in parameters.values()]), \
+                'any dictionary value is not a PyMeasurement'
+            pDict = parameters
+        else:
+            raise TypeError('PySource: Incompatible input type')
+
+        for key in pDict.keys():
+            self.setParameter(pDict[key])
+
+    def updateParameters(self, parameters):
+        """parameters can be None (source gets cleared), another PySource instance or a dictionary
+        of PyMeasurements"""
+        if parameters is None:
+            return
+        elif isinstance(parameters, PySource):
+            pDictNew = parameters.getParameters()
+        elif isinstance(parameters, dict):
+            assert all([isinstance(m, PyMeasurement) for m in parameters.values()]), \
+                'any dictionary value is not a PyMeasurement'
+            pDictNew = parameters
+        else:
+            raise TypeError('PySource: Incompatible input type')
+
+        pDict = self.getParameters()
+        pDict.update(pDictNew)
 
         self.clear()
-        for key in dictionary.keys():
-            self.setParameter(dictionary[key])
+        for key in pDict.keys():
+            self.setParameter(pDict[key])
 
     def clear(self):
         self.thisptr.clear()
 
     def copy(self):
-        return PySource(self)
+        _s = PySource(self)
+        _s.ID = self.ID
+        _s.name = self.name
+        return _s
 
 
 cdef class PySourceCatalog:
 
     def __cinit__(self, sc=None):
-        if sc is None:
-            self.thisptr = new SourceCatalog()
-        elif isinstance(sc, PySourceCatalog):
-            self.thisptr = new SourceCatalog(deref((<PySourceCatalog> sc).thisptr))
-        else:
-            raise TypeError('PySource: Incompatible input type')
+        self.thisptr = new SourceCatalog()
+        self.setSources(sc)
 
     def __dealloc__(self):
         del self.thisptr
@@ -452,8 +479,21 @@ cdef class PySourceCatalog:
     def readDuchampFile(self, filename):
         self.thisptr.readDuchampFile(<string> filename)
 
-    def insert(self,PySource s):
-        self.thisptr.insert(deref(PySource(s).thisptr))
+    def insert(self, PySource s, python_bool doCheck=True):
+        sID = s.getSourceID()
+        if doCheck:
+            if sID in self.getSourceIDs():
+                raise ValueError('Source ID ({0:d}) already present, please use update()'.format(sID))
+        res = self.thisptr.insert(deref((<PySource> s).thisptr))
+        assert res == 0, 'This should never happen'
+
+    def update(self, unsigned long sID, PySource s, python_bool doCheck=True):
+        assert sID == s.getSourceID(), 'sID from function call doesn\'t match that of PySource'
+        if doCheck:
+            if sID not in self.getSourceIDs():
+                raise ValueError('Source ID ({0:d}) not present, please use insert()'.format(sID))
+        res = self.thisptr.update(sID, deref((<PySource> s).thisptr))
+        assert res == 0, 'This should never happen'
 
     def getSources(self):
         pdict = {}
@@ -468,14 +508,81 @@ cdef class PySourceCatalog:
             inc(mapiter)
         return pdict
 
-    def setSources(self, dictionary):
-        assert isinstance(dictionary, dict), 'dictionary is not a python dict'
-        assert len(dictionary) > 0, 'dictionary empty'  # is this desired?
-        # one could also just let it be cleared
+    def getSourceIDs(self):
+        plist = []
+        cdef map[unsigned long, Source].iterator mapiter
+        cdef map[unsigned long, Source] pmap
+        pmap = self.thisptr.getSources()
+        mapiter = pmap.begin()
+        while mapiter != pmap.end():
+            plist.append(deref(mapiter).first)
+            inc(mapiter)
+        return sorted(plist)
+
+    def setSources(self, sources):
+        """sources maybe be None (sourceCatalog gets cleared) a dictionary or another
+        PySourceCatalog"""
 
         self.clear()
-        for key in dictionary.keys():
-            self.insert(dictionary[key])
+        if sources is None:
+            return
+        elif isinstance(sources, PySourceCatalog):
+            sDict = sources.getSources()
+        elif isinstance(sources, dict):
+            assert all([isinstance(s, PySource) for s in sources.values()]), \
+                'any dictionary value is not a PySource'
+            sDict = sources
+        else:
+            raise TypeError('PySourceCatalog: Incompatible input type')
+
+        # check whether any new dict-ID doesn't match the source-ID
+        assert all([
+            key == sDict[key].getSourceID() for key in sDict.keys()
+            ]), 'All dictionary keys must equal their source\'s ID!'
+
+        for key in sDict.keys():
+            self.insert(sDict[key], False)  # no check needed, since catalog was cleared
+
+    def updateSources(self, sources, python_bool warn_on_duplicate=True):
+        """insert sources (dictionary or another PySourceCatalog) into catalog
+        (without clearing it first
+
+        if warn_on_duplicate is True, an AssertionError will be thrown, if you try
+        to insert any source, the ID of which is already present in the catalog"""
+
+        if isinstance(sources, PySourceCatalog):
+            sDict = sources.getSources()
+        elif isinstance(sources, dict):
+            assert all([isinstance(s, PySource) for s in sources.values()]), \
+                'any dictionary value is not a PySource'
+            sDict = sources
+        else:
+            raise TypeError('PySourceCatalog: Incompatible input type')
+
+        # check whether any new dict-ID doesn't match the source-ID
+        assert all([
+            key == sDict[key].getSourceID() for key in sDict.keys()
+            ]), 'All dictionary keys must equal their source\'s ID!'
+
+        _presentIDs = self.getSourceIDs()
+        _newIDs = sDict.keys()
+        _needsCheck = False
+        if len(set(_presentIDs).intersection(set(_newIDs))) > 0:
+            _needsCheck = True
+            if warn_on_duplicate:
+                raise AssertionError('one or more of the IDs already present in catalog')
+
+
+        for key in sDict.keys():
+            if _needsCheck:
+                sID = sDict[key].getSourceID()
+                if sID in _presentIDs:
+                    print 'warning: ID', sID, 'already present, will overwrite'
+                    self.update(sID, sDict[key])
+                else:
+                    self.insert(sDict[key], False)  # no check needed, have already handled it
+            else:
+                self.insert(sDict[key], False)  # no check needed, have already handled it
 
     def clear(self):
         self.thisptr.clear()
