@@ -159,7 +159,7 @@ cdef _link_objects(np.ndarray[dtype = float, ndim = 3] data, np.ndarray[dtype = 
 	cdef int NOobj = 0
 	
 	# Define linking style: 1 for Rectangle, else ellipse
-	cdef int ss_mode = 1
+	cdef int ss_mode = 0
 	
 	# Inititalize object pointers
 	InitObjGen(detections, NOobj, obj_limit, obj_batch_limit, obj_ids, NO_obj_ids, check_obj_ids)
