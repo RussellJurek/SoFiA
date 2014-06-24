@@ -14,8 +14,6 @@ from functions import *
 # a function to a simple threshold filter and write out a mask:
 
 def filter(cube,header,clipMethod,threshold,rmsMode,verbose):
-	
-	mask = zeros(cube.shape)
 	if clipMethod == 'relative':
 		# determine the clip level
 		# Measure noise in original cube
@@ -26,8 +24,4 @@ def filter(cube,header,clipMethod,threshold,rmsMode,verbose):
 	if clipMethod == 'absolute':
 		clip = threshold
 	print 'using clip threshold: ', clip
-
-	mask = mask + (cube >= clip)
-	mask = mask + (cube <= -1*clip)
-	
-	return mask
+	return (cube >= clip)+(cube <= -1*clip)
