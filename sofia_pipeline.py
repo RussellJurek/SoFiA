@@ -81,7 +81,6 @@ sys.stdout.flush()
 np_Cube, dict_Header, mask = import_data.read_data(**Parameters['import'])
 
 
-
 # -------------------------
 # ---- PRECONDITIONING ----
 # -------------------------
@@ -116,6 +115,7 @@ sys.stdout.flush()
 # apply the different filters that each create a mask.
 # create an empty mask, the size of the cube:
 
+
 # --- PYFIND ---
 if Parameters['steps']['doSCfind']:
 	print 'Running S+C filter'
@@ -135,7 +135,8 @@ if Parameters['steps']['doCNHI']:
 # --- THRESHOLD ---	
 if Parameters['steps']['doThreshold']:
 	print 'Running threshold filter'
-	mask+=threshold_filter.filter(np_Cube, dict_Header, **Parameters['threshold'])
+	#mask+=threshold_filter.filter(np_Cube, dict_Header, **Parameters['threshold'])
+	threshold_filter.filter(mask,np_Cube, dict_Header, **Parameters['threshold'])
 
 print 'Filtering complete.'
 print
