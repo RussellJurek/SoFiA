@@ -6,7 +6,7 @@
 # last modified: 2013-05-15
 #
 #  run as: addrel <table1>.txt ... <tableN>.txt
-# creates: <table1>_rel.txt ... <tableN>_rel.txt [Ndrel_scatter.png]
+# creates: <table1>_rel.txt ... <tableN>_rel.txt [Ndrel_scatter.pdf]
 #          [Ndrel_contour.pdf] 
 #
 # - reads table(s) of positive and negative detection parameters written by
@@ -75,7 +75,7 @@ class gaussian_kde_set_covariance(stats.gaussian_kde):
 		self.inv_cov = linalg.inv(self.covariance)
 		self._norm_factor = sqrt(linalg.det(2*pi*self.covariance)) * self.n
 
-def EstimateRel(data,pngoutname,idCOL=0,nrvoxCOL=13,fminCOL=14,fmaxCOL=15,ftotCOL=16,parSpace=['ftot','fmax','nrvox'],projections=[[2,0],[2,1],[0,1]],kernel=[0.15,0.05,0.1],doscatter=1,docontour=1,check_kernel=0,dostats=0,saverel=1,relThresh=0.99,Nmin=0,dV=0.2,fMin=0,verb=0):
+def EstimateRel(data,pdfoutname,idCOL=0,nrvoxCOL=13,fminCOL=14,fmaxCOL=15,ftotCOL=16,parSpace=['ftot','fmax','nrvox'],projections=[[2,0],[2,1],[0,1]],kernel=[0.15,0.05,0.1],doscatter=1,docontour=1,check_kernel=0,dostats=0,saverel=1,relThresh=0.99,Nmin=0,dV=0.2,fMin=0,verb=0):
 	########################################
 	### BUILD ARRAY OF SOURCE PARAMETERS ###
 	########################################
@@ -284,7 +284,7 @@ def EstimateRel(data,pngoutname,idCOL=0,nrvoxCOL=13,fminCOL=14,fmaxCOL=15,ftotCO
 			ylim(lims[p2][0],lims[p2][1])
 			xlabel(labs[p1])
 			ylabel(labs[p2])
-		fig1.savefig('%s_scat.png'%pngoutname)
+		fig1.savefig('%s_scat.pdf'%pdfoutname,rasterized=True)
 
 	#####################
 	### PLOT CONTOURS ###
@@ -336,7 +336,7 @@ def EstimateRel(data,pngoutname,idCOL=0,nrvoxCOL=13,fminCOL=14,fmaxCOL=15,ftotCO
 			ylim(lims[p2][0],lims[p2][1])
 			xlabel(labs[p1])
 			ylabel(labs[p2])
-		fig2.savefig('%s_cont.png'%pngoutname)
+		fig2.savefig('%s_cont.pdf'%pdfoutname,rasterized=True)
 
 	###############################
 	### ADD Np and Nn TO TABLES ###

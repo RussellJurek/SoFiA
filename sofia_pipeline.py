@@ -135,8 +135,7 @@ if Parameters['steps']['doCNHI']:
 # --- THRESHOLD ---	
 if Parameters['steps']['doThreshold']:
 	print 'Running threshold filter'
-	threshold_mask = threshold_filter.filter(np_Cube, dict_Header, **Parameters['threshold'])
-	mask = mask + threshold_mask
+	mask+=threshold_filter.filter(np_Cube, dict_Header, **Parameters['threshold'])
 
 print 'Filtering complete.'
 print
