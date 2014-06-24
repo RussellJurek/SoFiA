@@ -10,6 +10,7 @@ def GetRMS(cube,rmsMode='negative',zoomx=1,zoomy=1,zoomz=10000,nrbins=10000,verb
 	z0,z1=int(mt.ceil((1-1./zoomz)*sh[0]/2)),int(mt.floor((1+1./zoomz)*sh[0]/2))+1
 	if verbose: print '    Estimating rms on subcube (x,y,z zoom = %.0f,%.0f,%.0f) ...'%(zoomx,zoomy,zoomz)
 	if verbose: print '    ... Subcube shape is',cube[z0:z1,y0:y1,x0:x1].shape,'...'
+	sys.stdout.flush()
 
 	if rmsMode=='negative':
 		cubemin=np.nanmin(cube)
@@ -22,6 +23,7 @@ def GetRMS(cube,rmsMode='negative',zoomx=1,zoomy=1,zoomz=10000,nrbins=10000,verb
 			nrsummedbins+=1
 		if nrsummedbins:
 			if verbose: print '    ... adjusting bin size to get a fraction of voxels in central bin >=',min_hist_peak
+			sys.stdout.flush()
 			nrbins/=nrsummedbins
 			bins=np.arange(cubemin,abs(cubemin)/nrbins-1e-12,abs(cubemin)/nrbins)
 			fluxval=(bins[:-1]+bins[1:])/2
@@ -33,6 +35,7 @@ def GetRMS(cube,rmsMode='negative',zoomx=1,zoomy=1,zoomz=10000,nrbins=10000,verb
 	elif rmsMode=='std':
 		rms=scipy.stats.nanstd(cube[z0:z1,y0:y1,x0:x1],axis=None)
 	if verbose: print '    ... %s rms = %.2e (data units)'%(rmsMode,rms)
+	sys.stdout.flush()
 	return rms
 
 def SizeFilter(mskt,sfx,sfy,sfz,sbx,sby,sbz,zt,sizeFilter,edgeMode='constant',verbose=0):
@@ -86,6 +89,7 @@ def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskS
 			kx=abs(float(kx)/header['cdelt1']/3600)
 			ky=abs(float(ky)/header['cdelt2']/3600)
 		if verbose:  print '    Filter %2.0f %2.0f %2.0f %s ...'%(kx,ky,0,'-')
+		sys.stdout.flush()
 
 		mskxy=np.zeros(cube.shape,'bool')
 
@@ -112,6 +116,7 @@ def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskS
 			# Velocity smoothing of *clipped* cube if needed
 			if kz:
 				if verbose:  print '    Filter %2.0f %2.0f %2.0f %s ...'%(kx,ky,kz,kt)
+				sys.stdout.flush()
 				if not ii:
 					rmsxyz=rmsxy/mt.sqrt(kz)
 					print '!!!'
@@ -127,6 +132,7 @@ def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskS
 			# Add detected voxels to mask
 			if sizeFilter:
 				if verbose: print '      Adding detected voxels to xy mask with size filtering'
+				sys.stdout.flush()
 				# Get beam FWHM in pixels
 				if 'BMAJ' in header.keys(): bmaj=header['bmaj']/abs(header['cdelt2']) # assumed to be along y axis
 				else: bmaj=0
@@ -135,9 +141,11 @@ def SCfinder(cube,header,kernels=[[0,0,0,'b'],],threshold=3.5,sizeFilter=0,maskS
 				mskxy=mskxy+SizeFilter(((cubexyz>=threshold*rmsxyz)+(cubexyz<=-threshold*rmsxyz)).astype('float32'),kx,ky,kz,bmin,bmaj,3,kt,sizeFilter,edgeMode=edgeMode,verbose=0).astype('bool')
 			else:
 				if verbose: print '      Adding detected voxels directly to xy mask ...'
+				sys.stdout.flush()
 				mskxy=mskxy+(cubexyz>=threshold*rmsxyz)+(cubexyz<=-threshold*rmsxyz)
 
 		if verbose: print '    Adding xy mask to final mask ...'
+		sys.stdout.flush()
 		msk=msk+mskxy
 
 	msk[np.isnan(cube)]=False
@@ -152,4 +160,5 @@ import scipy.ndimage as nd
 from sys import argv
 import string
 from os import path
+import sys
 

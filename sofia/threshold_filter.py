@@ -13,7 +13,7 @@ from functions import *
 
 # a function to a simple threshold filter and write out a mask:
 
-def filter(cube,header,clipMethod,threshold,rmsMode,verbose):
+def filter(mask,cube,header,clipMethod,threshold,rmsMode,verbose):
 	if clipMethod == 'relative':
 		# determine the clip level
 		# Measure noise in original cube
@@ -24,4 +24,7 @@ def filter(cube,header,clipMethod,threshold,rmsMode,verbose):
 	if clipMethod == 'absolute':
 		clip = threshold
 	print 'using clip threshold: ', clip
-	return (cube >= clip)+(cube <= -1*clip)
+	#return ((cube >= clip)+(cube <= -1*clip))
+	np.logical_or(mask, (np.greater_equal(cube, clip) + np.less_equal(cube, clip)), mask)
+	
+	return 
