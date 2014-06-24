@@ -19,8 +19,9 @@ def read_data(inFile, weightsFile, maskFile, weightsFunction = None):
 
 	print 'Loading cube: ' , inFile 
 	f = pyfits.open(inFile)
-	np_Cube = f[0].data
 	dict_Header = f[0].header
+	np_Cube = f[0].data
+	
 	f.close
 
 
@@ -161,7 +162,7 @@ def read_data(inFile, weightsFile, maskFile, weightsFunction = None):
 			mask[mask>0]=1
 			g.close()
 			print 'Mask cube loaded.'
-	else: mask = zeros(np_Cube.shape)
+	else: mask = zeros(np_Cube.shape, dtype=bool)
 
 	# The original data is replaced with the Weighted cube!
 	# If weighting is being used, the data should be read in again during parameterisation.
