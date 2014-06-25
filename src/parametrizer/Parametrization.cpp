@@ -381,11 +381,11 @@ int Parametrization::createIntegratedSpectrum()
     }
     
     // ...and determine noise per channel:
-    // ### WARNING: This still needs some consideration. Is is wise to provide the rms per
-    // ### WARNING: channel as the uncertainty? Or would one rather use the S/N? If the rms
-    // ### WARNING: is zero (because there are no data) the BF fitting will just produce NaNs.
-    // ### WARNING: Even worse: the noise will not scale with sqrt(N), because pixels are
-    // ### WARNING: spatially correlated!!!
+    // WARNING: This still needs some consideration. Is is wise to provide the rms per
+    // WARNING: channel as the uncertainty? Or would one rather use the S/N? If the rms
+    // WARNING: is zero (because there are no data) the BF fitting will just produce NaNs.
+    // WARNING: Even worse: the noise will not scale with sqrt(N), because pixels are
+    // WARNING: spatially correlated!!!
     for(size_t i = 0; i < noiseSpectrum.size(); i++)
     {
         if(counter[i] > 0) noiseSpectrum[i] = sqrt(static_cast<double>(counter[i])) * noiseSubCube;
@@ -504,7 +504,7 @@ int Parametrization::measureLineWidth()
     
     if(i >= spectrum.size())
     {
-        std::cerr << "Error (Parametrization): Calculation of Wm50 failed (1)." << std::endl;
+        std::cerr << "Error (Parametrization): Calculation of Wm50 failed." << std::endl;
         lineWidthWm50 = 0.0;
         return 1;
     }
@@ -525,7 +525,7 @@ int Parametrization::measureLineWidth()
     
     if(i < 0)
     {
-        std::cerr << "Error (Parametrization): Calculation of Wm50 failed (2)." << std::endl;
+        std::cerr << "Error (Parametrization): Calculation of Wm50 failed." << std::endl;
         lineWidthWm50 = 0.0;
         return 1;
     }
@@ -537,7 +537,7 @@ int Parametrization::measureLineWidth()
     
     if(mean <= 0)
     {
-        std::cerr << "Error (Parametrization): Calculation of Wm50 failed (3)." << std::endl;
+        std::cerr << "Error (Parametrization): Calculation of Wm50 failed." << std::endl;
         lineWidthWm50 = 0.0;
         return 1;
     }
@@ -548,7 +548,7 @@ int Parametrization::measureLineWidth()
     
     if(i >= spectrum.size())
     {
-        std::cerr << "Error (Parametrization): Calculation of Wm50 failed (4)." << std::endl;
+        std::cerr << "Error (Parametrization): Calculation of Wm50 failed." << std::endl;
         lineWidthWm50 = 0.0;
         return 1;
     }
@@ -562,7 +562,7 @@ int Parametrization::measureLineWidth()
     
     if(i < 0)
     {
-        std::cerr << "Error (Parametrization): Calculation of Wm50 failed (5)." << std::endl;
+        std::cerr << "Error (Parametrization): Calculation of Wm50 failed." << std::endl;
         lineWidthWm50 = 0.0;
         return 1;
     }
@@ -572,7 +572,7 @@ int Parametrization::measureLineWidth()
     
     if(lineWidthWm50 <= 0)
     {
-        std::cerr << "Error (Parametrization): Calculation of Wm50 failed (6)." << std::endl;
+        std::cerr << "Error (Parametrization): Calculation of Wm50 failed." << std::endl;
         lineWidthWm50 = 0.0;
         return 1;
     }
