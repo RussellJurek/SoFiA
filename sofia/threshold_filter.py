@@ -25,6 +25,6 @@ def filter(mask,cube,header,clipMethod,threshold,rmsMode,verbose):
 		clip = threshold
 	print 'using clip threshold: ', clip
 	#return ((cube >= clip)+(cube <= -1*clip))
-	np.logical_or(mask, (np.greater_equal(cube, clip) + np.less_equal(cube, clip)), mask)
+	np.logical_or(mask, (np.greater_equal(cube, clip) + np.less_equal(cube, -clip)), mask)
 	
 	return 
