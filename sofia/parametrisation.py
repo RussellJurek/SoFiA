@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from sofia import cparametrizer as cp
+from SoFiA import cparametrizer as cp
 import numpy as np
 
 def parametrise(

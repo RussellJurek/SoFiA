@@ -6,24 +6,24 @@ import sys, os
 import string
 
 # import source finding modules
-sys.path.insert(0, os.environ['SOFIA_MODULE_PATH'])
-from sofia import functions
-from sofia import readoptions
-from sofia import import_data
-from sofia import sigma_cube
-from sofia import pyfind
-from sofia import addrel
-from sofia import threshold_filter
-from sofia import smooth_cube
-from sofia import writemask
-from sofia import writemoment
-from sofia import linker
-from sofia import store_xml
-from sofia import store_ascii
-from sofia import cubelets
-from sofia import parametrisation
-from sofia import wcs_coordinates
-from sofia import flag_cube
+#sys.path.insert(0, os.environ['SOFIA_MODULE_PATH'])
+from SoFiA import functions
+from SoFiA import readoptions
+from SoFiA import import_data
+from SoFiA import sigma_cube
+from SoFiA import pyfind
+from SoFiA import addrel
+from SoFiA import threshold_filter
+from SoFiA import smooth_cube
+from SoFiA import writemask
+from SoFiA import writemoment
+from SoFiA import linker
+from SoFiA import store_xml
+from SoFiA import store_ascii
+from SoFiA import cubelets
+from SoFiA import parametrisation
+from SoFiA import wcs_coordinates
+from SoFiA import flag_cube
 
 
 

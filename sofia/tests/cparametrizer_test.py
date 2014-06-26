@@ -5,7 +5,7 @@ import traceback
 import sys
 import unittest
 import numpy as np
-from sofia import cparametrizer as cp
+from SoFiA import cparametrizer as cp
 
 
 class PyUnitInterfaceTests(unittest.TestCase):
@@ -713,10 +713,10 @@ class PyModuleParametrisationInterfaceTests(unittest.TestCase):
         self.assertAlmostEqual(s2params['Y'].value, 55., 1)
         self.assertAlmostEqual(s2params['Z'].value, 60., 1)
 
-        from sofia import store_ascii
+        from SoFiA import store_ascii
         store_ascii.make_ascii(results, ['*'], outname='/tmp/sofia_catalog_test1.txt')
         store_ascii.make_ascii(results, ['X', 'Y', 'Z'], outname='/tmp/sofia_catalog_test2.txt')
-        from sofia import store_xml
+        from SoFiA import store_xml
         store_xml.make_xml(results, outname='/tmp/sofia_catalog_test1.xml')
 
 def main():

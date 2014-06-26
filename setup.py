@@ -90,9 +90,9 @@ parametrizer_src_files = [
 parametrizer_src = [parametrizer_src_base + f for f in parametrizer_src_files]
 
 setup(
-    name='sofia',
+    name='SoFiA',
     version=version,
-    ext_package='sofia',
+    ext_package='SoFiA',
     ext_modules=[
         Extension(
             'linker',
@@ -108,8 +108,8 @@ setup(
             libraries=['gsl', 'gslcblas']
             )
         ],
-    package_dir={'sofia': 'sofia'},
-    packages=['sofia']  #,"cfitsio", "wcs"
+    package_dir={'SoFiA': 'sofia'},
+    packages=['SoFiA']  #,"cfitsio", "wcs"
     )
 
 # make sofia_pipeline.py executable
