@@ -41,8 +41,8 @@ def parametrise(
         Parameters['parameters']['fitBusyFunction']
         )
 
-    cube = cube.astype('<f4')
-    mask = mask.astype('<i2')
+    cube = cube.astype('<f4', copy=False)
+    mask = mask.astype('<i2', copy=False)
 
     moduleParametrizer.run(cube, mask, initcatalog)
     results = moduleParametrizer.getCatalog()
