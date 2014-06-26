@@ -1552,7 +1552,7 @@ void SoFiA::createInterface()
     connect(tabSourceFindingFieldThreshold2, SIGNAL(editingFinished()), this, SLOT(updateFields()));
     
     tabSourceFindingFieldClipMethod = new QComboBox(tabSourceFindingGroupBox2);
-    tabSourceFindingFieldClipMethod->setObjectName("threshold.mode");
+    tabSourceFindingFieldClipMethod->setObjectName("threshold.clipMethod");
     tabSourceFindingFieldClipMethod->addItem(tr("relative"));
     tabSourceFindingFieldClipMethod->addItem(tr("absolute"));
     
