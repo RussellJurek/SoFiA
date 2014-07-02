@@ -600,12 +600,17 @@ int Parametrization::fitBusyFunction()
     busyFit.getResult(&busyFitParameters[0], &busyFitUncertainties[0], busyFunctionChi2);
     busyFit.getParameters(busyFunctionCentroid, busyFunctionW50, busyFunctionW20, busyFunctionFpeak, busyFunctionFint);
     
+    // Correct spectral parameters for the shift caused by using a sub-cube:
+    busyFitParameters[4] += subRegionZ1;
+    busyFitParameters[5] += subRegionZ1;
+    busyFunctionCentroid += subRegionZ1;
+    
     return 0;
 }
 
 
 
-// Assign results to source
+// Assign results to source:
 
 int Parametrization::writeParameters()
 {
