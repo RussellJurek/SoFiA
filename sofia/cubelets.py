@@ -184,7 +184,7 @@ def writeSubcube(cube,header,mask,objects,cathead,outroot):
 	f = open(outputDir+cubename+'_'+str(int(obj[0]))+'_spec.txt', 'w')
 	#f.write('# '+specTypeX+' ('+specUnitX+')'+'  '+specTypeY+' ('+specUnitY+')\n')
 	for i in range(0,len(spec)):
-	  xspec = cValZ + (i-cPixZ) * dZ
+	  xspec = cValZ + (i+ZminNew-cPixZ) * dZ
 	  f.write('%15.6e %15.6e\n'%(xspec,spec[i]))
 	f.close()
 
