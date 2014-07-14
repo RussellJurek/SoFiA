@@ -106,6 +106,15 @@ basic help is available at this stage.
 Version history
 ---------------
 
+* SoFiA 0.3.1
+  * Released 14/07/2014
+  * Adds several new features, including weights functions, flagging, and
+    Qt 5 support.
+  * Fixes several bugs, including reduction of memory footprint and removal
+    of a security vulnerability.
+  * See release notes for details:
+    https://github.com/SoFiA-Admin/SoFiA/releases/tag/v0.3.1
+
 * SoFiA 0.3
   * Released 20/05/2014
   * Adds several new features, including WCS support, PV diagrams, and 
