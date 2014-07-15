@@ -98,6 +98,7 @@ parameters.optimiseMask         =       false
 
 # Output module
 
+writeCat.outputDir              =       
 writeCat.basename               =       
 writeCat.writeASCII             =       true
 writeCat.writeXML               =       false
