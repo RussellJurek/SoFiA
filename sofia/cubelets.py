@@ -146,9 +146,18 @@ def writeSubcube(cube,header,mask,objects,cathead,outroot):
 	hdulist.writeto(name,clobber=True)
 	hdulist.close()
 	
+
+
 	# moment 0
-	m0=np.array((subcube*submask).sum(axis=0))
-	m0*=abs(header['cdelt3'])/1e+3
+	if 'vopt' in header['ctype3'].lower() or 'vrad' in header['ctype3'].lower() or 'velo' in header['ctype3'].lower() or 'felo' in header['ctype3'].lower():
+        	if not 'cunit3' in header: dkms=abs(header['cdelt3'])/1e+3 # assuming m/s
+        	elif header['cunit3'].lower()=='km/s': dkms=abs(header['cdelt3'])
+        elif 'freq' in header['ctype3'].lower():
+        	if not 'cunit3' in header or header['cunit3'].lower()=='hz': dkms=abs(header['cdelt3'])/1.42040575177e+9*2.99792458e+5 # assuming Hz
+        	elif header['cunit3'].lower()=='khz': dkms=abs(header['cdelt3'])/1.42040575177e+6*2.99792458e+5
+        else: dkms=1. # no scaling, avoids crashing
+	m0=np.nan_to_num(subcube*submask.astype(bool)).sum(axis=0)
+	m0*=dkms
 	hdu = pyfits.PrimaryHDU(data=m0,header=header)
 	hdu.header['bunit']+='.km/s'
 	#hdu.header['datamin']=m0.min()
@@ -162,12 +171,18 @@ def writeSubcube(cube,header,mask,objects,cathead,outroot):
 	name = outputDir+cubename+'_'+str(int(obj[0]))+'_mom0.fits'
 	hdu.writeto(name,clobber=True)
 	
+	
 	# moment 1
-	m1=(np.arange(subcube.shape[0]).reshape((subcube.shape[0],1,1))*np.ones(subcube.shape)-header['crpix3']+1)*header['cdelt3']/1e+3+header['crval3']/1e+3
-	mom0 = m0/abs(header['cdelt3'])*1e+3
-	sumMask = submask.sum()
-	mom0[mom0==0] = float('nan')
-	m1=np.divide(np.array([(m1*subcube*(submask)).sum(axis=0)]).sum(axis=0),mom0)
+	m1=(np.arange(subcube.shape[0]).reshape((subcube.shape[0],1,1))*np.ones(subcube.shape)-header['crpix3']+1)*header['cdelt3']+header['crval3']
+        if 'vopt' in header['ctype3'].lower() or 'vrad' in header['ctype3'].lower() or 'velo' in header['ctype3'].lower() or 'felo' in header['ctype3'].lower():
+        	if not 'cunit3' in header: m1/=1e+3 # assuming m/s
+        	elif header['cunit3'].lower()=='km/s': pass
+        elif 'freq' in header['ctype3'].lower():
+        	if not 'cunit3' in header or header['cunit3'].lower()=='hz': m1*=2.99792458e+5/1.42040575177e+9 # assuming Hz
+        	elif header['cunit3'].lower()=='khz': m1*=2.99792458e+5/1.42040575177e+6
+        m0[m0==0]=np.nan
+        m0/=dkms
+        m1=np.divide(np.array(np.nan_to_num(m1*subcube*submask.astype('bool')).sum(axis=0)),m0)
 	hdu = pyfits.PrimaryHDU(data=m1,header=header)
 	hdu.header['bunit']='km/s'
 	hdu.header['datamin']=np.nanmin(m1)
@@ -178,6 +193,30 @@ def writeSubcube(cube,header,mask,objects,cathead,outroot):
 	del(hdu.header['ctype3'])
 	name = outputDir+cubename+'_'+str(int(obj[0]))+'_mom1.fits'
 	hdu.writeto(name,clobber=True)
+	
+	
+	# moment 2
+	m2=(np.arange(subcube.shape[0]).reshape((subcube.shape[0],1,1))*np.ones(subcube.shape)-header['crpix3']+1)*header['cdelt3']+header['crval3']
+	if 'vopt' in header['ctype3'].lower() or 'vrad' in header['ctype3'].lower() or 'velo' in header['ctype3'].lower() or 'felo' in header['ctype3'].lower():
+        	if not 'cunit3' in header: m2/=1e+3 # assuming m/s
+        	elif header['cunit3'].lower()=='km/s': pass
+        elif 'freq' in header['ctype3'].lower():
+        	if not 'cunit3' in header or header['cunit3'].lower()=='hz': m2*=2.99792458e+5/1.42040575177e+9 # assuming Hz
+        	elif header['cunit3'].lower()=='khz': m2*=2.99792458e+5/1.42040575177e+6
+	m2 = m2**2
+	m2=np.divide(np.array(np.nan_to_num(m2*subcube*submask.astype('bool')).sum(axis=0)),m0)
+	m2-=m1*m1
+	m2=np.sqrt(m2)
+	hdu = pyfits.PrimaryHDU(data=m2,header=header)
+        hdu.header['bunit']='km/s.km/s'
+        hdu.header['datamin']=np.nanmin(m1)
+        hdu.header['datamax']=np.nanmax(m1)
+        del(hdu.header['crpix3'])
+        del(hdu.header['crval3'])
+        del(hdu.header['cdelt3'])
+        del(hdu.header['ctype3'])
+        name = outputDir+cubename+'_'+str(int(obj[0]))+'_mom2.fits'
+        hdu.writeto(name,clobber=True)
 	
 	# spectra
 	spec = np.nansum(subcube*submask,axis=(1,2))
