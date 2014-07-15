@@ -61,14 +61,23 @@ for task in User_Parameters.iterkeys():
                         if(key in Parameters[task]):
                                 Parameters[task][key] = User_Parameters[task][key]
 
-# Define the base name used for output files (defaults to input file 
+# Define the base and output directory name used for output files (defaults to input file 
 # name if writeCat.basename is found to be invalid):
-outroot = Parameters['writeCat']['basename']
-if((not outroot) or outroot.isspace() or ("/" in outroot) or ("\\" in outroot) or (outroot == ".") or (outroot == "..")):
-	outroot = Parameters['import']['inFile']
-	if((outroot.lower()).endswith(".fits") and len(outroot) > 5):
-		outroot = outroot[0:-5]
+outputBase = Parameters['writeCat']['basename']
+outputDir  = Parameters['writeCat']['outputDir']
+if outputDir[-1] =='/': outputDir = outputDir[0:-1]
 
+if((not outputBase) or outputBase.isspace() or ("/" in outputBase) or ("\\" in outputBase) or (outputBase == ".") or (outputBase == "..")):
+    outroot = Parameters['import']['inFile'].split('/')[-1]
+    if((outroot.lower()).endswith(".fits") and len(outroot) > 5):
+        outroot = outroot[0:-5]
+else:
+    outroot = outputBase
+
+if((not outputDir) or (not os.path.isdir(outputDir)) or (outputDir.isspace())):
+    outroot = Parameters['import']['inFile'][0:len(Parameters['import']['inFile'])-len(Parameters['import']['inFile'].split('/')[-1])]+outroot
+else:
+    outroot = outputDir+'/'+outroot
 
 
 # ---------------------
