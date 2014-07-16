@@ -109,6 +109,7 @@ public:
     
 private slots:
     void selectInputDataFile();
+    void selectOutputDirectory();
     void loadSettings();
     void saveSettings();
     void saveSettingsAs();
@@ -141,7 +142,7 @@ private:
     
     WidgetSpreadsheet *spreadsheet;
     
-    int  selectFile(QLineEdit *target);
+    int  selectFile(QLineEdit *target, bool isDirectory = false);
     int  loadFile(QString &fileName);
     int  updateVariables();
     int  setFields();
@@ -374,6 +375,10 @@ private:
     QHBoxLayout  *tabOutputLayoutFormat;
     QWidget      *tabOutputWidgetFormat;
     QLineEdit    *tabOutputFieldBaseName;
+    QWidget      *tabOutputWidgetDirectory;
+    QHBoxLayout  *tabOutputLayoutDirectory;
+    QLineEdit    *tabOutputFieldDirectory;
+    QPushButton  *tabOutputButtonDirectory;
     QCheckBox    *tabOutputButtonASCII;
     QCheckBox    *tabOutputButtonXML;
     QCheckBox    *tabOutputButtonSQL;

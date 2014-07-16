@@ -65,7 +65,6 @@ for task in User_Parameters.iterkeys():
 # name if writeCat.basename is found to be invalid):
 outputBase = Parameters['writeCat']['basename']
 outputDir  = Parameters['writeCat']['outputDir']
-if outputDir[-1] =='/': outputDir = outputDir[0:-1]
 
 if((not outputBase) or outputBase.isspace() or ("/" in outputBase) or ("\\" in outputBase) or (outputBase == ".") or (outputBase == "..")):
     outroot = Parameters['import']['inFile'].split('/')[-1]
@@ -77,7 +76,8 @@ else:
 if((not outputDir) or (not os.path.isdir(outputDir)) or (outputDir.isspace())):
     outroot = Parameters['import']['inFile'][0:len(Parameters['import']['inFile'])-len(Parameters['import']['inFile'].split('/')[-1])]+outroot
 else:
-    outroot = outputDir+'/'+outroot
+    if outputDir[-1] != '/': outputDir += '/'
+    outroot = outputDir + outroot
 
 
 # ---------------------

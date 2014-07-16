@@ -132,13 +132,16 @@ int SoFiA::showMessage(int severity, QString &messageText, QString &statusText)
 
 
 
-// ---------------------------------
-// Function to select file from disc
-// ---------------------------------
+// ----------------------------------------------
+// Function to select file or directory from disc
+// ----------------------------------------------
 
-int SoFiA::selectFile(QLineEdit *target)
+int SoFiA::selectFile(QLineEdit *target, bool isDirectory)
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("SoFiA - Select File"), QDir::currentPath());
+    QString fileName;
+    
+    if(isDirectory == false) fileName = QFileDialog::getOpenFileName(this, tr("SoFiA - Select File"), QDir::currentPath());
+    else fileName = QFileDialog::getExistingDirectory(this, tr("SoFiA - Select Directory"), QDir::currentPath());
     
     if(fileName.isEmpty() or target == 0) return 1;
     
@@ -807,6 +810,19 @@ void SoFiA::selectInputWeightsFile()
 void SoFiA::selectInputMaskFile()
 {
     selectFile(tabInputFieldMask);
+    
+    return;
+}
+
+
+
+// -------------------------------
+// Slot to select output directory
+// -------------------------------
+
+void SoFiA::selectOutputDirectory()
+{
+    selectFile(tabOutputFieldDirectory, true);
     
     return;
 }
@@ -1888,11 +1904,26 @@ void SoFiA::createInterface()
     
     tabOutputFieldBaseName = new QLineEdit(tabOutputGroupBox1);
     tabOutputFieldBaseName->setObjectName("writeCat.basename");
-    tabOutputFieldBaseName->setToolTip("Name to be used for all output files (optional). Defaults to input file name.");
+    tabOutputFieldBaseName->setToolTip("Base name to be used for all output files (optional). Defaults to input file name.");
     tabOutputFieldBaseName->setEnabled(true);
+    
+    tabOutputFieldDirectory  = new QLineEdit(tabOutputGroupBox1);
+    tabOutputFieldDirectory->setObjectName("writeCat.outputDir");
+    tabOutputFieldDirectory->setToolTip("Path to output directory (optional). Defaults to current working directory.");
+    tabOutputButtonDirectory = new QPushButton(tr("Select..."), tabOutputGroupBox1);
+    connect(tabOutputButtonDirectory, SIGNAL(clicked()), this, SLOT(selectOutputDirectory()));
+    tabOutputButtonDirectory->setIcon(iconDocumentOpen);
+    
+    tabOutputWidgetDirectory = new QWidget(tabOutputGroupBox1);
+    tabOutputLayoutDirectory = new QHBoxLayout;
+    tabOutputLayoutDirectory->addWidget(tabOutputFieldDirectory);
+    tabOutputLayoutDirectory->addWidget(tabOutputButtonDirectory);
+    tabOutputLayoutDirectory->setContentsMargins(0, 0, 0, 0);
+    tabOutputWidgetDirectory->setLayout(tabOutputLayoutDirectory);
+    
     tabOutputButtonASCII = new QCheckBox(tr("ASCII "), tabOutputGroupBox1);
     tabOutputButtonASCII->setObjectName("writeCat.writeASCII");
-    tabOutputButtonASCII->setToolTip(tr("Human-readable ASCII format"));
+    tabOutputButtonASCII->setToolTip(tr("Human-readable ASCII file"));
     tabOutputButtonASCII->setChecked(true);
     tabOutputButtonASCII->setEnabled(true);
     //connect(tabOutputButtonASCII, SIGNAL(toggled(bool)), this, SLOT(updateFields()));
@@ -1948,6 +1979,7 @@ void SoFiA::createInterface()
     tabOutputWidgetProducts->setLayout(tabOutputLayoutProducts);
     
     tabOutputForm1->addRow(tr("Base name:"), tabOutputFieldBaseName);
+    tabOutputForm1->addRow(tr("Output directory:"), tabOutputWidgetDirectory);
     tabOutputForm1->addRow(tr("Catalogue:"), tabOutputWidgetFormat);
     tabOutputForm1->addRow(tr("Data products:"), tabOutputWidgetProducts);
     
