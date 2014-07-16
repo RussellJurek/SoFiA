@@ -9,7 +9,7 @@
     <h2 style="color:#4060A0;">Output</h2>
     
     <p align="center">
-      <img src="images/interface_output.png" width="360" heigh="189" alt="SoFiA User Interface: Output Parameters" />
+      <img src="images/interface_output.png" width="480" heigh="249" alt="SoFiA User Interface: Output Parameters" />
     </p>
     
     <p>
@@ -44,18 +44,24 @@
         <td>Optional base name of all output files. If not specified, the input file name will be used by default.</td>
       </tr>
       <tr style="background-color:#F0F8FF;">
+        <td>writeCat.outputDir</td>
+        <td>string</td>
+        <td>directory path</td>
+        <td>Optional directory path to which all output files are written. If not specified, the current working directory will be used by default.</td>
+      </tr>
+      <tr>
         <td>writeCat.writeASCII</td>
         <td>bool</td>
         <td><b>true</b>, false</td>
         <td>Write catalogue in ASCII format.</td>
       </tr>
-      <tr>
+      <tr style="background-color:#F0F8FF;">
         <td>writeCat.writeXML</td>
         <td>bool</td>
         <td>true, <b>false</b></td>
         <td>Write catalogue in VO table (XML) format.</td>
       </tr>
-      <tr style="background-color:#F0F8FF;">
+      <tr>
         <td>writeCat.writeSQL</td>
         <td>bool</td>
         <td>true, <b>false</b></td>
