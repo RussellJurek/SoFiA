@@ -121,6 +121,16 @@ def add_wcs_coordinates(objects,catParNames,catParFormt,catParUnits,Parameters):
 				catParFormt = tuple(list(catParFormt) + ['%15.7e', '%15.7e', '%15.7e'])
 
 			else:
+				# constrain the RA axis reference value CRVAL_ to be between 0 and 360 deg
+				rafound=0
+				for kk in range(header['naxis']):
+					if header['ctype1'][:2]=='RA':
+						rafound=1
+						break
+				if rafound:
+					if header['crval%i'%(kk+1)]<0: header['crval%i'%(kk+1)]+=360
+					elif header['crval%i'%(kk+1)]>360: header['crval%i'%(kk+1)]-=360
+
 				wcsin = wcs.WCS(header)
 				if header['naxis']==4:
 					objects=np.concatenate((objects,wcsin.wcs_pix2world(np.concatenate((objects[:,catParNames.index('Xm'):catParNames.index('Xm')+3],np.zeros((objects.shape[0],1))),axis=1),0)[:,:-1]),axis=1)
