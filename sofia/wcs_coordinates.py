@@ -128,8 +128,12 @@ def add_wcs_coordinates(objects,catParNames,catParFormt,catParUnits,Parameters):
 						rafound=1
 						break
 				if rafound:
-					if header['crval%i'%(kk+1)]<0: header['crval%i'%(kk+1)]+=360
-					elif header['crval%i'%(kk+1)]>360: header['crval%i'%(kk+1)]-=360
+					if header['crval%i'%(kk+1)]<0:
+						print 'WARNING: adding 360 deg to RA reference value'
+						header['crval%i'%(kk+1)]+=360
+					elif header['crval%i'%(kk+1)]>360:
+						print 'WARNING: subtracting 360 deg from RA reference value'
+						header['crval%i'%(kk+1)]-=360
 
 				wcsin = wcs.WCS(header)
 				if header['naxis']==4:
