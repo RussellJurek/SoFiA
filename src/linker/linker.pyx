@@ -1,5 +1,5 @@
 # distutils: language = c++
-# distutils: sources = RJJ_ObjGen_CreateObjs.cpp RJJ_ObjGen_MemManage.cpp RJJ_ObjGen_DetectDefn.cpp RJJ_ObjGen_ThreshObjs.cpp
+# distutils: sources = RJJ_ObjGen_CreateObjs.cpp RJJ_ObjGen_MemManage.cpp RJJ_ObjGen_DetectDefn.cpp RJJ_ObjGen_ThreshObjs.cpp RJJ_ObjGen_Dmetric.cpp
 
 # cython: boundscheck = False
 # cython: wraparound = False
@@ -7,6 +7,7 @@
 
 cimport numpy as np
 import numpy as np
+from libcpp.vector cimport vector
 
 cdef extern from "RJJ_ObjGen.h":
 	cdef int CreateObjects( float * data_vals, int * flag_vals, 
@@ -17,13 +18,16 @@ cdef extern from "RJJ_ObjGen.h":
 							int min_v_size, 
 							float intens_thresh_min, float intens_thresh_max, 
 							int flag_value, 
-							int start_obj, object_props ** detections, int * obj_ids, int& NO_obj_ids, int * check_obj_ids, int& NO_check_obj_ids, int obj_limit, int obj_batch_limit, 
+							int start_obj, vector[object_props *] & detections, vector[int] & obj_ids, vector[int] & check_obj_ids, int obj_limit, 
 							int max_x_val, int max_y_val, int max_z_val, 
-							int ss_mode)
-	
-	cdef void InitObjGen(object_props **& detections, int& NOobj, int obj_limit, int obj_batch_limit, int *& obj_ids, int& NO_obj_ids, int *& check_obj_ids)
-	cdef void FreeObjGen(object_props **& detections, int NOobj, int obj_batch_limit, int *& obj_ids, int *& check_obj_ids)
-	cdef void ThresholdObjs(object_props ** detections, int NOobj, int obj_limit, int minSizeX, int minSizeY, int minSizeZ, int min_v_size, float intens_thresh_min, float intens_thresh_max, int min_LoS_count)
+							int ss_mode,
+							int * data_metric, int * xyz_order)
+
+	cdef void InitObjGen(vector[object_props *] & detections, int & NOobj, int obj_limit, vector[int] & obj_ids, vector[int] & check_obj_ids, int *& data_metric, int *& xyz_order)
+	cdef void FreeObjGen(vector[object_props *] & detections, int *& data_metric, int *& xyz_order)
+	cdef void ThresholdObjs(vector[object_props *] & detections, int NOobj, int obj_limit, int minSizeX, int minSizeY, int minSizeZ, int min_v_size, float intens_thresh_min, float intens_thresh_max, int min_LoS_count)
+	cdef void CreateMetric( int * data_metric, int * xyz_order, int size_x, int size_y, int size_z)
+
 	cdef cppclass object_props:
 		
 		void CalcProps()
@@ -84,6 +88,9 @@ def link_objects(data, mask, mergeX = 0, mergeY = 0, mergeZ = 0, minSizeX = 1, m
 		
 	min_LOS : int
 		The mininum pixel-extent in the spatial (x,y) domain of the data a source must have
+
+	ss_mode : int
+		The linking method. A value of 1 uses a cuboid and all other values use an elliptical cylinder.
 		
 		
 	Returns
@@ -112,25 +119,25 @@ cdef _link_objects(np.ndarray[dtype = float, ndim = 3] data, np.ndarray[dtype = 
 		
 	cdef int i, x, y, z, g, g_start, g_end
 	cdef int obj_id = 0
-	
-	cdef object_props X
+	cdef int obj_batch
 	
 	cdef int size_x = data.shape[2]
 	cdef int size_y = data.shape[1]
 	cdef int size_z = data.shape[0]
-		
-	# Create output / working mask
-	cdef np.ndarray[dtype = int, ndim = 3] final_mask = mask.copy()
-	
+			
 	# Convert binary mask to conform with the object code
-	for x in range(size_x):
+	for z in range(size_z):
 		for y in range(size_y):
-			for z in range(size_z):
-				if final_mask[z,y,x] > 0:
-					final_mask[z,y,x] = -1
+			for x in range(size_x):
+				if mask[z,y,x] > 0:
+					mask[z,y,x] = -1
 				else:
-					final_mask[z,y,x] = -99
+					mask[z,y,x] = -99
 	
+	# Define arrays storing datacube geometry metric
+	cdef int * data_metric
+	cdef int * xyz_order	
+
 	# Chunking is disabled for this interface
 	cdef int chunk_x_start = 0
 	cdef int chunk_y_start = 0
@@ -146,90 +153,98 @@ cdef _link_objects(np.ndarray[dtype = float, ndim = 3] data, np.ndarray[dtype = 
 	# Define value that is used to mark sources in the mask
 	cdef int flag_val = -1
 	
-	# Object limits
-	cdef int obj_limit = 10000
-	cdef int obj_batch_limit = 10000
+	# Specify size of allocated object groups 
+	cdef int obj_limit = 1000
 	
 	# Object and ID arrays; will be written to by the function
-	cdef object_props **detections
-	cdef int *obj_ids
+	cdef vector[object_props *] detections
+	cdef vector[int] obj_ids
 	cdef int NO_obj_ids
-	cdef int *check_obj_ids
-	cdef int NO_check_obj_ids = 0
+	cdef vector[int] check_obj_ids
 	cdef int NOobj = 0
 	
 	# Define linking style: 1 for Rectangle, else ellipse
 	cdef int ss_mode = 0
 	
 	# Inititalize object pointers
-	InitObjGen(detections, NOobj, obj_limit, obj_batch_limit, obj_ids, NO_obj_ids, check_obj_ids)
+	InitObjGen(detections, NOobj, obj_limit, obj_ids, check_obj_ids, data_metric, xyz_order)
+
+	# Define the mapping of RA, Dec and frequency to the datacube's first three axes. RA, Dec and freq. --> 1, 2, 3: use the default values of x=RA=1 y=Dec=2 z=freq.=3
+	xyz_order[0] = 1
+	xyz_order[1] = 2
+	xyz_order[2] = 3
+
+	# create metric for accessing this data chunk in arbitrary x,y,z order
+	CreateMetric(data_metric, xyz_order, size_x, size_y, size_z)
 		
 	# Create and threshold objects
-	NOobj = CreateObjects(<float *> data.data, <int *> final_mask.data, size_x, size_y, size_z, chunk_x_start, chunk_y_start, chunk_z_start, mergeX, mergeY, mergeZ, minSizeX, minSizeY, minSizeZ, min_v_size, intens_thresh_min, intens_thresh_max, flag_val, NOobj, detections, obj_ids, NO_obj_ids, check_obj_ids, NO_check_obj_ids, obj_limit, obj_batch_limit, size_x, size_y, size_z, ss_mode)	
+	NOobj = CreateObjects(<float *> data.data, <int *> mask.data, size_x, size_y, size_z, chunk_x_start, chunk_y_start, chunk_z_start, mergeX, mergeY, mergeZ, minSizeX, minSizeY, minSizeZ, min_v_size, intens_thresh_min, intens_thresh_max, flag_val, NOobj, detections, obj_ids, check_obj_ids, obj_limit, size_x, size_y, size_z, ss_mode, data_metric, xyz_order)
 	ThresholdObjs(detections, NOobj, obj_limit, minSizeX, minSizeY, minSizeZ, min_v_size, intens_thresh_min, intens_thresh_max, min_LOS)
-	
+
 	# Reset output mask
-	for x in range(size_x):
+	for z in range(size_z):
 		for y in range(size_y):
-			for z in range(size_z):
-				final_mask[z,y,x] = 0
+			for x in range(size_x):
+				mask[z,y,x] = 0
 	
+	# Create Python list `objects' from C++ vector `detections' and re-label mask with final, sequential IDs
 	objects = []
 		
-	for i in range(NOobj):
+	for i in range(NOobj):		
 		
-		X = detections[0][i]
-		
-		if X.ShowVoxels() >= 1:
-			
+		# calculate batch number for this object --- which group of objects does it belong to
+		obj_batch = i / obj_limit
+
+		if detections[obj_batch][i - (obj_batch * obj_limit)].ShowVoxels() >= 1:		
+	
 			obj_id += 1
 			
 			obj = []
 			obj.append(obj_id)
 		
-			X.CalcProps()
+			detections[obj_batch][i - (obj_batch * obj_limit)].CalcProps()
 			
 			# Geometric center
-			obj.append(X.GetRA())
-			obj.append(X.GetDEC())
-			obj.append(X.GetFREQ())
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetRA())
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetDEC())
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetFREQ())
 			
 			# Center of mass
-			obj.append(X.GetRAi())
-			obj.append(X.GetDECi())
-			obj.append(X.GetFREQi())
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetRAi())
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetDECi())
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetFREQi())
 			
 			# Adding 1 to the maxima to aid slicing/iteration
-			obj.append(X.GetRAmin())
-			obj.append(X.GetRAmax() + 1)
-			obj.append(X.GetDECmin())
-			obj.append(X.GetDECmax() + 1)
-			obj.append(X.GetFREQmin())
-			obj.append(X.GetFREQmax() + 1)
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetRAmin())
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetRAmax() + 1)
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetDECmin())
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetDECmax() + 1)
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetFREQmin())
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetFREQmax() + 1)
 			
 			# Number of voxels
-			obj.append(X.ShowVoxels())
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].ShowVoxels())
 			
 			# Min/Max/Total flux
-			obj.append(X.GetMinI())
-			obj.append(X.GetMaxI())
-			obj.append(X.GetTI())
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetMinI())
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetMaxI())
+			obj.append(detections[obj_batch][i - (obj_batch * obj_limit)].GetTI())
 		
 			objects.append(obj)
 			
-			for x in range(X.Get_srep_size(0), X.Get_srep_size(1) + 1):
-				for y in range(X.Get_srep_size(2), X.Get_srep_size(3) + 1):
+			for y in range(detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_size(2), detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_size(3) + 1):
+				for x in range(detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_size(0), detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_size(1) + 1):
 					
-					g_start = X.Get_srep_grid(((((y - X.Get_srep_size(2)) * (X.Get_srep_size(1) - X.Get_srep_size(0) + 1)) + x - X.Get_srep_size(0))))
-					g_end = X.Get_srep_grid(((((y - X.Get_srep_size(2)) * (X.Get_srep_size(1) - X.Get_srep_size(0) + 1)) + x - X.Get_srep_size(0) + 1)))
+					g_start = detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_grid(((((y - detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_size(2)) * (detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_size(1) - detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_size(0) + 1)) + x - detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_size(0))))
+					g_end = detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_grid(((((y - detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_size(2)) * (detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_size(1) - detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_size(0) + 1)) + x - detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_size(0) + 1)))
 					
 					for g in range(g_start, g_end):
-						final_mask[X.Get_srep_strings((2 * g)) : X.Get_srep_strings((2 * g) + 1) + 1, y, x] = obj_id
+						mask[detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_strings((2 * g)) : detections[obj_batch][i - (obj_batch * obj_limit)].Get_srep_strings((2 * g) + 1) + 1, y, x] = obj_id
 						
 	# Free memory for object pointers
-	FreeObjGen(detections, NOobj, obj_batch_limit, obj_ids, check_obj_ids)
-		
-	return objects, final_mask
+	FreeObjGen(detections, data_metric, xyz_order)
+
+	return objects, mask
 	
 	
 	

@@ -67,7 +67,8 @@ linker_src_files = [
     'RJJ_ObjGen_CreateObjs.cpp',
     'RJJ_ObjGen_DetectDefn.cpp',
     'RJJ_ObjGen_MemManage.cpp',
-    'RJJ_ObjGen_ThreshObjs.cpp'
+    'RJJ_ObjGen_ThreshObjs.cpp',
+    'RJJ_ObjGen_Dmetric.cpp'
     ]
 linker_src = [linker_src_base + f for f in linker_src_files]
 
